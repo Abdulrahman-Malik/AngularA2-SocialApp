@@ -1,0 +1,1076 @@
+
+/* =====================================================
+   ROUTE POSTS — FEED UI/UX
+   Facebook-inspired | Responsive | 3D | Accessible
+===================================================== */
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  color: #050505;
+  -webkit-tap-highlight-color: transparent;
+}
+
+:host *,
+:host *::before,
+:host *::after {
+  box-sizing: border-box;
+}
+
+:host img {
+  display: block;
+  max-width: 100%;
+}
+
+:host button {
+  font: inherit;
+}
+
+:host button:disabled {
+  cursor: not-allowed;
+}
+
+/* =====================================================
+   1. FEED LAYOUT
+===================================================== */
+
+:host .news-feed {
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px 20px;
+  overflow-x: clip;
+  background: #f0f2f5;
+}
+
+:host .news-feed-container {
+  width: 100%;
+  max-width: 680px;
+  min-width: 0;
+  margin-inline: auto;
+}
+
+/* =====================================================
+   2. POST CARD
+===================================================== */
+
+:host .post-card {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 16px;
+  overflow-wrap: anywhere;
+
+  border: 1px solid #e0e3e8;
+  border-radius: 12px;
+
+  background: #fff;
+  color: #050505;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 4%);
+
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  transform-origin: center top;
+
+  /* Individual transforms keep entrance animation
+     independent from the 3D hover transform. */
+  animation: feed-card-enter 480ms cubic-bezier(
+    0.2, 0.7, 0.2, 1
+  ) both;
+
+  transition:
+    transform 280ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 280ms ease,
+    border-color 220ms ease;
+}
+
+/* Stagger the first four posts */
+:host .news-feed-container > .post-card:nth-child(1) {
+  animation-delay: 40ms;
+}
+
+:host .news-feed-container > .post-card:nth-child(2) {
+  animation-delay: 100ms;
+}
+
+:host .news-feed-container > .post-card:nth-child(3) {
+  animation-delay: 160ms;
+}
+
+:host .news-feed-container > .post-card:nth-child(4) {
+  animation-delay: 220ms;
+}
+
+:host .news-feed-container > .post-card:nth-child(n + 5) {
+  animation-delay: 0ms;
+}
+
+@keyframes feed-card-enter {
+  from {
+    opacity: 0;
+    translate: 0 16px;
+    scale: 0.99;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+/* Keep the active post above neighboring cards when a menu
+   or reaction picker is open. */
+:host .post-card:has(details[open]),
+:host .post-card:has(.reaction-picker) {
+  z-index: 20;
+}
+
+/* =====================================================
+   3. POST HEADER & USER
+===================================================== */
+
+:host .post-card > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  min-width: 0;
+}
+
+:host .post-card > header > div {
+  min-width: 0;
+}
+
+:host .post-card > header img {
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+
+  border: 1px solid #e4e6eb;
+  border-radius: 50%;
+
+  object-fit: cover;
+  background: #f0f2f5;
+
+  transition:
+    transform 240ms ease,
+    box-shadow 240ms ease;
+}
+
+:host .post-card h2,
+:host .post-card h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+:host .post-card time {
+  white-space: nowrap;
+}
+
+/* =====================================================
+   4. POST TEXT
+===================================================== */
+
+:host .post-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+:host .post-text p {
+  margin: 0;
+  color: #050505;
+  font-size: 15px;
+  line-height: 1.65;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+/* =====================================================
+   5. POST IMAGE
+===================================================== */
+
+:host .post-image-wrapper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  background: #f7f8fa;
+}
+
+:host .post-image-wrapper img {
+  width: 100%;
+  height: auto;
+  max-height: 650px;
+  margin-inline: auto;
+
+  object-fit: contain;
+  object-position: center;
+
+  transition:
+    transform 450ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* =====================================================
+   6. REACTION COUNTS
+===================================================== */
+
+:host .post-stats {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  min-width: 0;
+  min-height: 44px;
+}
+
+:host .post-stats > * {
+  min-width: 0;
+}
+
+:host .post-stats button {
+  border-radius: 5px;
+  color: #65676b;
+
+  transition:
+    color 180ms ease,
+    background-color 180ms ease;
+}
+
+:host .post-stats button:hover {
+  color: #0866ff;
+  text-decoration: underline;
+}
+
+/* =====================================================
+   7. POST ACTIONS
+===================================================== */
+
+:host .post-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+
+  min-width: 0;
+}
+
+:host .post-actions > * {
+  min-width: 0;
+}
+
+:host .post-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  min-width: 0;
+  min-height: 44px;
+  padding: 7px 5px;
+
+  border: 0;
+  border-radius: 7px;
+
+  background: transparent;
+  color: #606770;
+
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+:host .post-actions button i {
+  flex: 0 0 auto;
+  font-size: 16px;
+
+  transition: transform 180ms ease;
+}
+
+:host .action-label {
+  min-width: 0;
+  white-space: nowrap;
+}
+
+:host .post-actions button:active {
+  transform: scale(0.96);
+  background: #e4e6eb;
+}
+
+:host .post-actions button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* =====================================================
+   8. DROPDOWN MENUS
+===================================================== */
+
+:host .post-card details {
+  position: relative;
+}
+
+:host .post-card details > summary {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+:host .post-card details > summary::-webkit-details-marker {
+  display: none;
+}
+
+:host .post-card details > summary::marker {
+  content: "";
+}
+
+:host .post-card details[open] {
+  z-index: 50;
+}
+
+:host .post-card .audience-dropdown,
+:host .post-card .more-dropdown {
+  max-width: calc(100vw - 24px);
+  overflow-wrap: anywhere;
+  transform-origin: top center;
+
+  animation: menu-enter 180ms ease-out both;
+}
+
+:host .audience-dropdown button,
+:host .more-dropdown button {
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+@keyframes menu-enter {
+  from {
+    opacity: 0;
+    translate: 0 -5px;
+    scale: 0.98;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+/* =====================================================
+   9. REACTION PICKER
+===================================================== */
+
+:host .post-card .reaction-picker {
+  max-width: calc(100vw - 20px);
+  white-space: nowrap;
+  transform-origin: bottom center;
+
+  animation: reaction-enter 220ms cubic-bezier(
+    0.2, 0.7, 0.2, 1
+  ) both;
+}
+
+:host .post-card .reaction-picker button {
+  flex: 0 0 auto;
+  min-width: 34px;
+  cursor: pointer;
+
+  transition: transform 180ms cubic-bezier(
+    0.2, 0.7, 0.2, 1
+  );
+}
+
+@keyframes reaction-enter {
+  from {
+    opacity: 0;
+    translate: 0 7px;
+    scale: 0.9;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+/* =====================================================
+   10. COMMENTS
+===================================================== */
+
+:host .comments-panel {
+  min-width: 0;
+  background: #f7f8fa;
+}
+
+:host .comments-panel form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+:host .comments-panel input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+
+  color: #1c1e21;
+  font: inherit;
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+:host .comments-panel input::placeholder {
+  color: #65676b;
+  opacity: 1;
+}
+
+:host .comments-panel input:focus {
+  border-color: #0866ff;
+  box-shadow: 0 0 0 3px rgb(8 102 255 / 12%);
+}
+
+/* =====================================================
+   11. DESKTOP INTERACTIONS & 3D HOVER
+===================================================== */
+
+@media (hover: hover) and (pointer: fine) {
+  :host .post-card:hover {
+    z-index: 3;
+
+    transform:
+      perspective(1100px)
+      translateY(-3px)
+      rotateX(0.6deg)
+      rotateY(-0.3deg);
+
+    border-color: #d3dff2;
+
+    box-shadow:
+      0 10px 24px rgb(24 65 130 / 8%),
+      0 3px 8px rgb(0 0 0 / 4%);
+  }
+
+  :host .post-card > header img:hover {
+    transform: scale(1.06);
+    box-shadow: 0 4px 10px rgb(8 102 255 / 15%);
+  }
+
+  :host .post-image-wrapper:hover img {
+    transform: scale(1.02);
+  }
+
+  :host .post-actions button:hover {
+    transform: translateY(-1px);
+    background: #f0f2f5;
+    color: #0866ff;
+  }
+
+  :host .post-actions button:hover i {
+    transform: scale(1.1);
+  }
+
+  :host .audience-dropdown button:hover,
+  :host .more-dropdown button:hover {
+    background: #f0f5ff;
+    color: #0866ff;
+  }
+
+  :host .reaction-picker button:hover {
+    transform: translateY(-5px) scale(1.2);
+  }
+}
+
+/* =====================================================
+   12. RESPONSIVE — SMALL PHONES
+===================================================== */
+
+@media (max-width: 380px) {
+  :host .news-feed {
+    padding: 8px 0;
+  }
+
+  :host .news-feed-container {
+    max-width: 100%;
+  }
+
+  :host .post-card {
+    margin-bottom: 10px;
+    border-radius: 7px;
+  }
+
+  :host .post-card > header {
+    gap: 7px;
+  }
+
+  :host .post-text p {
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  :host .post-image-wrapper img {
+    max-height: 65vh;
+  }
+
+  :host .post-stats {
+    gap: 5px;
+  }
+
+  :host .post-actions {
+    gap: 2px;
+    padding-inline: 3px;
+  }
+
+  :host .post-actions button {
+    gap: 4px;
+    min-height: 44px;
+    padding-inline: 2px;
+    font-size: 12px;
+  }
+
+  :host .post-actions button i {
+    font-size: 15px;
+  }
+
+  :host .post-actions .action-label {
+    display: none;
+  }
+
+  :host .post-card .reaction-picker {
+    gap: 1px;
+    padding: 4px;
+  }
+
+  :host .post-card .reaction-picker button {
+    width: 32px;
+    height: 34px;
+    font-size: 20px;
+  }
+}
+
+/* =====================================================
+   13. RESPONSIVE — PHONES
+===================================================== */
+
+@media (min-width: 381px) and (max-width: 480px) {
+  :host .news-feed {
+    padding: 12px 8px;
+  }
+
+  :host .news-feed-container {
+    max-width: 100%;
+  }
+
+  :host .post-card {
+    margin-bottom: 12px;
+    border-radius: 9px;
+  }
+
+  :host .post-image-wrapper img {
+    max-height: 70vh;
+  }
+
+  :host .post-actions {
+    gap: 2px;
+  }
+
+  :host .post-actions button {
+    gap: 5px;
+    padding-inline: 3px;
+    font-size: 12px;
+  }
+}
+
+/* =====================================================
+   14. RESPONSIVE — TABLETS
+===================================================== */
+
+@media (min-width: 481px) and (max-width: 767px) {
+  :host .news-feed {
+    padding: 20px 16px;
+  }
+
+  :host .news-feed-container {
+    max-width: 620px;
+  }
+
+  :host .post-card {
+    margin-bottom: 16px;
+  }
+
+  :host .post-image-wrapper img {
+    max-height: 600px;
+  }
+}
+
+/* =====================================================
+   15. RESPONSIVE — DESKTOP
+===================================================== */
+
+@media (min-width: 768px) {
+  :host .news-feed {
+    padding: 24px 20px;
+  }
+
+  :host .news-feed-container {
+    max-width: 680px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :host .news-feed {
+    padding-top: 30px;
+    padding-bottom: 36px;
+  }
+}
+
+/* =====================================================
+   16. ACCESSIBILITY & REDUCED MOTION
+===================================================== */
+
+:host button:focus-visible,
+:host summary:focus-visible,
+:host input:focus-visible {
+  outline: 2px solid #0866ff;
+  outline-offset: 3px;
+}
+
+@media (max-width: 767px) {
+  :host .post-card:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host .post-card,
+  :host .post-card *,
+  :host .post-card *::before,
+  :host .post-card *::after {
+    animation: none !important;
+    transition: none !important;
+    translate: none !important;
+    scale: 1 !important;
+    transform: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+/* =====================================================
+   17. REACTION PICKER — FIX VISIBILITY
+===================================================== */
+
+:host .post-actions {
+  position: relative;
+  overflow: visible;
+}
+
+:host .reaction-action {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+  overflow: visible;
+}
+
+:host .reaction-action > button {
+  min-width: 0;
+}
+
+:host .reaction-action .reaction-main-action {
+  flex: 1 1 auto;
+}
+
+:host .reaction-action .reaction-trigger {
+  flex: 0 0 30px;
+  min-width: 30px;
+  padding-inline: 4px;
+}
+
+:host .reaction-action .reaction-trigger i {
+  font-size: 12px;
+}
+
+/* Floating emoji picker */
+:host .post-card .reaction-picker {
+  position: absolute;
+  z-index: 100;
+  bottom: calc(100% + 10px);
+  left: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  width: max-content;
+  max-width: calc(100vw - 20px);
+  padding: 8px 10px;
+
+  overflow: visible;
+  white-space: nowrap;
+
+  border: 1px solid #e4e6eb;
+  border-radius: 999px;
+
+  background: #fff;
+  box-shadow:
+    0 8px 24px rgb(0 0 0 / 12%),
+    0 2px 5px rgb(0 0 0 / 5%);
+
+  transform: translateX(-50%);
+  transform-origin: bottom center;
+
+  animation: reaction-picker-appear 200ms ease-out both;
+}
+
+:host .post-card .reaction-picker button {
+  display: grid;
+  place-items: center;
+
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: transparent;
+  font-size: 24px;
+  line-height: 1;
+
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+@keyframes reaction-picker-appear {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+    scale: 0.92;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :host .post-card .reaction-picker button:hover {
+    background: #f0f2f5;
+    transform: translateY(-5px) scale(1.15);
+  }
+}
+
+@media (max-width: 380px) {
+  :host .post-card .reaction-picker {
+    gap: 1px;
+    padding: 5px;
+  }
+
+  :host .post-card .reaction-picker button {
+    width: 31px;
+    height: 34px;
+    min-width: 31px;
+    font-size: 21px;
+  }
+}
+
+/* =====================================================
+   18. COMMENT EDITOR
+===================================================== */
+
+:host .comments-panel {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+:host .comments-panel .comment-compose {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+:host .comments-panel .comment-compose textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 82px;
+  max-width: 100%;
+  padding: 12px 14px;
+
+  resize: vertical;
+
+  border: 1px solid #dfe3e9;
+  border-radius: 12px;
+  outline: none;
+
+  background: #fff;
+  color: #1c1e21;
+
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.65;
+
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+:host .comments-panel .comment-compose textarea::placeholder {
+  color: #65676b;
+  opacity: 1;
+}
+
+:host .comments-panel .comment-compose textarea:focus {
+  border-color: #0866ff;
+  box-shadow: 0 0 0 3px rgb(8 102 255 / 10%);
+}
+
+:host .comment-compose-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  color: #65676b;
+  font-size: 12px;
+}
+
+:host .comment-compose-footer button,
+:host .comment-preview-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  min-height: 38px;
+  padding: 9px 14px;
+
+  border: 0;
+  border-radius: 9px;
+
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
+}
+
+:host .comment-compose-footer button {
+  background: #0866ff;
+  color: #fff;
+}
+
+:host .comment-compose-footer button:disabled,
+:host .comment-preview-actions button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* =====================================================
+   19. COMMENTS LIST
+===================================================== */
+
+:host .posted-comments {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+:host .posted-comment {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  min-width: 0;
+}
+
+:host .comment-avatar {
+  display: grid;
+  place-items: center;
+
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+
+  border: 1px solid #dce6fa;
+  border-radius: 50%;
+
+  background: #e7efff;
+  color: #174ea6;
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+:host .comment-bubble {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 10px 13px;
+
+  border: 1px solid #eceef2;
+  border-radius: 4px 14px 14px 14px;
+
+  background: #fff;
+  overflow-wrap: anywhere;
+}
+
+:host .comment-bubble strong {
+  display: block;
+  margin-bottom: 5px;
+  color: #1c1e21;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+:host .comment-bubble p {
+  margin: 0;
+  color: #242526;
+  font-size: 14px;
+  line-height: 1.65;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+:host .comment-bubble time,
+:host .comment-bubble .preview-label {
+  display: block;
+  margin-top: 7px;
+  color: #65676b;
+  font-size: 11px;
+}
+
+/* =====================================================
+   20. COMMENT PREVIEW BEFORE SENDING
+===================================================== */
+
+:host .comment-preview {
+  min-width: 0;
+  padding: 14px;
+
+  border: 1px solid #dce6fa;
+  border-radius: 14px;
+
+  background: #fff;
+  box-shadow: 0 2px 8px rgb(24 65 130 / 4%);
+
+  animation: comment-preview-appear 220ms ease-out both;
+}
+
+:host .comment-preview-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  margin-bottom: 14px;
+
+  color: #315b9d;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+:host .preview-comment .comment-bubble {
+  background: #f7f9fd;
+  border-color: #e4eaf5;
+}
+
+:host .comment-preview-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  margin-top: 14px;
+}
+
+:host .comment-preview-actions .edit-comment-button {
+  border: 1px solid #e0e3e8;
+  background: #f7f8fa;
+  color: #303846;
+}
+
+:host .comment-preview-actions .send-comment-button {
+  background: #0866ff;
+  color: #fff;
+}
+
+@keyframes comment-preview-appear {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* =====================================================
+   21. COMMENT BUTTON HOVER & MOBILE
+===================================================== */
+
+@media (hover: hover) and (pointer: fine) {
+  :host .comment-compose-footer button:hover,
+  :host .comment-preview-actions .send-comment-button:hover {
+    background: #0759db;
+  }
+
+  :host .comment-preview-actions .edit-comment-button:hover {
+    background: #eaf1ff;
+  }
+
+  :host .comment-preview-actions button:not(:disabled):active {
+    transform: scale(0.97);
+  }
+}
+
+@media (max-width: 380px) {
+  :host .comment-preview {
+    padding: 10px;
+  }
+
+  :host .comment-preview-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  :host .comment-preview-actions button {
+    min-width: 0;
+    padding-inline: 7px;
+    font-size: 12px;
+  }
+
+  :host .comment-avatar {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+  }
+}

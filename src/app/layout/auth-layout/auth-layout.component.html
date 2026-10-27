@@ -1,0 +1,280 @@
+<div class="auth-page constellation-theme relative min-h-screen w-full overflow-hidden">
+
+  <!-- Constellation Canvas Background -->
+  <canvas #starfieldCanvas class="starfield-canvas"></canvas>
+
+  <!-- Ambient Glow Spheres -->
+  <div class="ambient-glow ambient-1"></div>
+  <div class="ambient-glow ambient-2"></div>
+  <div class="ambient-glow ambient-3"></div>
+
+  <main class="relative z-10 mx-auto max-w-[1720px] px-4 py-6 sm:px-8 lg:px-12 lg:py-10">
+
+    <!-- Top Header Navigation -->
+    <header class="mb-10 flex items-center justify-between lg:mb-14">
+      <a routerLink="/auth/login" class="group flex items-center gap-4 focus:outline-none">
+        <div class="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-tr from-blue-600 via-violet-600 to-fuchsia-600 p-[1px] shadow-2xl shadow-blue-500/20 transition-transform duration-500 group-hover:scale-105">
+          <div class="flex h-full w-full items-center justify-center rounded-[15px] bg-[#050916]">
+            <span class="text-xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-fuchsia-400">R</span>
+            <span class="absolute top-2.5 right-2.5 h-2 w-2 rounded-full bg-emerald-400 shadow-lg shadow-emerald-400/50 animate-pulse"></span>
+          </div>
+        </div>
+
+        <div>
+          <span class="block text-2xl font-black tracking-tight text-white sm:text-3xl">
+            Route Posts
+          </span>
+          <span class="block text-[10px] font-extrabold uppercase tracking-[3.5px] text-slate-400">
+            Your world. Your people.
+          </span>
+        </div>
+      </a>
+
+      <!-- Elite Language Dropdown Button -->
+      <button type="button" class="spotlight-card group hidden items-center gap-3 rounded-2xl px-4 py-3 shadow-2xl backdrop-blur-3xl transition-all duration-300 sm:flex focus:outline-none">
+        <span class="flex h-8 w-8 items-center justify-center rounded-xl bg-blue-500/15 text-blue-400 shadow-inner">
+          <i class="fa-solid fa-globe"></i>
+        </span>
+        <span class="text-sm font-bold text-slate-200">English</span>
+        <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-300 group-hover:rotate-180"></i>
+      </button>
+    </header>
+
+    <!-- Main Grid Section -->
+    <section class="grid items-center gap-12 xl:grid-cols-[1.12fr_0.88fr] xl:gap-20">
+
+      <!-- LEFT: Brand Experience Stage -->
+      <section class="relative min-w-0">
+
+        <!-- Live Community Badge -->
+        <div class="spotlight-card mb-7 inline-flex items-center gap-3 rounded-full px-4.5 py-2 shadow-2xl backdrop-blur-2xl">
+          <span class="relative flex h-2.5 w-2.5">
+            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+            <span class="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400"></span>
+          </span>
+          <span class="text-xs font-bold tracking-wide text-slate-200">
+            A community that brings people closer
+          </span>
+        </div>
+
+        <div class="grid items-center gap-8 md:grid-cols-[0.9fr_1.1fr]">
+
+          <!-- Hero Typography -->
+          <div class="relative z-10">
+            <h1 class="text-5xl font-black leading-[1.04] tracking-[-2.5px] sm:text-6xl lg:text-[70px]">
+              Connect.<br />
+              Share.<br />
+              <span class="hero-gradient">Belong.</span>
+            </h1>
+
+            <p class="mt-6 max-w-md text-base leading-8 text-slate-300/90 sm:text-lg">
+              Your next great connection starts with a story. Meet your people, share your perspective, and build a world that feels like yours.
+            </p>
+
+            <div class="mt-8 flex flex-wrap items-center gap-4">
+              <a
+                routerLink="/auth/register"
+                class="group relative inline-flex items-center gap-3.5 overflow-hidden rounded-2xl border border-white/15 bg-gradient-to-r from-blue-600 via-violet-600 to-fuchsia-600 px-7 py-4 text-sm font-black text-white shadow-xl shadow-blue-600/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-blue-600/50 hover:brightness-110 active:translate-y-0"
+              >
+                <span>Join the community</span>
+                <i class="fa-solid fa-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1"></i>
+              </a>
+
+              <!-- Member Avatars Stack -->
+              <div class="flex items-center -space-x-3.5">
+                <img src="https://i.pravatar.cc/80?img=12" alt="Member" class="h-11 w-11 rounded-full border-[3px] border-[#03050c] object-cover shadow-xl" />
+                <img src="https://i.pravatar.cc/80?img=47" alt="Member" class="h-11 w-11 rounded-full border-[3px] border-[#03050c] object-cover shadow-xl" />
+                <img src="https://i.pravatar.cc/80?img=32" alt="Member" class="h-11 w-11 rounded-full border-[3px] border-[#03050c] object-cover shadow-xl" />
+                <span class="flex h-11 w-11 items-center justify-center rounded-full border-[3px] border-[#03050c] bg-gradient-to-br from-indigo-500/30 to-purple-500/30 text-[11px] font-black text-indigo-200 backdrop-blur-xl shadow-xl">
+                  +9k
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Visual Collage -->
+          <div class="relative mx-auto w-full max-w-[430px] py-4">
+
+            <!-- Orbit Glow -->
+            <div class="absolute -inset-6 rounded-full border border-white/[0.04] bg-gradient-to-tr from-blue-500/10 via-transparent to-fuchsia-500/10 blur-md"></div>
+
+            <!-- Main Photo Card -->
+            <div class="collage-photo aspect-[4/5] bg-white/5 backdrop-blur-2xl">
+              <img
+                src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?auto=format&fit=crop&w=900&q=85"
+                alt="Community Moments"
+                class="absolute inset-0 h-full w-full object-cover"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-[#03050c] via-[#03050c]/30 to-transparent"></div>
+
+              <div class="absolute bottom-6 left-6 right-6 z-10 text-white">
+                <span class="mb-2.5 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-3.5 py-1 text-[10px] font-bold uppercase tracking-widest backdrop-blur-md">
+                  COMMUNITY MOMENTS
+                </span>
+                <p class="text-2xl font-black">Better together.</p>
+                <p class="mt-1 text-xs text-slate-300">Every connection starts somewhere.</p>
+              </div>
+            </div>
+
+            <!-- Floating Top Card -->
+            <div class="spotlight-card absolute -left-6 top-8 z-20 w-[240px] rounded-2xl p-4.5 shadow-2xl backdrop-blur-2xl sm:-left-10 animate-bounce-slow">
+              <div class="flex items-center gap-3.5">
+                <div class="flex h-11 w-11 items-center justify-center rounded-2xl bg-emerald-500/15 text-lg text-emerald-400 shadow-inner">
+                  <i class="fa-solid fa-user-group"></i>
+                </div>
+                <div>
+                  <p class="text-xs font-black text-white">Find your people</p>
+                  <p class="text-[10px] text-slate-400">Discover new connections</p>
+                </div>
+              </div>
+              <div class="mt-3.5 flex items-center gap-1.5">
+                <span class="h-1.5 flex-1 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50"></span>
+                <span class="h-1.5 flex-1 rounded-full bg-violet-500 shadow-sm shadow-violet-500/50"></span>
+                <span class="h-1.5 flex-1 rounded-full bg-white/20"></span>
+              </div>
+            </div>
+
+            <!-- Floating Post Card -->
+            <div class="spotlight-card absolute -right-6 bottom-6 z-20 w-[260px] rounded-2xl p-4.5 shadow-2xl backdrop-blur-2xl sm:-right-10 animate-float-slow">
+              <div class="flex items-center gap-3">
+                <img src="https://i.pravatar.cc/80?img=44" alt="Alya Ahmed" class="h-10 w-10 rounded-full object-cover ring-2 ring-blue-500/40" />
+                <div class="min-w-0 flex-1">
+                  <p class="text-xs font-bold text-white truncate">Alya Ahmed</p>
+                  <p class="text-[10px] text-slate-400">Shared a moment · 2h ago</p>
+                </div>
+                <i class="fa-solid fa-ellipsis text-slate-400 text-xs"></i>
+              </div>
+
+              <p class="my-3 text-[11px] leading-5 text-slate-300">
+                Some moments deserve to be shared with everyone ✨
+              </p>
+
+              <img src="https://images.unsplash.com/photo-1472120435266-53107fd0c44a?auto=format&fit=crop&w=600&q=80" alt="Post photo" class="h-28 w-full rounded-xl object-cover shadow-lg" />
+
+              <div class="mt-3 flex items-center justify-between text-xs text-slate-400">
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-heart text-pink-500"></i> 128</span>
+                <span class="flex items-center gap-1.5"><i class="fa-regular fa-comment"></i> 24</span>
+              </div>
+            </div>
+
+            <!-- Reaction Bubble -->
+            <div class="spotlight-card absolute -top-3 left-1/2 z-30 flex -translate-x-1/2 items-center gap-2.5 rounded-full px-4 py-2 shadow-2xl backdrop-blur-2xl">
+              <span class="flex h-6 w-6 items-center justify-center rounded-full bg-pink-500/20 text-xs text-pink-400 shadow-inner">
+                <i class="fa-solid fa-heart"></i>
+              </span>
+              <span class="whitespace-nowrap text-xs font-bold text-slate-200">
+                Moments that matter
+              </span>
+              <i class="fa-solid fa-wand-magic-sparkles text-amber-300 text-xs"></i>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Features Strip -->
+        <div class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div class="spotlight-card group flex items-center gap-4 rounded-2xl p-4.5">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-blue-500/10 text-blue-400 shadow-inner transition-transform group-hover:scale-110">
+              <i class="fa-solid fa-users text-sm"></i>
+            </span>
+            <div>
+              <p class="text-xs font-black text-white">Real connections</p>
+              <p class="text-[11px] text-slate-400">Meet people who get you.</p>
+            </div>
+          </div>
+
+          <div class="spotlight-card group flex items-center gap-4 rounded-2xl p-4.5">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-violet-500/10 text-violet-400 shadow-inner transition-transform group-hover:scale-110">
+              <i class="fa-solid fa-camera-retro text-sm"></i>
+            </span>
+            <div>
+              <p class="text-xs font-black text-white">Share your world</p>
+              <p class="text-[11px] text-slate-400">Every story has a place.</p>
+            </div>
+          </div>
+
+          <div class="spotlight-card group flex items-center gap-4 rounded-2xl p-4.5">
+            <span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 shadow-inner transition-transform group-hover:scale-110">
+              <i class="fa-solid fa-shield-halved text-sm"></i>
+            </span>
+            <div>
+              <p class="text-xs font-black text-white">Privacy first</p>
+              <p class="text-[11px] text-slate-400">Your space, your control.</p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT: Elite Auth Shell Card -->
+      <section class="relative mx-auto w-full max-w-[600px]">
+
+        <div class="glass-panel relative overflow-hidden rounded-[36px]">
+
+          <!-- Top Neon Gradient Line -->
+          <div class="h-1.5 w-full bg-gradient-to-r from-blue-500 via-violet-500 to-fuchsia-500 shadow-lg shadow-blue-500/50"></div>
+
+          <!-- Auth Navigation Tabs -->
+          <nav class="grid grid-cols-2 gap-2.5 border-b border-white/10 p-3.5 sm:px-9">
+            <a
+              routerLink="/auth/login"
+              routerLinkActive="bg-white/10 text-white shadow-2xl border-white/20 shadow-blue-500/10"
+              class="flex items-center justify-center gap-3 rounded-2xl border border-transparent px-5 py-3.5 text-sm font-bold text-slate-400 transition-all duration-300 hover:text-white"
+            >
+              <i class="fa-solid fa-right-to-bracket text-xs"></i>
+              <span>Log In</span>
+            </a>
+
+            <a
+              routerLink="/auth/register"
+              routerLinkActive="bg-white/10 text-white shadow-2xl border-white/20 shadow-blue-500/10"
+              class="flex items-center justify-center gap-3 rounded-2xl border border-transparent px-5 py-3.5 text-sm font-bold text-slate-400 transition-all duration-300 hover:text-white"
+            >
+              <i class="fa-solid fa-user-plus text-xs"></i>
+              <span>Create Account</span>
+            </a>
+          </nav>
+
+          <!-- Router Form Output Area -->
+          <div class="p-7 sm:p-11">
+            <router-outlet></router-outlet>
+          </div>
+
+          <!-- Security Footer Notice -->
+          <footer class="border-t border-white/10 bg-white/[0.015] px-7 py-5 sm:px-9">
+            <div class="flex items-center gap-4">
+              <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 shadow-inner">
+                <i class="fa-solid fa-lock text-xs"></i>
+              </span>
+
+              <div>
+                <p class="text-xs font-black text-white">Your privacy matters</p>
+                <p class="text-[11px] text-slate-400">Your account and personal information deserve protection.</p>
+              </div>
+
+              <i class="fa-solid fa-shield-check ml-auto hidden text-xl text-emerald-400 sm:block"></i>
+            </div>
+          </footer>
+
+        </div>
+
+        <p class="mt-6 text-center text-xs text-slate-400/90 font-medium">
+          Made with passion for meaningful connections <i class="fa-solid fa-heart mx-1 text-pink-500 animate-pulse"></i>
+        </p>
+
+      </section>
+
+    </section>
+
+    <!-- Master Bottom Footer -->
+    <footer class="mt-14 flex flex-wrap items-center justify-between gap-4 border-t border-white/10 pt-6 text-xs text-slate-400">
+      <p>© Route Posts. Connect with your world.</p>
+      <div class="flex items-center gap-8 font-semibold">
+        <a href="#" class="transition-colors hover:text-white">Community</a>
+        <a href="#" class="transition-colors hover:text-white">Privacy</a>
+        <a href="#" class="transition-colors hover:text-white">Support</a>
+      </div>
+    </footer>
+
+  </main>
+</div>

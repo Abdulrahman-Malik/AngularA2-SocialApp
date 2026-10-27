@@ -1,0 +1,264 @@
+<nav class="navbar-shell flex">
+  <div class="navbar-container">
+
+    <!-- Left: Brand + Search -->
+    <div class="navbar-start">
+      <a
+        routerLink="/main/home"
+        class="brand"
+        aria-label="Route Posts Home"
+        (click)="closeMenus()"
+      >
+        <span class="brand-logo">
+          <span class="brand-logo-letter">R</span>
+        </span>
+        <span class="brand-name">Route<span>Posts</span></span>
+      </a>
+
+      <label class="search-pill">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          type="search"
+          [value]="searchText"
+          (input)="onSearchInput($event)"
+          placeholder="Search Route Posts"
+          aria-label="Search Route Posts"
+        />
+      </label>
+    </div>
+
+    <!-- Center: Main navigation -->
+    <div class="desktop-navigation">
+      <a
+        routerLink="/main/home"
+        routerLinkActive="nav-active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-link"
+        aria-label="Home"
+        (click)="closeMenus()"
+      >
+        <i class="fa-solid fa-house"></i>
+        <span class="tooltip" aria-hidden="true">Home</span>
+      </a>
+
+      <a
+        routerLink="/main/profile"
+        routerLinkActive="nav-active"
+        ariaCurrentWhenActive="page"
+        class="nav-link"
+        aria-label="Profile"
+        (click)="closeMenus()"
+      >
+        <i class="fa-solid fa-user"></i>
+        <span class="tooltip" aria-hidden="true">Profile</span>
+      </a>
+
+      <a
+        routerLink="/main/notification"
+        routerLinkActive="nav-active"
+        ariaCurrentWhenActive="page"
+        class="nav-link"
+        aria-label="Notifications"
+        (click)="closeMenus()"
+      >
+        <i class="fa-solid fa-bell"></i>
+        <span class="notification-dot" aria-hidden="true"></span>
+        <span class="tooltip" aria-hidden="true">Notifications</span>
+      </a>
+    </div>
+
+    <!-- Right: Actions -->
+    <div class="navbar-actions">
+
+      <button
+        type="button"
+        class="icon-button search-button"
+        (click)="toggleSearch()"
+        aria-label="Search"
+        [attr.aria-expanded]="isSearchOpen"
+      >
+        <i
+          class="fa-solid"
+          [class.fa-magnifying-glass]="!isSearchOpen"
+          [class.fa-xmark]="isSearchOpen"
+        ></i>
+      </button>
+
+      <button
+        type="button"
+        class="icon-button mobile-menu-button"
+        (click)="toggleMobileMenu()"
+        [attr.aria-expanded]="isMobileMenuOpen"
+        aria-label="Toggle navigation"
+      >
+        <i
+          class="fa-solid"
+          [class.fa-bars]="!isMobileMenuOpen"
+          [class.fa-xmark]="isMobileMenuOpen"
+        ></i>
+      </button>
+
+      <!-- Profile -->
+      <div class="profile-wrapper">
+        <button
+          type="button"
+          class="profile-trigger"
+          (click)="toggleProfileMenu()"
+          [attr.aria-expanded]="isProfileMenuOpen"
+          aria-haspopup="menu"
+          aria-label="Open profile menu"
+        >
+          <img
+            [src]="profileImage"
+            [alt]="userName"
+            class="profile-avatar"
+            (error)="onImageError($event)"
+          />
+          <span class="profile-chevron-badge">
+            <i class="fa-solid fa-chevron-down"></i>
+          </span>
+        </button>
+
+        @if (isProfileMenuOpen) {
+          <div class="profile-dropdown" role="menu">
+
+            <a
+              routerLink="/main/profile"
+              class="dropdown-card"
+              role="menuitem"
+              (click)="closeMenus()"
+            >
+              <span class="dropdown-avatar-wrap">
+                <img
+                  [src]="profileImage"
+                  [alt]="userName"
+                  class="dropdown-avatar"
+                  (error)="onImageError($event)"
+                />
+                <span class="online-indicator"></span>
+              </span>
+
+              <span class="min-w-0 dropdown-card-copy">
+                <span class="dropdown-user-name">{{ userName }}</span>
+                <span class="dropdown-user-caption">See your profile</span>
+              </span>
+
+              <i class="fa-solid fa-chevron-right dropdown-end-icon"></i>
+            </a>
+
+            <div class="dropdown-divider"></div>
+
+            <a
+              routerLink="/main/change"
+              class="dropdown-item"
+              role="menuitem"
+              (click)="closeMenus()"
+            >
+              <span class="dropdown-icon"><i class="fa-solid fa-gear"></i></span>
+              <span class="dropdown-label">Settings</span>
+              <i class="fa-solid fa-chevron-right dropdown-end-icon"></i>
+            </a>
+
+            <button
+              type="button"
+              class="dropdown-item"
+              role="menuitemcheckbox"
+              [attr.aria-checked]="isDarkMode"
+              (click)="toggleTheme()"
+            >
+              <span class="dropdown-icon">
+                <i
+                  class="fa-solid"
+                  [class.fa-sun]="isDarkMode"
+                  [class.fa-moon]="!isDarkMode"
+                ></i>
+              </span>
+              <span class="dropdown-label">Dark mode</span>
+              <span class="switch" [class.switch-on]="isDarkMode" aria-hidden="true">
+                <span class="switch-thumb"></span>
+              </span>
+            </button>
+
+            <div class="dropdown-divider"></div>
+
+            <button
+              type="button"
+              class="dropdown-item logout-item"
+              role="menuitem"
+              (click)="logOut()"
+            >
+              <span class="dropdown-icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
+              <span class="dropdown-label">Log out</span>
+            </button>
+
+          </div>
+        }
+      </div>
+
+    </div>
+  </div>
+
+  @if (isSearchOpen) {
+    <div class="search-panel">
+      <label class="search-pill search-pill-panel">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input
+          type="search"
+          [value]="searchText"
+          (input)="onSearchInput($event)"
+          placeholder="Search Route Posts"
+          aria-label="Search Route Posts"
+          autofocus
+        />
+      </label>
+    </div>
+  }
+
+  @if (isMobileMenuOpen) {
+    <div class="mobile-navigation">
+      <a
+        routerLink="/main/home"
+        routerLinkActive="nav-active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="mobile-nav-link"
+        (click)="closeMenus()"
+      >
+        <span class="mobile-nav-icon"><i class="fa-solid fa-house"></i></span>
+        <span>Home</span>
+      </a>
+
+      <a
+        routerLink="/main/profile"
+        routerLinkActive="nav-active"
+        ariaCurrentWhenActive="page"
+        class="mobile-nav-link"
+        (click)="closeMenus()"
+      >
+        <span class="mobile-nav-icon"><i class="fa-solid fa-user"></i></span>
+        <span>Profile</span>
+      </a>
+
+      <a
+        routerLink="/main/notification"
+        routerLinkActive="nav-active"
+        ariaCurrentWhenActive="page"
+        class="mobile-nav-link"
+        (click)="closeMenus()"
+      >
+        <span class="mobile-nav-icon"><i class="fa-solid fa-bell"></i></span>
+        <span>Notifications</span>
+      </a>
+    </div>
+  }
+</nav>
+
+@if (isProfileMenuOpen || isMobileMenuOpen) {
+  <button
+    type="button"
+    class="menu-backdrop"
+    aria-label="Close menu"
+    (click)="closeMenus()"
+  ></button>
+}

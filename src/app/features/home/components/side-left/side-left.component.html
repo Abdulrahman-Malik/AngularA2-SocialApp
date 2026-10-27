@@ -1,0 +1,218 @@
+
+<aside
+  class="group/sidebar w-full min-w-0 overflow-visible rounded-2xl border border-[#e4e6eb] bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
+  aria-label="Route Posts sidebar"
+>
+  <!-- Cover -->
+  <div class="relative h-28 overflow-hidden rounded-t-2xl bg-[#1877f2]">
+    <img
+      src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=900&q=85"
+      alt="Route Posts cover"
+      class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover/sidebar:scale-105"
+    />
+
+    <div class="absolute inset-0 bg-gradient-to-r from-[#0b2454]/80 via-[#173b72]/35 to-transparent"></div>
+
+    <div class="relative flex items-center gap-3 p-4">
+      <div class="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-white/15 text-white backdrop-blur-sm">
+        <i class="fa-solid fa-route text-lg"></i>
+      </div>
+
+      <div>
+        <h2 class="text-base font-extrabold tracking-tight text-white">
+          Route Posts
+        </h2>
+        <p class="mt-1 text-[11px] font-medium text-white/80">
+          Your world. Your people.
+        </p>
+      </div>
+    </div>
+
+    <span class="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
+      <span class="h-2 w-2 rounded-full bg-[#31a24c]"></span>
+      Online
+    </span>
+  </div>
+
+  <!-- Profile -->
+  <div class="px-4 pb-4">
+    <div class="-mt-8 flex items-end justify-between">
+      <div class="relative rounded-full border-4 border-white bg-white shadow-sm">
+        <img
+          src="https://i.pravatar.cc/160?img=12"
+          alt="Profile picture"
+          referrerpolicy="no-referrer"
+          class="h-[76px] w-[76px] rounded-full bg-[#f0f2f5] object-cover"
+        />
+
+        <span class="absolute bottom-1 right-0 h-3.5 w-3.5 rounded-full border-[3px] border-white bg-[#31a24c]"></span>
+      </div>
+
+      <div class="relative mb-1">
+        <button
+          type="button"
+          aria-label="Open profile menu"
+          [attr.aria-expanded]="showProfileMenu"
+          (click)="toggleProfileMenu()"
+          class="flex h-9 w-9 items-center justify-center rounded-full bg-[#f0f2f5] text-[#65676b] transition hover:bg-[#e4e6eb] hover:text-[#1877f2]"
+        >
+          <i class="fa-solid fa-ellipsis text-lg"></i>
+        </button>
+
+        @if (showProfileMenu) {
+          <div class="absolute right-0 top-11 z-50 w-48 rounded-xl border border-[#e4e6eb] bg-white p-1.5 shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
+            <button
+              type="button"
+              (click)="closeProfileMenu()"
+              class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-[#050505] transition hover:bg-[#f0f2f5]"
+            >
+              <i class="fa-regular fa-user w-4 text-[#65676b]"></i>
+              My Profile
+            </button>
+
+            <button
+              type="button"
+              (click)="closeProfileMenu()"
+              class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-[#050505] transition hover:bg-[#f0f2f5]"
+            >
+              <i class="fa-solid fa-gear w-4 text-[#65676b]"></i>
+              Settings
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <div class="flex items-center gap-2">
+        <h3 class="text-base font-extrabold text-[#050505]">
+          My Account
+        </h3>
+        <i class="fa-solid fa-circle-check text-xs text-[#1877f2]" title="Verified"></i>
+      </div>
+
+      <p class="mt-1 text-xs leading-5 text-[#65676b]">
+        Welcome back! Stay connected with your community.
+      </p>
+    </div>
+
+    <!-- Stats -->
+    <div class="mt-4 grid grid-cols-3 divide-x divide-[#e4e6eb] rounded-xl bg-[#f7f8fa] py-3">
+      <div class="px-1 text-center">
+        <p class="text-base font-extrabold text-[#050505]">24</p>
+        <p class="mt-1 text-[10px] font-medium text-[#65676b]">Posts</p>
+      </div>
+
+      <div class="px-1 text-center">
+        <p class="text-base font-extrabold text-[#050505]">128</p>
+        <p class="mt-1 text-[10px] font-medium text-[#65676b]">Friends</p>
+      </div>
+
+      <div class="px-1 text-center">
+        <p class="text-base font-extrabold text-[#050505]">860</p>
+        <p class="mt-1 text-[10px] font-medium text-[#65676b]">Followers</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <div class="border-t border-[#e4e6eb] px-3 py-4">
+    <div class="mb-3 flex items-center justify-between px-2">
+      <h4 class="text-xs font-bold text-[#65676b]">
+        Your shortcuts
+      </h4>
+      <i class="fa-solid fa-ellipsis text-sm text-[#8a8d91]"></i>
+    </div>
+
+    <nav class="flex flex-col gap-1">
+      <!-- Feed -->
+      <a
+        routerLink="/main/home"
+        routerLinkActive="!bg-[#e7f3ff] !text-[#1877f2]"
+        class="group flex min-h-[52px] items-center gap-3 rounded-xl px-3 text-[#050505] transition-colors hover:bg-[#f0f2f5]"
+      >
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e7f3ff] text-[#1877f2]">
+          <i class="fa-solid fa-house text-lg"></i>
+        </span>
+        <span class="flex-1 text-sm font-bold">Feed</span>
+        <i class="fa-solid fa-chevron-right text-[10px] text-[#bec3c9] transition group-hover:translate-x-0.5"></i>
+      </a>
+
+      <!-- My Posts -->
+      <a
+        routerLink="/main/my-posts"
+        routerLinkActive="!bg-[#f0eaff] !text-[#7048e8]"
+        class="group flex min-h-[52px] items-center gap-3 rounded-xl px-3 text-[#050505] transition-colors hover:bg-[#f0f2f5]"
+      >
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f0eaff] text-[#7048e8]">
+          <i class="fa-solid fa-layer-group text-lg"></i>
+        </span>
+        <span class="flex-1 text-sm font-bold">My Posts</span>
+        <i class="fa-solid fa-chevron-right text-[10px] text-[#bec3c9] transition group-hover:translate-x-0.5"></i>
+      </a>
+
+      <!-- Community -->
+      <a
+        routerLink="/main/community"
+        routerLinkActive="!bg-[#e6f7f5] !text-[#008b83]"
+        class="group flex min-h-[52px] items-center gap-3 rounded-xl px-3 text-[#050505] transition-colors hover:bg-[#f0f2f5]"
+      >
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e6f7f5] text-[#008b83]">
+          <i class="fa-solid fa-users text-lg"></i>
+        </span>
+        <span class="flex-1 text-sm font-bold">Community</span>
+        <i class="fa-solid fa-chevron-right text-[10px] text-[#bec3c9] transition group-hover:translate-x-0.5"></i>
+      </a>
+
+      <!-- Saved -->
+      <a
+        routerLink="/main/saved"
+        routerLinkActive="!bg-[#ffebe9] !text-[#e41e3f]"
+        class="group flex min-h-[52px] items-center gap-3 rounded-xl px-3 text-[#050505] transition-colors hover:bg-[#f0f2f5]"
+      >
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ffebe9] text-[#e41e3f]">
+          <i class="fa-regular fa-bookmark text-lg"></i>
+        </span>
+        <span class="flex-1 text-sm font-bold">Saved</span>
+        <i class="fa-solid fa-chevron-right text-[10px] text-[#bec3c9] transition group-hover:translate-x-0.5"></i>
+      </a>
+    </nav>
+  </div>
+
+  <!-- Community -->
+  <div class="px-3 pb-4">
+    <div class="rounded-2xl border border-[#dbeafe] bg-gradient-to-br from-[#edf5ff] to-white p-4">
+      <div class="flex items-start gap-3">
+        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1877f2] text-white">
+          <i class="fa-solid fa-user-group"></i>
+        </div>
+
+        <div class="min-w-0 flex-1">
+          <h4 class="text-sm font-extrabold text-[#050505]">
+            Find your people
+          </h4>
+          <p class="mt-1.5 text-xs leading-5 text-[#65676b]">
+            Discover conversations and share moments that matter.
+          </p>
+        </div>
+      </div>
+
+      <a
+        routerLink="/main/community"
+        class="mt-4 flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#1877f2] px-3 py-2.5 text-xs font-bold text-white transition hover:bg-[#166fe5] active:scale-[0.99]"
+      >
+        Explore community
+        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex items-center justify-center gap-2 rounded-b-2xl border-t border-[#e4e6eb] bg-[#fafafa] px-3 py-3.5">
+    <i class="fa-solid fa-shield-halved text-xs text-[#31a24c]"></i>
+    <span class="text-[10px] font-medium text-[#65676b]">
+      Your community, your space
+    </span>
+  </div>
+</aside>
+

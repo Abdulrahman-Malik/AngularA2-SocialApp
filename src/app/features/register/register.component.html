@@ -1,0 +1,363 @@
+<div
+  class="relative isolate w-full overflow-hidden rounded-[32px] border border-purple-100/80 bg-white/95 p-6 shadow-[0_30px_90px_-20px_rgba(109,40,217,0.15)] backdrop-blur-xl sm:p-9"
+  style="font-family: 'SN Pro', -apple-system, BlinkMacSystemFont, sans-serif;"
+>
+  <!-- Radiant Violet Gradient Top Border -->
+  <div
+    class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-purple-400 via-violet-600 to-indigo-800"
+  ></div>
+
+  <!-- Ambient Glowing Aura -->
+  <div
+    class="pointer-events-none absolute -right-28 -top-28 -z-10 h-72 w-72 rounded-full bg-purple-200/50 blur-[90px]"
+  ></div>
+  <div
+    class="pointer-events-none absolute -bottom-28 -left-28 -z-10 h-72 w-72 rounded-full bg-violet-100/60 blur-[90px]"
+  ></div>
+
+  <div class="relative z-10">
+
+    <!-- Premium Navigation Tabs -->
+    <nav
+      class="mb-8 grid grid-cols-2 gap-1.5 rounded-2xl border border-purple-100/70 bg-purple-50/50 p-1.5 backdrop-blur-md"
+      aria-label="Authentication navigation"
+    >
+      <a
+        routerLink="/auth/login"
+        routerLinkActive="!bg-white !text-purple-700 !shadow-[0_4px_16px_rgba(109,40,217,0.12)] font-black"
+        class="flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-500 transition-all duration-300 hover:text-purple-700"
+      >
+        <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+        <span>Login</span>
+      </a>
+
+      <a
+        routerLink="/auth/register"
+        routerLinkActive="!bg-white !text-purple-700 !shadow-[0_4px_16px_rgba(109,40,217,0.12)] font-black"
+        class="flex min-h-[44px] items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-xs font-bold text-slate-500 transition-all duration-300 hover:text-purple-700"
+      >
+        <i class="fa-regular fa-user text-xs"></i>
+        <span>Register</span>
+      </a>
+    </nav>
+
+    <!-- Header & Brand Section -->
+    <header class="mb-8">
+      <div class="mb-6 flex items-center gap-4">
+        <div
+          class="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-purple-700 via-violet-600 to-indigo-600 text-xl text-white shadow-xl shadow-purple-600/25 ring-4 ring-purple-50"
+        >
+          <i class="fa-solid fa-user-plus"></i>
+        </div>
+
+        <div>
+          <p
+            class="text-[10px] font-black uppercase tracking-[0.25em] text-purple-600"
+          >
+            ROUTE POSTS
+          </p>
+
+          <p class="mt-0.5 text-xs font-medium text-slate-400">
+            Join our growing community today.
+          </p>
+        </div>
+      </div>
+
+      <p
+        class="mb-1 text-[10px] font-black uppercase tracking-[0.2em] text-violet-500"
+      >
+        GET STARTED
+      </p>
+
+      <h1
+        class="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl"
+      >
+        Create an account
+      </h1>
+
+      <p class="mt-2 text-xs leading-5 text-slate-500">
+        Fill in your details below to start connecting with your people.
+      </p>
+    </header>
+
+    <!-- Register Form -->
+    <form [formGroup]="registerForm" (ngSubmit)="submitForm()" class="space-y-4">
+
+      <!-- Full Name -->
+      <div>
+        <label
+          for="name"
+          class="mb-1.5 block text-[11px] font-extrabold uppercase tracking-wider text-slate-700"
+        >
+          Full name
+        </label>
+
+        <div class="group relative">
+          <span
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors duration-200 group-focus-within:text-purple-600"
+          >
+            <i class="fa-regular fa-user text-sm"></i>
+          </span>
+
+          <input
+            id="name"
+            type="text"
+            formControlName="name"
+            placeholder="Enter your full name"
+            autocomplete="name"
+            required
+            class="h-12 w-full rounded-2xl border border-purple-100 bg-purple-50/30 pl-11 pr-4 text-sm font-medium text-slate-800 outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-purple-200 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-500/10"
+          />
+        </div>
+      </div>
+
+      <!-- Username -->
+      <div>
+        <label
+          for="username"
+          class="mb-1.5 block text-[11px] font-extrabold uppercase tracking-wider text-slate-700"
+        >
+          Username <span class="font-normal normal-case text-slate-400">(optional)</span>
+        </label>
+
+        <div class="group relative">
+          <span
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors duration-200 group-focus-within:text-purple-600"
+          >
+            <i class="fa-solid fa-at text-sm"></i>
+          </span>
+
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            placeholder="Choose a username"
+            autocomplete="username"
+            class="h-12 w-full rounded-2xl border border-purple-100 bg-purple-50/30 pl-11 pr-4 text-sm font-medium text-slate-800 outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-purple-200 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-500/10"
+          />
+        </div>
+      </div>
+
+      <!-- Email Address -->
+      <div>
+        <label
+          for="email"
+          class="mb-1.5 block text-[11px] font-extrabold uppercase tracking-wider text-slate-700"
+        >
+          Email address
+        </label>
+
+        <div class="group relative">
+          <span
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors duration-200 group-focus-within:text-purple-600"
+          >
+            <i class="fa-regular fa-envelope text-sm"></i>
+          </span>
+
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="name@example.com"
+            autocomplete="email"
+            required
+            class="h-12 w-full rounded-2xl border border-purple-100 bg-purple-50/30 pl-11 pr-4 text-sm font-medium text-slate-800 outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-purple-200 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-500/10"
+          />
+        </div>
+      </div>
+
+      <!-- Gender -->
+      <div>
+        <label
+          for="gender"
+          class="mb-1.5 block text-[11px] font-extrabold uppercase tracking-wider text-slate-700"
+        >
+          Gender
+        </label>
+
+        <div class="relative">
+          <span
+            class="pointer-events-none absolute inset-y-0 left-0 z-10 flex items-center pl-4 text-slate-400"
+          >
+            <i class="fa-solid fa-users text-sm"></i>
+          </span>
+
+          <select
+            id="gender"
+            formControlName="gender"
+            required
+            class="h-12 w-full appearance-none rounded-2xl border border-purple-100 bg-purple-50/30 pl-11 pr-10 text-sm font-medium text-slate-800 outline-none transition-all duration-300 hover:border-purple-200 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-500/10"
+          >
+            <option value="" disabled selected class="text-slate-400">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+
+          <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-xs text-slate-400">
+            <i class="fa-solid fa-chevron-down"></i>
+          </span>
+        </div>
+      </div>
+
+      <!-- Date of Birth -->
+      <div>
+        <label
+          for="dateOfBirth"
+          class="mb-1.5 block text-[11px] font-extrabold uppercase tracking-wider text-slate-700"
+        >
+          Date of birth <span class="font-normal normal-case text-slate-400">(optional)</span>
+        </label>
+
+        <div class="group relative">
+          <span
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors duration-200 group-focus-within:text-purple-600"
+          >
+            <i class="fa-regular fa-calendar text-sm"></i>
+          </span>
+
+          <input
+            id="dateOfBirth"
+            type="date"
+            formControlName="dateOfBirth"
+            autocomplete="bday"
+            class="h-12 w-full rounded-2xl border border-purple-100 bg-purple-50/30 pl-11 pr-4 text-sm font-medium text-slate-800 outline-none transition-all duration-300 hover:border-purple-200 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-500/10"
+          />
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label
+          for="password"
+          class="mb-1.5 block text-[11px] font-extrabold uppercase tracking-wider text-slate-700"
+        >
+          Password
+        </label>
+
+        <div class="group relative">
+          <span
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors duration-200 group-focus-within:text-purple-600"
+          >
+            <i class="fa-solid fa-lock text-sm"></i>
+          </span>
+
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="Create a strong password"
+            autocomplete="new-password"
+            required
+            class="h-12 w-full rounded-2xl border border-purple-100 bg-purple-50/30 pl-11 pr-4 text-sm font-medium text-slate-800 outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-purple-200 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-500/10"
+          />
+        </div>
+      </div>
+
+      <!-- Confirm Password -->
+      <div>
+        <label
+          for="rePassword"
+          class="mb-1.5 block text-[11px] font-extrabold uppercase tracking-wider text-slate-700"
+        >
+          Confirm password
+        </label>
+
+        <div class="group relative">
+          <span
+            class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 transition-colors duration-200 group-focus-within:text-purple-600"
+          >
+            <i class="fa-solid fa-shield-halved text-sm"></i>
+          </span>
+
+          <input
+            id="rePassword"
+            type="password"
+            formControlName="rePassword"
+            placeholder="Re-enter your password"
+            autocomplete="new-password"
+            required
+            class="h-12 w-full rounded-2xl border border-purple-100 bg-purple-50/30 pl-11 pr-4 text-sm font-medium text-slate-800 outline-none transition-all duration-300 placeholder:text-slate-400 hover:border-purple-200 focus:border-purple-600 focus:bg-white focus:ring-4 focus:ring-purple-500/10"
+          />
+        </div>
+      </div>
+
+      <!-- Terms Checkbox -->
+      <div class="flex items-start gap-3 pt-1">
+        <label
+          for="acceptTerms"
+          class="flex cursor-pointer items-start gap-2.5 text-xs text-slate-600"
+        >
+          <input
+            id="acceptTerms"
+            type="checkbox"
+            required
+            class="mt-0.5 h-4 w-4 cursor-pointer rounded-md border-purple-200 text-purple-600 accent-purple-600 focus:ring-purple-500/30"
+          />
+          <span class="leading-5">I agree to the <a href="#" class="font-bold text-purple-700 hover:underline">Terms of Service</a> and <a href="#" class="font-bold text-purple-700 hover:underline">Privacy Policy</a>.</span>
+        </label>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="group relative flex h-12 w-full items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-gradient-to-r from-purple-700 via-violet-600 to-indigo-600 px-5 text-sm font-black text-white shadow-lg shadow-purple-600/25 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-purple-600/35 active:translate-y-0"
+      >
+        <span>Create account</span>
+
+        <i
+          class="fa-solid fa-arrow-right text-xs transition-transform duration-300 group-hover:translate-x-1"
+        ></i>
+
+        @if (loading) {
+          <span
+            class="absolute right-4 flex items-center"
+            aria-label="Loading"
+          >
+            <i class="fa-solid fa-spinner animate-spin text-sm"></i>
+          </span>
+        }
+      </button>
+
+      @if(msgErr){
+        <p class="mx-auto w-full rounded-2xl border border-red-100 bg-red-50 p-3 text-center text-xs font-semibold text-red-600 shadow-sm">{{msgErr}}</p>
+      }
+    </form>
+
+    <!-- Divider -->
+    <div class="my-7 flex items-center gap-4">
+      <div class="h-px flex-1 bg-slate-100"></div>
+
+      <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+        Already have an account?
+      </span>
+
+      <div class="h-px flex-1 bg-slate-100"></div>
+    </div>
+
+    <!-- Login CTA Link -->
+    <a
+      routerLink="/auth/login"
+      class="group flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-purple-100 bg-purple-50/40 px-4 text-sm font-bold text-purple-700 transition-all duration-300 hover:border-purple-200 hover:bg-white hover:shadow-sm"
+    >
+      <span>Log in to your account</span>
+
+      <i
+        class="fa-solid fa-arrow-up-right-from-square text-[10px] transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+      ></i>
+    </a>
+
+    <!-- Footer Notice -->
+    <footer class="mt-6 flex items-center justify-center gap-2">
+      <span
+        class="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-50 text-[10px] text-emerald-600"
+      >
+        <i class="fa-solid fa-shield-halved"></i>
+      </span>
+
+      <p class="text-[11px] font-semibold text-slate-400">
+        Your privacy and security matter to us.
+      </p>
+    </footer>
+
+  </div>
+</div>
