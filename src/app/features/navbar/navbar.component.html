@@ -1,18 +1,25 @@
 <!-- =====================================================
-     ROUTE POSTS — RESPONSIVE STICKY NAVBAR
+     ROUTE POSTS — RESPONSIVE FACEBOOK-STYLE NAVBAR
 ===================================================== -->
 
-<nav
-  class="navbar-shell sticky top-0 z-[100] w-full"
->
+<nav class="navbar-shell sticky top-0 z-[100] w-full">
+
+  <!-- MAIN NAVBAR CONTAINER -->
   <div
-    class="navbar-container mx-auto flex w-full max-w-7xl items-center justify-between gap-3"
+    class="navbar-container mx-auto flex w-full max-w-7xl items-center justify-between gap-3
+           md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] md:items-center md:gap-4"
   >
 
-    <!-- LEFT: BRAND + DESKTOP SEARCH -->
-    <div class="navbar-start flex min-w-0 items-center gap-3">
+    <!-- =================================================
+         LEFT: BRAND + DESKTOP SEARCH
+    ================================================== -->
 
-      <!-- Brand -->
+    <div
+      class="navbar-start flex min-w-0 items-center gap-3
+             md:col-start-1 md:row-start-1 md:justify-self-start"
+    >
+
+      <!-- BRAND -->
       <a
         routerLink="/main/home"
         class="brand group flex shrink-0 items-center gap-2.5 no-underline"
@@ -20,23 +27,31 @@
         (click)="closeMenus()"
       >
         <span
-          class="brand-logo flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-lg font-extrabold text-white shadow-md transition-transform duration-200 group-hover:scale-105"
+          class="brand-logo flex h-10 w-10 items-center justify-center rounded-xl
+                 bg-primary text-lg font-extrabold text-white shadow-md
+                 transition-transform duration-200 group-hover:scale-105"
         >
           <span class="brand-logo-letter">R</span>
         </span>
 
         <span
-          class="brand-name hidden whitespace-nowrap text-xl font-extrabold tracking-tight sm:inline-block"
+          class="brand-name hidden whitespace-nowrap text-xl font-extrabold
+                 tracking-tight sm:inline-block"
         >
           Route<span class="text-primary">Posts</span>
         </span>
       </a>
 
-      <!-- Desktop Search -->
+      <!-- DESKTOP SEARCH -->
       <label
-        class="search-pill hidden min-w-0 items-center gap-2.5 rounded-full border border-gray-200 bg-gray-50 px-3.5 py-2 transition-all md:flex"
+        class="search-pill hidden min-w-0 items-center gap-2.5 rounded-full
+               border border-gray-200 bg-gray-50 px-3.5 py-2
+               transition-all md:flex"
       >
-        <i class="fa-solid fa-magnifying-glass text-sm text-gray-400"></i>
+        <i
+          class="fa-solid fa-magnifying-glass text-sm text-gray-400"
+          aria-hidden="true"
+        ></i>
 
         <input
           type="search"
@@ -44,55 +59,71 @@
           (input)="onSearchInput($event)"
           placeholder="Search Route Posts"
           aria-label="Search Route Posts"
-          class="w-48 min-w-0 border-none bg-transparent text-sm text-gray-700 outline-none lg:w-56 xl:w-64"
+          class="w-36 min-w-0 border-none bg-transparent text-sm
+                 text-gray-700 outline-none focus:ring-0 lg:w-48 xl:w-56"
         />
       </label>
 
     </div>
 
-    <!-- CENTER: DESKTOP NAVIGATION -->
-    <div class="desktop-navigation hidden h-full items-center justify-center gap-2 md:flex">
+    <!-- =================================================
+         CENTER: DESKTOP NAVIGATION
+         Kept in the exact center using the middle grid column.
+    ================================================== -->
 
-      <!-- Home -->
+    <div
+      class="desktop-navigation hidden h-full min-w-0 items-center
+             justify-center gap-2 md:col-start-2 md:row-start-1 md:flex
+             md:justify-self-center"
+    >
+
+      <!-- HOME -->
       <a
         routerLink="/main/home"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-link relative flex h-full items-center justify-center rounded-xl px-4 py-2.5 text-gray-600 transition-all hover:bg-gray-100 hover:text-primary"
+        class="nav-link relative flex h-full items-center justify-center
+               rounded-xl px-4 py-2.5 text-gray-600
+               transition-all hover:bg-gray-100 hover:text-primary"
         aria-label="Home"
         (click)="closeMenus()"
       >
-        <i class="fa-solid fa-house text-lg"></i>
+        <i class="fa-solid fa-house text-lg" aria-hidden="true"></i>
         <span class="tooltip" aria-hidden="true">Home</span>
       </a>
 
-      <!-- Profile -->
+      <!-- PROFILE -->
       <a
         routerLink="/main/profile"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
-        class="nav-link relative flex h-full items-center justify-center rounded-xl px-4 py-2.5 text-gray-600 transition-all hover:bg-gray-100 hover:text-primary"
+        class="nav-link relative flex h-full items-center justify-center
+               rounded-xl px-4 py-2.5 text-gray-600
+               transition-all hover:bg-gray-100 hover:text-primary"
         aria-label="Profile"
         (click)="closeMenus()"
       >
-        <i class="fa-solid fa-user text-lg"></i>
+        <i class="fa-solid fa-user text-lg" aria-hidden="true"></i>
         <span class="tooltip" aria-hidden="true">Profile</span>
       </a>
 
-      <!-- Notifications -->
+      <!-- NOTIFICATIONS -->
       <a
         routerLink="/main/notification"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
-        class="nav-link relative flex h-full items-center justify-center rounded-xl px-4 py-2.5 text-gray-600 transition-all hover:bg-gray-100 hover:text-primary"
+        class="nav-link relative flex h-full items-center justify-center
+               rounded-xl px-4 py-2.5 text-gray-600
+               transition-all hover:bg-gray-100 hover:text-primary"
         aria-label="Notifications"
         (click)="closeMenus()"
       >
-        <i class="fa-solid fa-bell text-lg"></i>
+        <i class="fa-solid fa-bell text-lg" aria-hidden="true"></i>
 
         <span
-          class="notification-dot absolute right-3 top-2.5 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white"
+          class="notification-dot absolute right-3 top-2.5 h-2.5 w-2.5
+                 rounded-full bg-red-500 ring-2 ring-white"
           aria-hidden="true"
         ></span>
 
@@ -101,13 +132,21 @@
 
     </div>
 
-    <!-- RIGHT: ACTIONS -->
-    <div class="navbar-actions flex shrink-0 items-center justify-end gap-2">
+    <!-- =================================================
+         RIGHT: MOBILE ACTIONS + PROFILE
+    ================================================== -->
 
-      <!-- Mobile Search Toggle -->
+    <div
+      class="navbar-actions flex shrink-0 items-center justify-end gap-2
+             md:col-start-3 md:row-start-1 md:justify-self-end"
+    >
+
+      <!-- MOBILE SEARCH TOGGLE -->
       <button
         type="button"
-        class="icon-button search-button flex h-10 w-10 items-center justify-center rounded-full border-0 bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 md:hidden"
+        class="icon-button search-button flex h-10 w-10 items-center
+               justify-center rounded-full border-0 bg-gray-100
+               text-gray-600 transition-colors hover:bg-gray-200 md:hidden"
         (click)="toggleSearch()"
         aria-label="Search"
         [attr.aria-expanded]="isSearchOpen"
@@ -117,13 +156,17 @@
           class="fa-solid text-lg"
           [class.fa-magnifying-glass]="!isSearchOpen"
           [class.fa-xmark]="isSearchOpen"
+          aria-hidden="true"
         ></i>
       </button>
 
-      <!-- Mobile Menu Toggle -->
+      <!-- MOBILE MENU TOGGLE -->
       <button
         type="button"
-        class="icon-button mobile-menu-button flex h-10 w-10 items-center justify-center rounded-full border-0 bg-gray-100 text-gray-600 transition-colors hover:bg-gray-200 md:hidden"
+        class="icon-button mobile-menu-button flex h-10 w-10
+               items-center justify-center rounded-full border-0
+               bg-gray-100 text-gray-600 transition-colors
+               hover:bg-gray-200 md:hidden"
         (click)="toggleMobileMenu()"
         [attr.aria-expanded]="isMobileMenuOpen"
         aria-controls="mobile-navigation"
@@ -133,15 +176,22 @@
           class="fa-solid text-lg"
           [class.fa-bars]="!isMobileMenuOpen"
           [class.fa-xmark]="isMobileMenuOpen"
+          aria-hidden="true"
         ></i>
       </button>
 
-      <!-- PROFILE MENU -->
+      <!-- =================================================
+           PROFILE MENU
+      ================================================== -->
+
       <div class="profile-wrapper relative shrink-0">
 
+        <!-- PROFILE TRIGGER -->
         <button
           type="button"
-          class="profile-trigger flex items-center justify-center rounded-full border border-transparent p-1 transition-all hover:border-gray-200 hover:bg-gray-100"
+          class="profile-trigger flex items-center justify-center
+                 rounded-full border border-transparent p-1
+                 transition-all hover:border-gray-200 hover:bg-gray-100"
           (click)="toggleProfileMenu()"
           [attr.aria-expanded]="isProfileMenuOpen"
           aria-haspopup="menu"
@@ -155,29 +205,35 @@
           />
 
           <span
-            class="profile-chevron-badge hidden pr-1 text-xs text-gray-500 sm:inline-block"
+            class="profile-chevron-badge hidden pr-1 text-xs
+                   text-gray-500 sm:inline-block"
             aria-hidden="true"
           >
             <i class="fa-solid fa-chevron-down"></i>
           </span>
         </button>
 
-        <!-- Profile Dropdown -->
+        <!-- PROFILE DROPDOWN -->
         @if (isProfileMenuOpen) {
+
           <div
-            class="profile-dropdown absolute right-0 z-[120] mt-3 w-72 rounded-2xl border border-gray-100 bg-white p-2 shadow-xl"
+            class="profile-dropdown absolute right-0 z-[120] mt-3
+                   w-72 max-w-[calc(100vw-24px)] rounded-2xl
+                   border border-gray-100 bg-white p-2 shadow-xl"
             role="menu"
             aria-label="Profile menu"
           >
 
-            <!-- User Profile -->
+            <!-- USER PROFILE -->
             <a
               routerLink="/main/profile"
-              class="dropdown-card flex items-center gap-3 rounded-xl p-3 no-underline transition-colors hover:bg-gray-50"
+              class="dropdown-card flex items-center gap-3 rounded-xl p-3
+                     no-underline transition-colors hover:bg-gray-50"
               role="menuitem"
               (click)="closeMenus()"
             >
               <span class="dropdown-avatar-wrap relative shrink-0">
+
                 <img
                   [src]="profileImage"
                   [alt]="userName"
@@ -186,69 +242,102 @@
                 />
 
                 <span
-                  class="online-indicator absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-white bg-green-500"
+                  class="online-indicator absolute bottom-0 right-0 h-3.5
+                         w-3.5 rounded-full border-2 border-white bg-green-500"
                   aria-label="Online"
                 ></span>
+
               </span>
 
               <span class="dropdown-card-copy min-w-0 flex-1">
-                <span class="dropdown-user-name block truncate font-semibold text-gray-900">
+
+                <span
+                  class="dropdown-user-name block truncate
+                         font-semibold text-gray-900"
+                >
                   {{ userName }}
                 </span>
 
-                <span class="dropdown-user-caption mt-0.5 block text-xs text-gray-500">
+                <span
+                  class="dropdown-user-caption mt-0.5 block
+                         text-xs text-gray-500"
+                >
                   See your profile
                 </span>
+
               </span>
 
-              <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+              <i
+                class="fa-solid fa-chevron-right text-xs text-gray-400"
+                aria-hidden="true"
+              ></i>
             </a>
 
             <div class="dropdown-divider my-2 h-px bg-gray-100"></div>
 
-            <!-- Settings -->
+            <!-- SETTINGS -->
             <a
               routerLink="/main/change"
-              class="dropdown-item flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-700 no-underline transition-colors hover:bg-gray-50"
+              class="dropdown-item flex items-center gap-3 rounded-xl
+                     px-3 py-2.5 text-sm font-medium text-gray-700
+                     no-underline transition-colors hover:bg-gray-50"
               role="menuitem"
               (click)="closeMenus()"
             >
-              <span class="dropdown-icon flex w-5 items-center justify-center text-gray-400">
-                <i class="fa-solid fa-gear"></i>
+              <span
+                class="dropdown-icon flex w-5 items-center
+                       justify-center text-gray-400"
+              >
+                <i class="fa-solid fa-gear" aria-hidden="true"></i>
               </span>
 
               <span class="dropdown-label flex-1">Settings</span>
 
-              <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+              <i
+                class="fa-solid fa-chevron-right text-xs text-gray-400"
+                aria-hidden="true"
+              ></i>
             </a>
 
-            <!-- Dark Mode -->
+            <!-- DARK MODE -->
             <button
               type="button"
-              class="dropdown-item flex w-full items-center justify-between rounded-xl border-0 bg-transparent px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+              class="dropdown-item flex w-full items-center justify-between
+                     rounded-xl border-0 bg-transparent px-3 py-2.5
+                     text-sm font-medium text-gray-700
+                     transition-colors hover:bg-gray-50"
               role="menuitemcheckbox"
               [attr.aria-checked]="isDarkMode"
               (click)="toggleTheme()"
             >
               <span class="flex items-center gap-3">
-                <span class="dropdown-icon flex w-5 items-center justify-center text-gray-400">
+
+                <span
+                  class="dropdown-icon flex w-5 items-center
+                         justify-center text-gray-400"
+                >
                   <i
                     class="fa-solid"
                     [class.fa-sun]="isDarkMode"
                     [class.fa-moon]="!isDarkMode"
+                    aria-hidden="true"
                   ></i>
                 </span>
 
                 <span class="dropdown-label">Dark mode</span>
+
               </span>
 
               <span
-                class="switch relative h-6 w-10 rounded-full bg-gray-300 transition-colors"
+                class="switch relative h-6 w-10 rounded-full
+                       bg-gray-300 transition-colors"
                 [class.bg-primary]="isDarkMode"
                 aria-hidden="true"
               >
                 <span
-                  class="switch-thumb absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow-sm transition-transform"
+                  class="switch-thumb absolute left-1 top-1 h-4 w-4
+                         rounded-full bg-white shadow-sm
+                         transition-transform"
                   [class.translate-x-4]="isDarkMode"
                 ></span>
               </span>
@@ -256,15 +345,24 @@
 
             <div class="dropdown-divider my-2 h-px bg-gray-100"></div>
 
-            <!-- Logout -->
+            <!-- LOG OUT -->
             <button
               type="button"
-              class="dropdown-item logout-item flex w-full items-center gap-3 rounded-xl border-0 bg-transparent px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+              class="dropdown-item logout-item flex w-full items-center
+                     gap-3 rounded-xl border-0 bg-transparent
+                     px-3 py-2.5 text-sm font-medium text-red-600
+                     transition-colors hover:bg-red-50"
               role="menuitem"
               (click)="logOut()"
             >
-              <span class="dropdown-icon flex w-5 items-center justify-center">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span
+                class="dropdown-icon flex w-5 items-center
+                       justify-center"
+              >
+                <i
+                  class="fa-solid fa-arrow-right-from-bracket"
+                  aria-hidden="true"
+                ></i>
               </span>
 
               <span class="dropdown-label">Log out</span>
@@ -284,14 +382,23 @@
   ================================================== -->
 
   @if (isSearchOpen) {
+
     <div
       id="mobile-search-panel"
-      class="search-panel absolute left-0 top-full w-full border-t border-gray-100 bg-white p-3 shadow-md md:hidden"
+      class="search-panel absolute left-0 top-full w-full
+             border-t border-gray-100 bg-white p-3 shadow-md md:hidden"
     >
       <label
-        class="search-pill search-pill-panel flex w-full items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 transition-all focus-within:border-primary focus-within:bg-white focus-within:ring-2 focus-within:ring-primary/20"
+        class="search-pill search-pill-panel flex w-full
+               items-center gap-2 rounded-xl border border-gray-200
+               bg-gray-50 px-3 py-2.5 transition-all
+               focus-within:border-primary focus-within:bg-white
+               focus-within:ring-2 focus-within:ring-primary/20"
       >
-        <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+        <i
+          class="fa-solid fa-magnifying-glass text-gray-400"
+          aria-hidden="true"
+        ></i>
 
         <input
           type="search"
@@ -299,11 +406,13 @@
           (input)="onSearchInput($event)"
           placeholder="Search Route Posts"
           aria-label="Search Route Posts"
-          class="w-full min-w-0 border-none bg-transparent text-sm text-gray-700 outline-none"
+          class="w-full min-w-0 border-none bg-transparent
+                 text-sm text-gray-700 outline-none focus:ring-0"
           autofocus
         />
       </label>
     </div>
+
   }
 
   <!-- =================================================
@@ -311,71 +420,93 @@
   ================================================== -->
 
   @if (isMobileMenuOpen) {
+
     <div
       id="mobile-navigation"
-      class="mobile-navigation absolute left-0 top-full z-[105] w-full flex-col gap-1.5 border-t border-gray-100 bg-white px-3 py-3 shadow-lg md:hidden"
+      class="mobile-navigation absolute left-0 top-full z-[105]
+             flex w-full flex-col gap-1.5 border-t border-gray-100
+             bg-white px-3 py-3 shadow-lg md:hidden"
     >
 
-      <!-- Home -->
+      <!-- HOME -->
       <a
         routerLink="/main/home"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="mobile-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium text-gray-700 no-underline transition-colors hover:bg-gray-50 hover:text-primary"
+        class="mobile-nav-link flex items-center gap-3 rounded-xl
+               px-3 py-2.5 font-medium text-gray-700 no-underline
+               transition-colors hover:bg-gray-50 hover:text-primary"
         (click)="closeMenus()"
       >
-        <span class="mobile-nav-icon flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 text-gray-500">
-          <i class="fa-solid fa-house"></i>
+        <span
+          class="mobile-nav-icon flex h-10 w-10 items-center
+                 justify-center rounded-xl bg-gray-100 text-gray-500"
+        >
+          <i class="fa-solid fa-house" aria-hidden="true"></i>
         </span>
 
         <span>Home</span>
       </a>
 
-      <!-- Profile -->
+      <!-- PROFILE -->
       <a
         routerLink="/main/profile"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
-        class="mobile-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium text-gray-700 no-underline transition-colors hover:bg-gray-50 hover:text-primary"
+        class="mobile-nav-link flex items-center gap-3 rounded-xl
+               px-3 py-2.5 font-medium text-gray-700 no-underline
+               transition-colors hover:bg-gray-50 hover:text-primary"
         (click)="closeMenus()"
       >
-        <span class="mobile-nav-icon flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 text-gray-500">
-          <i class="fa-solid fa-user"></i>
+        <span
+          class="mobile-nav-icon flex h-10 w-10 items-center
+                 justify-center rounded-xl bg-gray-100 text-gray-500"
+        >
+          <i class="fa-solid fa-user" aria-hidden="true"></i>
         </span>
 
         <span>Profile</span>
       </a>
 
-      <!-- Notifications -->
+      <!-- NOTIFICATIONS -->
       <a
         routerLink="/main/notification"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
-        class="mobile-nav-link flex items-center gap-3 rounded-xl px-3 py-2.5 font-medium text-gray-700 no-underline transition-colors hover:bg-gray-50 hover:text-primary"
+        class="mobile-nav-link flex items-center gap-3 rounded-xl
+               px-3 py-2.5 font-medium text-gray-700 no-underline
+               transition-colors hover:bg-gray-50 hover:text-primary"
         (click)="closeMenus()"
       >
-        <span class="mobile-nav-icon flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 text-gray-500">
-          <i class="fa-solid fa-bell"></i>
+        <span
+          class="mobile-nav-icon flex h-10 w-10 items-center
+                 justify-center rounded-xl bg-gray-100 text-gray-500"
+        >
+          <i class="fa-solid fa-bell" aria-hidden="true"></i>
         </span>
 
         <span>Notifications</span>
       </a>
 
     </div>
+
   }
 
 </nav>
 
 <!-- =====================================================
-     BACKDROP
+     MENU BACKDROP
 ===================================================== -->
 
 @if (isProfileMenuOpen || isMobileMenuOpen) {
+
   <button
     type="button"
-    class="menu-backdrop fixed inset-0 z-[90] cursor-default border-0 bg-black/20 backdrop-blur-[2px]"
+    class="menu-backdrop fixed inset-0 z-[90]
+           cursor-default border-0 bg-black/20 backdrop-blur-[2px]"
     aria-label="Close menu"
     (click)="closeMenus()"
   ></button>
+
 }
