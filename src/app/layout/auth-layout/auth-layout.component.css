@@ -1,50 +1,305 @@
-.auth-page {
-  perspective: 1800px;
-  transform-style: preserve-3d;
-  background: #02040a;
-  background-image:
-    radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(147, 51, 234, 0.12) 0%, transparent 40%),
-    radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 1) 100%);
+/* =========================================================
+   ROUTE POSTS — AUTH PAGE · BLUE COSMOS (PRO)
+   Built for the real markup: .auth-page.constellation-theme,
+   .ambient-glow(.ambient-1/2/3), .spotlight-card, .hero-gradient,
+   .collage-photo, .glass-panel, .animate-bounce-slow, .animate-float-slow.
+   Replaces the previous auth CSS (those class names were different).
+   If it is a component stylesheet use ViewEncapsulation.None,
+   or put it in styles.css.
+========================================================= */
+
+@property --edge-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
 }
 
-.starfield-canvas {
-  position: fixed;
-  inset: 0;
+.constellation-theme {
+  --c-bg: #02040f;
+  --c-blue: #2f7bff;
+  --c-blue-deep: #1d5fff;
+  --c-sky: #38c8ff;
+  --c-ice: #b4ecff;
+  --c-line: rgb(150 185 255 / 16%);
+  --c-grad: linear-gradient(110deg, #1d5fff 0%, #2f9bff 45%, #38c8ff 100%);
+
+  position: relative;
+  isolation: isolate;
+  color-scheme: dark;
+  font-family: Outfit, "Plus Jakarta Sans", Cairo, "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: var(--c-bg);
+  background-image:
+    radial-gradient(circle at 12% 16%, rgb(47 123 255 / 20%) 0%, transparent 42%),
+    radial-gradient(circle at 90% 84%, rgb(56 200 255 / 15%) 0%, transparent 42%),
+    radial-gradient(ellipse at 50% 120%, rgb(20 50 140 / 38%) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, #081025 0%, var(--c-bg) 100%);
+}
+
+/* ---------- Living aurora + vignette ---------- */
+
+.constellation-theme::before {
+  content: "";
+  position: absolute;
+  inset: -30%;
   z-index: 0;
   pointer-events: none;
+  background:
+    conic-gradient(from 200deg at 28% 38%, transparent 0 55%, rgb(56 200 255 / 22%) 68%, transparent 82%),
+    conic-gradient(from 20deg at 74% 62%, transparent 0 50%, rgb(47 123 255 / 26%) 66%, transparent 80%),
+    radial-gradient(40% 30% at 50% 0%, rgb(180 236 255 / 13%), transparent 70%);
+  filter: blur(34px);
+  will-change: transform;
+  animation: c-aurora 24s ease-in-out infinite alternate;
 }
 
-/* بطاقة الـ 3D المجسمة مع إضاءة حواف متحركة وتوهج عميق */
-.elite-3d-card {
-  transform-style: preserve-3d;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 30px 60px rgba(0, 0, 0, 0.8),
-    0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-    0 20px 40px rgba(37, 99, 235, 0.15);
-  transition: transform 0.1s ease-out, box-shadow 0.3s ease;
-
-  &:hover {
-    box-shadow:
-      0 40px 80px rgba(0, 0, 0, 0.9),
-      0 0 0 1px rgba(255, 255, 255, 0.2) inset,
-      0 30px 60px rgba(147, 51, 234, 0.25);
-  }
+.constellation-theme::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgb(1 2 8 / 65%) 100%);
 }
 
-/* تأثير التوهج الحيوي للخلفيات */
-.ambient-glow-sphere {
-  filter: blur(100px);
-  opacity: 0.5;
+.starfield-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+/* ---------- Ambient glow spheres ---------- */
+
+.ambient-glow {
+  position: absolute;
+  z-index: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(90px);
   mix-blend-mode: screen;
-  animation: pulseGlow 8s ease-in-out infinite alternate;
+  opacity: 0.5;
+  animation: c-pulse 9s ease-in-out infinite alternate, c-drift 20s ease-in-out infinite alternate;
 }
 
-@keyframes pulseGlow {
-  0% { transform: scale(1); opacity: 0.4; }
-  100% { transform: scale(1.15); opacity: 0.7; }
+.ambient-1 {
+  top: -12%; left: -8%;
+  width: min(60vw, 620px); aspect-ratio: 1;
+  background: radial-gradient(circle, #2f7bff 0%, transparent 68%);
+}
+
+.ambient-2 {
+  right: -10%; bottom: -14%;
+  width: min(56vw, 580px); aspect-ratio: 1;
+  background: radial-gradient(circle, #38c8ff 0%, transparent 68%);
+  animation-duration: 11s, 26s;
+  animation-delay: -4s, -8s;
+}
+
+.ambient-3 {
+  top: 38%; left: 42%;
+  width: min(40vw, 420px); aspect-ratio: 1;
+  background: radial-gradient(circle, #4f5bff 0%, transparent 68%);
+  opacity: 0.28;
+  animation-duration: 13s, 22s;
+  animation-delay: -6s, -3s;
+}
+
+/* ---------- Glass cards (badge, floating cards, features) ---------- */
+
+.spotlight-card {
+  background:
+    radial-gradient(240px circle at var(--mouse-x, 50%) var(--mouse-y, -20%), rgb(56 200 255 / 13%), transparent 62%),
+    linear-gradient(145deg, rgb(255 255 255 / 8%), rgb(255 255 255 / 2.5%));
+  border: 1px solid var(--c-line);
+  -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  backdrop-filter: blur(22px) saturate(1.5);
+  box-shadow:
+    0 20px 44px rgb(0 0 0 / 45%),
+    0 1px 0 rgb(255 255 255 / 12%) inset;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.spotlight-card:hover {
+  border-color: rgb(56 200 255 / 45%);
+  box-shadow:
+    0 26px 56px rgb(0 0 0 / 55%),
+    0 1px 0 rgb(255 255 255 / 20%) inset,
+    0 0 36px rgb(47 123 255 / 24%);
+}
+
+/* ---------- Hero ---------- */
+
+.constellation-theme h1 {
+  color: #f4f8ff;
+  text-shadow: 0 8px 40px rgb(47 123 255 / 25%);
+}
+
+.hero-gradient {
+  display: inline-block;
+  padding-bottom: 0.08em;
+  background: linear-gradient(100deg, #5aa2ff 0%, #38c8ff 35%, #b4ecff 55%, #38c8ff 75%, #5aa2ff 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 26px rgb(56 200 255 / 40%));
+  animation: c-shine 7s linear infinite;
+}
+
+/* ---------- Photo collage ---------- */
+
+.collage-photo {
+  position: relative;
+  overflow: hidden;
+  border-radius: 34px;
+  border: 1px solid rgb(150 185 255 / 22%);
+  box-shadow:
+    0 40px 90px rgb(0 0 0 / 70%),
+    0 0 70px rgb(47 123 255 / 26%),
+    0 1px 0 rgb(255 255 255 / 20%) inset;
+  transition: transform 0.6s cubic-bezier(.2, .8, .2, 1), box-shadow 0.4s ease;
+}
+
+.collage-photo img { transition: transform 1.2s cubic-bezier(.2, .8, .2, 1); }
+.collage-photo:hover { transform: translateY(-4px); box-shadow: 0 50px 100px rgb(0 0 0 / 75%), 0 0 90px rgb(56 200 255 / 32%); }
+.collage-photo:hover img { transform: scale(1.06); }
+
+/* ---------- Auth panel (the hero card) ---------- */
+
+.glass-panel {
+  background: linear-gradient(150deg, rgb(255 255 255 / 9%) 0%, rgb(255 255 255 / 2.5%) 55%, rgb(47 123 255 / 7%) 100%);
+  -webkit-backdrop-filter: blur(30px) saturate(1.5);
+  backdrop-filter: blur(30px) saturate(1.5);
+  box-shadow:
+    0 50px 100px rgb(0 0 0 / 70%),
+    0 0 0 1px rgb(255 255 255 / 5%) inset,
+    0 1px 0 rgb(255 255 255 / 18%) inset,
+    0 30px 80px rgb(47 123 255 / 22%);
+}
+
+/* rotating light edge */
+.glass-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  padding: 1.5px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from var(--edge-angle),
+    rgb(47 123 255 / 10%) 0deg,
+    rgb(56 200 255 / 95%) 70deg,
+    rgb(180 236 255 / 100%) 100deg,
+    rgb(47 123 255 / 10%) 170deg,
+    rgb(79 91 255 / 60%) 250deg,
+    rgb(47 123 255 / 10%) 360deg
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: c-edge 7s linear infinite;
+}
+
+/* holographic sweep */
+.glass-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(115deg, transparent 38%, rgb(180 236 255 / 9%) 50%, transparent 62%);
+  background-size: 260% 100%;
+  background-position: 130% 0;
+  animation: c-sweep 9s ease-in-out infinite;
+}
+
+/* ---------- Floating motion for collage cards ---------- */
+
+.animate-bounce-slow { animation: c-bounce 6s ease-in-out infinite; }
+.animate-float-slow  { animation: c-float 8s ease-in-out infinite; }
+
+/* ---------- Blue override of the Tailwind violet/fuchsia utilities ---------- */
+
+.constellation-theme .via-violet-600,
+.constellation-theme .via-violet-500 {
+  background-image: linear-gradient(110deg, #1d5fff 0%, #2f9bff 50%, #38c8ff 100%);
+}
+
+.constellation-theme .to-fuchsia-400 { background-image: linear-gradient(90deg, #60a5fa, #67e8f9); }
+
+.constellation-theme .to-fuchsia-500\/10 {
+  background-image: linear-gradient(to top right, rgb(59 130 246 / 12%), transparent, rgb(34 211 238 / 12%));
+}
+
+.constellation-theme .bg-violet-500 { background-color: #38c8ff; }
+.constellation-theme .bg-violet-500\/10 { background-color: rgb(56 200 255 / 10%); }
+.constellation-theme .text-violet-400 { color: #67d9ff; }
+.constellation-theme .shadow-violet-500\/50 { --tw-shadow-color: rgb(56 200 255 / 50%); }
+.constellation-theme .from-indigo-500\/30.to-purple-500\/30 {
+  background-image: linear-gradient(135deg, rgb(47 123 255 / 30%), rgb(56 200 255 / 28%));
+}
+
+/* spacing utilities used in the markup that stock Tailwind v3 does not ship */
+.p-4\.5 { padding: 1.125rem; }
+.px-4\.5 { padding-inline: 1.125rem; }
+
+/* ---------- Primary CTA polish ---------- */
+
+.constellation-theme a.bg-gradient-to-r.via-violet-600 {
+  background-size: 200% 100%;
+  box-shadow: 0 16px 40px rgb(47 123 255 / 42%), 0 0 0 1px rgb(255 255 255 / 22%) inset;
+  animation: c-flow 6s ease-in-out infinite alternate;
+}
+
+/* ---------- Focus ---------- */
+
+.constellation-theme :where(a, button, input):focus-visible {
+  outline: 2px solid var(--c-sky);
+  outline-offset: 3px;
+}
+
+/* ---------- Keyframes ---------- */
+
+@keyframes c-aurora {
+  0%   { transform: translate3d(-4%, -2%, 0) rotate(0deg) scale(1); }
+  50%  { transform: translate3d(3%, 3%, 0) rotate(6deg) scale(1.1); }
+  100% { transform: translate3d(-2%, 4%, 0) rotate(-4deg) scale(1.04); }
+}
+
+@keyframes c-pulse { from { scale: 1; opacity: 0.38; } to { scale: 1.18; opacity: 0.7; } }
+@keyframes c-drift { from { translate: 0 0; } to { translate: 42px -30px; } }
+@keyframes c-shine { to { background-position: -250% 0; } }
+@keyframes c-edge  { to { --edge-angle: 360deg; } }
+@keyframes c-sweep { 0%, 55% { background-position: 130% 0; } 100% { background-position: -30% 0; } }
+@keyframes c-flow  { to { background-position: 100% 0; } }
+
+@keyframes c-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-12px); }
+}
+
+@keyframes c-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%      { transform: translateY(10px) rotate(0.8deg); }
+}
+
+/* ---------- Responsive & motion ---------- */
+
+@media (max-width: 640px) {
+  .spotlight-card,
+  .glass-panel {
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    backdrop-filter: blur(16px) saturate(1.4);
+  }
+  .constellation-theme::before { filter: blur(22px); }
+  .ambient-glow { filter: blur(70px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .constellation-theme::before,
+  .ambient-glow,
+  .hero-gradient,
+  .glass-panel::before,
+  .glass-panel::after,
+  .animate-bounce-slow,
+  .animate-float-slow,
+  .constellation-theme a.bg-gradient-to-r.via-violet-600 { animation: none !important; }
 }
