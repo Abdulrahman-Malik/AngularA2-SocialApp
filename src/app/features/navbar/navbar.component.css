@@ -1188,3 +1188,306 @@
     transition: none !important;
   }
 }
+/* =========================================================
+   ROUTE POSTS — NAVBAR · WHITE · BLUE DREAMSCAPE
+   Matches the v5 feed theme (pearl white + pastel aurora).
+   Paste at the very END of the navbar component's CSS file.
+   Colors and effects only: your layout and breakpoints stay.
+========================================================= */
+
+/* ---------- 1. Tokens (remapped onto your --nb-* variables) ---------- */
+
+.navbar-shell {
+  --dz-blue: #1d6bff;
+  --dz-cyan: #5ce1ff;
+  --dz-sky: #29b6ff;
+  --dz-mint: #14c596;
+  --dz-gradient: linear-gradient(110deg, #1d6bff 0%, #4a8fff 38%, #29b6ff 70%, #5ce1ff 100%);
+
+  --nb-bg: rgb(255 255 255 / 74%);
+  --nb-solid: #ffffff;
+  --nb-chip: #eef5ff;
+  --nb-chip-hover: #dfeaff;
+  --nb-border: rgb(70 120 200 / 16%);
+  --nb-text: #0f1f3d;
+  --nb-muted: #5c6e94;
+  --nb-accent: var(--dz-blue);
+  --nb-accent-soft: rgb(29 107 255 / 11%);
+  --nb-danger: #e5365f;
+  --nb-shadow: 0 1px 2px rgb(30 60 140 / 5%), 0 14px 40px rgb(40 90 200 / 12%);
+  --nb-popup-shadow: 0 28px 70px rgb(30 60 140 / 24%), 0 0 0 1px rgb(255 255 255 / 70%) inset;
+
+  font-family: Outfit, "Plus Jakarta Sans", Cairo, "Segoe UI", system-ui, sans-serif;
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+}
+
+/* ---------- 2. The bar and its rainbow edge ---------- */
+
+.navbar-shell::after {
+  height: 2px;
+  background: linear-gradient(90deg, #1d6bff, #5ce1ff, #29b6ff, #4a8fff, #1d6bff);
+  background-size: 300% 100%;
+  box-shadow: 0 0 14px rgb(60 140 255 / 55%);
+  animation: nbz-edge 10s linear infinite;
+}
+
+/* ---------- 3. Brand ---------- */
+
+.navbar-shell .brand-logo {
+  background: var(--dz-gradient);
+  background-size: 200% 200%;
+  box-shadow: 0 8px 20px rgb(29 107 255 / 40%), 0 0 0 1px rgb(255 255 255 / 40%) inset;
+  animation: nbz-flow 8s ease-in-out infinite alternate;
+}
+
+.navbar-shell .brand-name { color: var(--nb-text); font-weight: 800; }
+
+.navbar-shell .brand-name span {
+  background: var(--dz-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+
+/* ---------- 4. Search ---------- */
+
+.navbar-shell .search-pill {
+  background: rgb(29 107 255 / 7%);
+  border: 1px solid rgb(29 107 255 / 10%);
+  color: var(--nb-muted);
+}
+
+.navbar-shell .search-pill:hover { background: rgb(29 107 255 / 11%); }
+
+.navbar-shell .search-pill:focus-within {
+  background: #fff;
+  border-color: rgb(29 107 255 / 55%);
+  box-shadow: 0 0 0 4px rgb(29 107 255 / 13%), 0 10px 28px rgb(29 107 255 / 18%);
+}
+
+.navbar-shell .search-pill:focus-within > i { color: var(--dz-blue); }
+
+/* ---------- 5. Navigation icons ---------- */
+
+.navbar-shell .nav-link { color: var(--nb-muted); }
+
+.navbar-shell .nav-link:hover { color: var(--dz-blue); }
+
+.navbar-shell .nav-link:hover::before { background: rgb(29 107 255 / 8%); }
+
+.navbar-shell .nav-link.nav-active { color: var(--dz-blue); }
+
+.navbar-shell .nav-link.nav-active::before {
+  background: linear-gradient(160deg, rgb(29 107 255 / 16%), rgb(41 182 255 / 9%));
+  box-shadow: 0 6px 18px rgb(29 107 255 / 16%);
+}
+
+.navbar-shell .nav-link.nav-active > i {
+  filter: drop-shadow(0 3px 8px rgb(29 107 255 / 45%));
+}
+
+.navbar-shell .nav-link::after {
+  height: 3px;
+  background: var(--dz-gradient);
+  box-shadow: 0 0 12px rgb(60 140 255 / 70%);
+}
+
+.navbar-shell .tooltip {
+  background: linear-gradient(135deg, #14316b, #0f1f3d);
+  box-shadow: 0 10px 24px rgb(15 40 110 / 35%);
+  border-radius: 9px;
+}
+
+.navbar-shell .notification-dot {
+  background: linear-gradient(135deg, #29b6ff, #ff8a5f);
+  box-shadow: 0 0 0 2px #fff, 0 0 12px rgb(41 182 255 / 70%);
+}
+
+/* ---------- 6. Icon buttons ---------- */
+
+.navbar-shell .icon-button {
+  background: #fff;
+  border: 1px solid var(--nb-border);
+  color: var(--nb-text);
+  box-shadow: 0 3px 10px rgb(40 90 200 / 9%);
+  transition: background-color .2s ease, color .2s ease, transform .18s ease, box-shadow .2s ease, border-color .2s ease;
+}
+
+.navbar-shell .icon-button:hover {
+  background: #fff;
+  border-color: rgb(29 107 255 / 45%);
+  color: var(--dz-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgb(29 107 255 / 26%);
+}
+
+.navbar-shell .icon-button:active { transform: scale(.94); }
+
+/* ---------- 7. Profile ---------- */
+
+.navbar-shell .profile-trigger:hover {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgb(29 107 255 / 55%);
+}
+
+.navbar-shell .profile-trigger[aria-expanded="true"] {
+  border-color: transparent;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--dz-blue), 0 8px 22px rgb(29 107 255 / 45%);
+}
+
+.navbar-shell .profile-avatar { background: #e3eeff; }
+
+.navbar-shell .profile-chevron-badge {
+  background: var(--dz-gradient);
+  border: 2px solid #fff;
+  color: #fff;
+}
+
+/* ---------- 8. Dropdown ---------- */
+
+.navbar-shell .profile-dropdown {
+  padding: 10px;
+  border-radius: 22px;
+  background: rgb(255 255 255 / 96%);
+  border-color: rgb(29 107 255 / 20%);
+}
+
+.navbar-shell .dropdown-card {
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgb(29 107 255 / 20%), transparent 60%),
+    radial-gradient(120% 140% at 100% 100%, rgb(41 182 255 / 18%), transparent 60%),
+    #f6faff;
+  border: 1px solid rgb(29 107 255 / 14%);
+  border-radius: 16px;
+}
+
+.navbar-shell .dropdown-avatar {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--dz-blue), 0 6px 16px rgb(29 107 255 / 35%);
+}
+
+.navbar-shell .online-indicator {
+  background: var(--dz-mint);
+  box-shadow: 0 0 10px rgb(20 197 150 / 70%);
+}
+
+.navbar-shell .dropdown-item { border-radius: 14px; }
+.navbar-shell .dropdown-item:hover { background: rgb(29 107 255 / 7%); }
+
+.navbar-shell .dropdown-icon { background: rgb(29 107 255 / 9%); color: var(--nb-muted); }
+
+.navbar-shell .dropdown-item:hover .dropdown-icon {
+  background: var(--dz-gradient);
+  color: #fff;
+  box-shadow: 0 6px 14px rgb(29 107 255 / 32%);
+}
+
+.navbar-shell .logout-item:hover { background: rgb(229 54 95 / 8%); }
+.navbar-shell .logout-item:hover .dropdown-icon { background: #e5365f; color: #fff; box-shadow: 0 6px 14px rgb(229 54 95 / 30%); }
+
+.navbar-shell .dropdown-divider { background: var(--nb-border); }
+
+.navbar-shell .switch { background: linear-gradient(90deg, #bfdcff, #c6e8ff); }
+.navbar-shell .switch-thumb { box-shadow: 0 2px 6px rgb(29 107 255 / 35%); }
+
+/* ---------- 9. Search panel & mobile menu ---------- */
+
+.navbar-shell .search-panel,
+.navbar-shell .mobile-navigation {
+  background: rgb(255 255 255 / 92%);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  backdrop-filter: blur(22px) saturate(1.6);
+  border-top: 1px solid var(--nb-border);
+  box-shadow: 0 24px 50px rgb(30 60 140 / 18%);
+  border-radius: 0 0 26px 26px;
+}
+
+.navbar-shell .mobile-nav-link { border-radius: 16px; }
+.navbar-shell .mobile-nav-link:hover { background: rgb(29 107 255 / 7%); }
+
+.navbar-shell .mobile-nav-link.nav-active {
+  background: linear-gradient(100deg, rgb(29 107 255 / 14%), rgb(41 182 255 / 8%));
+  color: var(--dz-blue);
+}
+
+.navbar-shell .mobile-nav-icon { background: rgb(29 107 255 / 9%); }
+
+.navbar-shell .mobile-nav-link.nav-active .mobile-nav-icon {
+  background: var(--dz-gradient);
+  color: #fff;
+  box-shadow: 0 8px 18px rgb(29 107 255 / 35%);
+}
+
+.menu-backdrop {
+  background: rgb(15 40 110 / 18%);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+/* ---------- 10. Dark mode (keeps your theme switch working) ---------- */
+
+:host-context(.dark) .navbar-shell,
+:host-context([data-theme="dark"]) .navbar-shell {
+  --nb-bg: rgb(10 18 44 / 72%);
+  --nb-solid: #0e1a3d;
+  --nb-chip: rgb(255 255 255 / 8%);
+  --nb-chip-hover: rgb(255 255 255 / 14%);
+  --nb-border: rgb(150 185 255 / 18%);
+  --nb-text: #eaf2ff;
+  --nb-muted: #9db3dc;
+  --nb-accent: #6aa4ff;
+  --nb-accent-soft: rgb(106 164 255 / 16%);
+  --nb-danger: #ff7a95;
+  --nb-shadow: 0 14px 40px rgb(2 6 22 / 50%);
+  --nb-popup-shadow: 0 28px 70px rgb(2 6 22 / 70%);
+}
+
+.dark .navbar-shell,
+[data-theme="dark"] .navbar-shell {
+  --nb-bg: rgb(10 18 44 / 72%);
+  --nb-solid: #0e1a3d;
+  --nb-chip: rgb(255 255 255 / 8%);
+  --nb-chip-hover: rgb(255 255 255 / 14%);
+  --nb-border: rgb(150 185 255 / 18%);
+  --nb-text: #eaf2ff;
+  --nb-muted: #9db3dc;
+  --nb-accent: #6aa4ff;
+  --nb-accent-soft: rgb(106 164 255 / 16%);
+  --nb-danger: #ff7a95;
+  --nb-shadow: 0 14px 40px rgb(2 6 22 / 50%);
+  --nb-popup-shadow: 0 28px 70px rgb(2 6 22 / 70%);
+}
+
+:host-context(.dark) .navbar-shell .icon-button,
+:host-context([data-theme="dark"]) .navbar-shell .icon-button { background: rgb(255 255 255 / 8%); }
+:host-context(.dark) .navbar-shell .profile-dropdown,
+:host-context([data-theme="dark"]) .navbar-shell .profile-dropdown,
+:host-context(.dark) .navbar-shell .search-panel,
+:host-context(.dark) .navbar-shell .mobile-navigation { background: rgb(14 24 56 / 96%); }
+:host-context(.dark) .navbar-shell .dropdown-card { background: rgb(255 255 255 / 5%); }
+:host-context(.dark) .navbar-shell .search-pill:focus-within { background: rgb(255 255 255 / 8%); }
+
+.dark .navbar-shell .icon-button,
+[data-theme="dark"] .navbar-shell .icon-button { background: rgb(255 255 255 / 8%); }
+.dark .navbar-shell .profile-dropdown,
+[data-theme="dark"] .navbar-shell .profile-dropdown,
+.dark .navbar-shell .search-panel,
+.dark .navbar-shell .mobile-navigation { background: rgb(14 24 56 / 96%); }
+.dark .navbar-shell .dropdown-card { background: rgb(255 255 255 / 5%); }
+.dark .navbar-shell .search-pill:focus-within { background: rgb(255 255 255 / 8%); }
+
+/* ---------- 11. Motion ---------- */
+
+@keyframes nbz-edge { to { background-position: 300% 0; } }
+@keyframes nbz-flow { to { background-position: 100% 100%; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .navbar-shell::after,
+  .navbar-shell .brand-logo { animation: none !important; }
+}
+
+/* lighter effects where blur is unsupported */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .navbar-shell { --nb-bg: rgb(255 255 255 / 97%); }
+}

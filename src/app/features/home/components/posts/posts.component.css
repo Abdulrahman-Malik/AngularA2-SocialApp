@@ -2089,7 +2089,7 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 }
 
 /* =========================================================
-   ROUTE POSTS — v5  ·  WHITE DREAMSCAPE
+   ROUTE POSTS — v5  ·  WHITE · BLUE DREAMSCAPE
    Pearl-white sky · soft pastel aurora · frosted white cards
    Paste at the very END of posts.component.css
    (replace any previous dreamscape layer: v1 / v2 / dark).
@@ -2097,34 +2097,34 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 ========================================================= */
 
 .home-feed-page {
-  --dz-bg: #f7f5ff;
+  --dz-bg: #f3f8ff;
   --dz-glass: rgb(255 255 255 / 80%);
   --dz-solid: #ffffff;
-  --dz-line: rgb(110 98 200 / 14%);
-  --dz-text: #1b1d3b;
-  --dz-text-2: #5b5f8f;
-  --dz-text-3: #8e92b6;
+  --dz-line: rgb(70 120 200 / 14%);
+  --dz-text: #0f1f3d;
+  --dz-text-2: #52648a;
+  --dz-text-3: #8496b8;
 
-  --dz-violet: #7a5cff;
+  --dz-blue: #1d6bff;
   --dz-cyan: #14b4e4;
-  --dz-pink: #ff5fc4;
+  --dz-sky: #29b6ff;
   --dz-mint: #14c596;
 
-  --dz-gradient: linear-gradient(110deg, #7a5cff 0%, #b45cff 38%, #ff5fc4 70%, #3cc4f0 100%);
+  --dz-gradient: linear-gradient(110deg, #1d6bff 0%, #4a8fff 38%, #29b6ff 70%, #5ce1ff 100%);
   --dz-radius: 26px;
-  --dz-shadow: 0 1px 2px rgb(60 50 140 / 5%), 0 18px 48px rgb(90 70 190 / 11%);
-  --dz-shadow-hover: 0 2px 4px rgb(60 50 140 / 6%), 0 28px 64px rgb(122 92 255 / 20%);
+  --dz-shadow: 0 1px 2px rgb(30 60 140 / 5%), 0 18px 48px rgb(40 90 200 / 11%);
+  --dz-shadow-hover: 0 2px 4px rgb(30 60 140 / 6%), 0 28px 64px rgb(29 107 255 / 20%);
 
   /* remap earlier tokens */
-  --fb-blue: var(--dz-violet);
-  --fb-blue-hover: #6446f0;
-  --fb-blue-soft: rgb(122 92 255 / 11%);
+  --fb-blue: var(--dz-blue);
+  --fb-blue-hover: #1456d6;
+  --fb-blue-soft: rgb(29 107 255 / 11%);
   --fb-text: var(--dz-text);
   --fb-secondary: var(--dz-text-2);
   --fb-muted: var(--dz-text-3);
   --fb-border: var(--dz-line);
-  --fb-hover: rgb(122 92 255 / 7%);
-  --fb-soft: #f4f2ff;
+  --fb-hover: rgb(29 107 255 / 7%);
+  --fb-soft: #eef5ff;
   --fb-red: #e5365f;
   --fb-green: var(--dz-mint);
 
@@ -2147,9 +2147,9 @@ button, summary { -webkit-tap-highlight-color: transparent; }
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(40% 32% at 16% 20%, rgb(170 148 255 / 46%), transparent 70%),
+    radial-gradient(40% 32% at 16% 20%, rgb(130 175 255 / 46%), transparent 70%),
     radial-gradient(36% 30% at 84% 14%, rgb(120 214 255 / 44%), transparent 70%),
-    radial-gradient(44% 34% at 72% 80%, rgb(255 160 226 / 38%), transparent 72%),
+    radial-gradient(44% 34% at 72% 80%, rgb(150 205 255 / 38%), transparent 72%),
     radial-gradient(34% 28% at 10% 86%, rgb(150 240 210 / 36%), transparent 70%);
   will-change: transform;
   animation: dz-aurora 28s ease-in-out infinite alternate;
@@ -2164,13 +2164,13 @@ button, summary { -webkit-tap-highlight-color: transparent; }
   pointer-events: none;
   opacity: 0.5;
   background-image:
-    radial-gradient(1.4px 1.4px at 12% 18%, #9a85ff 50%, transparent 52%),
+    radial-gradient(1.4px 1.4px at 12% 18%, #7aa8ff 50%, transparent 52%),
     radial-gradient(1.2px 1.2px at 30% 66%, #6fc9ef 50%, transparent 52%),
-    radial-gradient(1.6px 1.6px at 48% 28%, #ff8fd6 50%, transparent 52%),
-    radial-gradient(1.2px 1.2px at 66% 84%, #9a85ff 50%, transparent 52%),
+    radial-gradient(1.6px 1.6px at 48% 28%, #7fd6ff 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 66% 84%, #7aa8ff 50%, transparent 52%),
     radial-gradient(1.4px 1.4px at 80% 42%, #6fc9ef 50%, transparent 52%),
-    radial-gradient(1.2px 1.2px at 92% 12%, #ff8fd6 50%, transparent 52%),
-    radial-gradient(1.2px 1.2px at 6% 90%, #9a85ff 50%, transparent 52%);
+    radial-gradient(1.2px 1.2px at 92% 12%, #7fd6ff 50%, transparent 52%),
+    radial-gradient(1.2px 1.2px at 6% 90%, #7aa8ff 50%, transparent 52%);
   background-size: 560px 560px;
   animation: dz-twinkle 8s ease-in-out infinite alternate;
 }
@@ -2206,10 +2206,10 @@ button, summary { -webkit-tap-highlight-color: transparent; }
   border-radius: inherit;
   pointer-events: none;
   background: linear-gradient(145deg,
-    rgb(122 92 255 / 38%),
-    rgb(60 196 240 / 16%) 40%,
+    rgb(29 107 255 / 38%),
+    rgb(92 225 255 / 16%) 40%,
     rgb(255 255 255 / 0%) 62%,
-    rgb(255 95 196 / 32%));
+    rgb(41 182 255 / 32%));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
@@ -2223,12 +2223,12 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 /* composer = hero, with an animated rainbow edge */
 .home-feed-page .composer-card {
   margin-bottom: 30px;
-  box-shadow: 0 2px 4px rgb(60 50 140 / 5%), 0 30px 70px rgb(122 92 255 / 20%) !important;
+  box-shadow: 0 2px 4px rgb(30 60 140 / 5%), 0 30px 70px rgb(29 107 255 / 20%) !important;
 }
 
 .home-feed-page .composer-card::before {
   padding: 2px;
-  background: linear-gradient(120deg, #7a5cff, #3cc4f0 35%, #ff5fc4 70%, #7a5cff);
+  background: linear-gradient(120deg, #1d6bff, #5ce1ff 35%, #29b6ff 70%, #1d6bff);
   background-size: 250% 250%;
   animation: dz-edge 9s linear infinite;
 }
@@ -2242,7 +2242,7 @@ button, summary { -webkit-tap-highlight-color: transparent; }
   border-radius: 16px;
   color: #fff;
   background: var(--dz-gradient);
-  box-shadow: 0 10px 24px rgb(122 92 255 / 38%);
+  box-shadow: 0 10px 24px rgb(29 107 255 / 38%);
 }
 
 .home-feed-page .composer-heading h2 {
@@ -2260,8 +2260,8 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 .home-feed-page .composer-avatar,
 .home-feed-page .post-avatar {
   border: 0;
-  background: #ece8ff;
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--dz-violet), 0 6px 18px rgb(122 92 255 / 35%);
+  background: #e3eeff;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--dz-blue), 0 6px 18px rgb(29 107 255 / 35%);
 }
 
 .home-feed-page .composer-textarea {
@@ -2269,7 +2269,7 @@ button, summary { -webkit-tap-highlight-color: transparent; }
   padding: 18px 20px !important;
   border: 1px solid var(--dz-line) !important;
   border-radius: 18px !important;
-  background: rgb(122 92 255 / 4%) !important;
+  background: rgb(29 107 255 / 4%) !important;
   color: var(--dz-text) !important;
   font-size: 16px;
   transition: border-color 200ms ease, box-shadow 200ms ease, background 200ms ease;
@@ -2279,8 +2279,8 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 
 .home-feed-page .composer-textarea:focus {
   background: #fff !important;
-  border-color: rgb(122 92 255 / 60%) !important;
-  box-shadow: 0 0 0 4px rgb(122 92 255 / 13%), 0 12px 32px rgb(122 92 255 / 14%) !important;
+  border-color: rgb(29 107 255 / 60%) !important;
+  box-shadow: 0 0 0 4px rgb(29 107 255 / 13%), 0 12px 32px rgb(29 107 255 / 14%) !important;
 }
 
 .home-feed-page .composer-editor { border: 0; }
@@ -2295,13 +2295,13 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 
 .home-feed-page .composer-tool { background: transparent; border-radius: 12px; color: var(--dz-text-2); }
 .home-feed-page .composer-tool-photo   { color: var(--dz-mint); }
-.home-feed-page .composer-tool-people  { color: var(--dz-violet); }
+.home-feed-page .composer-tool-people  { color: var(--dz-blue); }
 .home-feed-page .composer-tool-feeling { color: #f0a020; }
 
 .home-feed-page .composer-tool:hover {
   background: #fff;
   border-color: var(--dz-line);
-  box-shadow: 0 8px 20px rgb(122 92 255 / 14%);
+  box-shadow: 0 8px 20px rgb(29 107 255 / 14%);
 }
 
 .home-feed-page .composer-publish-button {
@@ -2315,7 +2315,7 @@ button, summary { -webkit-tap-highlight-color: transparent; }
   color: #fff !important;
   font-size: 15px;
   letter-spacing: 0.2px;
-  box-shadow: 0 14px 32px rgb(122 92 255 / 38%), 0 0 0 1px rgb(255 255 255 / 30%) inset;
+  box-shadow: 0 14px 32px rgb(29 107 255 / 38%), 0 0 0 1px rgb(255 255 255 / 30%) inset;
   animation: dz-flow 7s ease-in-out infinite alternate;
   transition: transform 160ms ease, box-shadow 200ms ease;
 }
@@ -2332,7 +2332,7 @@ button, summary { -webkit-tap-highlight-color: transparent; }
   background: var(--dz-gradient) !important;
   background-size: 220% 100% !important;
   transform: translateY(-2px);
-  box-shadow: 0 20px 44px rgb(180 92 255 / 45%), 0 0 0 1px rgb(255 255 255 / 40%) inset;
+  box-shadow: 0 20px 44px rgb(60 140 255 / 45%), 0 0 0 1px rgb(255 255 255 / 40%) inset;
 }
 
 .home-feed-page .composer-publish-button:hover:not(:disabled)::after {
@@ -2350,14 +2350,14 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 }
 
 .home-feed-page .audience-trigger > i:first-child,
-.home-feed-page .post-audience-trigger > i:first-child { color: var(--dz-violet); }
+.home-feed-page .post-audience-trigger > i:first-child { color: var(--dz-blue); }
 
 .home-feed-page .audience-trigger:hover,
 .home-feed-page .post-audience-trigger:hover,
 .home-feed-page .audience-menu[open] > summary {
-  background: rgb(122 92 255 / 10%);
-  border-color: rgb(122 92 255 / 45%);
-  color: var(--dz-violet);
+  background: rgb(29 107 255 / 10%);
+  border-color: rgb(29 107 255 / 45%);
+  color: var(--dz-blue);
 }
 
 .home-feed-page .audience-dropdown,
@@ -2367,7 +2367,7 @@ button, summary { -webkit-tap-highlight-color: transparent; }
   color: var(--dz-text) !important;
   border: 1px solid var(--dz-line);
   border-radius: 20px;
-  box-shadow: 0 24px 60px rgb(60 50 140 / 20%), 0 0 0 1px rgb(255 255 255 / 60%) inset;
+  box-shadow: 0 24px 60px rgb(30 60 140 / 20%), 0 0 0 1px rgb(255 255 255 / 60%) inset;
 }
 
 .home-feed-page .reaction-picker { border-radius: 999px; }
@@ -2379,17 +2379,17 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 .home-feed-page .audience-option,
 .home-feed-page .post-menu-option { background: transparent; color: var(--dz-text); border-radius: 14px; }
 .home-feed-page .audience-option:hover,
-.home-feed-page .post-menu-option:hover { background: rgb(122 92 255 / 7%); }
-.home-feed-page .audience-option-active { background: rgb(122 92 255 / 11%); border-color: rgb(122 92 255 / 35%); }
+.home-feed-page .post-menu-option:hover { background: rgb(29 107 255 / 7%); }
+.home-feed-page .audience-option-active { background: rgb(29 107 255 / 11%); border-color: rgb(29 107 255 / 35%); }
 .home-feed-page .audience-copy strong { color: var(--dz-text); }
 .home-feed-page .audience-copy small { color: var(--dz-text-2); }
 
 .home-feed-page .audience-public    { background: rgb(20 180 228 / 13%);  color: var(--dz-cyan); }
 .home-feed-page .audience-followers { background: rgb(20 197 150 / 13%);  color: var(--dz-mint); }
-.home-feed-page .audience-private   { background: rgb(255 95 196 / 13%);  color: var(--dz-pink); }
-.home-feed-page .audience-check { color: var(--dz-violet); }
+.home-feed-page .audience-private   { background: rgb(79 91 213 / 13%);  color: #4f5bd5; }
+.home-feed-page .audience-check { color: var(--dz-blue); }
 
-.home-feed-page .post-menu-option-icon { background: rgb(122 92 255 / 9%); color: var(--dz-text-2); }
+.home-feed-page .post-menu-option-icon { background: rgb(29 107 255 / 9%); color: var(--dz-text-2); }
 .home-feed-page .post-menu-divider { background: var(--dz-line); }
 .home-feed-page .post-menu-report { color: #e5365f; }
 .home-feed-page .post-menu-report .post-menu-option-icon { background: rgb(229 54 95 / 11%); color: #e5365f; }
@@ -2408,14 +2408,14 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 
 .home-feed-page .post-menu-trigger { background: transparent; color: var(--dz-text-2); }
 .home-feed-page .post-menu-trigger:hover,
-.home-feed-page .post-menu[open] > .post-menu-trigger { background: rgb(122 92 255 / 10%); color: var(--dz-violet); }
+.home-feed-page .post-menu[open] > .post-menu-trigger { background: rgb(29 107 255 / 10%); color: var(--dz-blue); }
 
 .home-feed-page .post-body { padding: 0 24px 18px; }
 .home-feed-page .post-body p,
-.home-feed-page .post-body > p { color: #2b2e50 !important; font-size: 16px; line-height: 1.8; }
+.home-feed-page .post-body > p { color: #1e2d4d !important; font-size: 16px; line-height: 1.8; }
 
 .home-feed-page .post-media {
-  background: #f1eefc;
+  background: #eaf2fe;
   border-block: 1px solid var(--dz-line);
 }
 
@@ -2429,10 +2429,10 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 
 .home-feed-page .post-like-icon {
   background: var(--dz-gradient);
-  box-shadow: 0 4px 12px rgb(180 92 255 / 45%);
+  box-shadow: 0 4px 12px rgb(60 140 255 / 45%);
 }
 
-.home-feed-page .post-stats-links button:hover { color: var(--dz-violet); }
+.home-feed-page .post-stats-links button:hover { color: var(--dz-blue); }
 
 .home-feed-page .post-actions { margin: 0 16px; padding: 8px 0 10px; gap: 6px; }
 
@@ -2448,39 +2448,39 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 .home-feed-page .reaction-main-action:hover,
 .home-feed-page .post-action-button:hover,
 .home-feed-page .reaction-trigger:hover {
-  background: rgb(122 92 255 / 10%);
-  color: var(--dz-violet);
+  background: rgb(29 107 255 / 10%);
+  color: var(--dz-blue);
 }
 
 .home-feed-page .reaction-main-action.reaction-selected {
-  color: var(--dz-violet);
-  background: rgb(122 92 255 / 9%);
+  color: var(--dz-blue);
+  background: rgb(29 107 255 / 9%);
 }
 
 .home-feed-page .reaction-picker button { background: transparent; }
 .home-feed-page .reaction-picker button:hover {
-  background: rgb(122 92 255 / 9%);
+  background: rgb(29 107 255 / 9%);
   transform: translateY(-8px) scale(1.35);
 }
 .home-feed-page .reaction-picker button[aria-pressed="true"] {
-  background: rgb(122 92 255 / 16%);
-  box-shadow: 0 0 0 2px rgb(122 92 255 / 30%);
+  background: rgb(29 107 255 / 16%);
+  box-shadow: 0 0 0 2px rgb(29 107 255 / 30%);
 }
 
 /* ---------- 6. Comments ---------- */
 
 .home-feed-page .comments-panel {
-  background: rgb(245 242 255 / 75%);
+  background: rgb(240 246 255 / 75%);
   border-color: var(--dz-line);
   padding: 18px 24px 22px;
   border-radius: 0 0 var(--dz-radius) var(--dz-radius);
 }
 
 .home-feed-page .comments-panel-heading h4 { color: var(--dz-text); }
-.home-feed-page .comments-panel-heading > span { background: rgb(122 92 255 / 13%); color: var(--dz-violet); }
+.home-feed-page .comments-panel-heading > span { background: rgb(29 107 255 / 13%); color: var(--dz-blue); }
 
 .home-feed-page .comments-empty {
-  border-color: rgb(122 92 255 / 28%);
+  border-color: rgb(29 107 255 / 28%);
   color: var(--dz-text-2);
   background: rgb(255 255 255 / 60%);
 }
@@ -2489,14 +2489,14 @@ button, summary { -webkit-tap-highlight-color: transparent; }
   border: 0;
   background: var(--dz-gradient);
   color: #fff;
-  box-shadow: 0 6px 14px rgb(122 92 255 / 32%);
+  box-shadow: 0 6px 14px rgb(29 107 255 / 32%);
 }
 
 .home-feed-page .comment-bubble {
   background: #fff;
   border: 1px solid var(--dz-line);
   border-radius: 4px 18px 18px 18px;
-  box-shadow: 0 4px 14px rgb(90 70 190 / 6%);
+  box-shadow: 0 4px 14px rgb(40 90 200 / 6%);
 }
 
 .home-feed-page .comment-bubble > strong,
@@ -2511,8 +2511,8 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 
 .home-feed-page .comment-compose:focus-within {
   background: #fff;
-  border-color: rgb(122 92 255 / 55%);
-  box-shadow: 0 0 0 4px rgb(122 92 255 / 12%);
+  border-color: rgb(29 107 255 / 55%);
+  box-shadow: 0 0 0 4px rgb(29 107 255 / 12%);
 }
 
 .home-feed-page .comment-compose textarea { color: var(--dz-text); }
@@ -2520,20 +2520,20 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 .home-feed-page .comment-compose-footer { border-color: var(--dz-line); }
 
 .home-feed-page .comment-compose-footer button {
-  background: rgb(122 92 255 / 12%);
-  color: var(--dz-violet);
+  background: rgb(29 107 255 / 12%);
+  color: var(--dz-blue);
 }
 
-.home-feed-page .comment-compose-footer button:hover:not(:disabled) { background: rgb(122 92 255 / 22%); }
+.home-feed-page .comment-compose-footer button:hover:not(:disabled) { background: rgb(29 107 255 / 22%); }
 
 .home-feed-page .comment-preview {
-  background: rgb(122 92 255 / 6%);
-  border: 1px dashed rgb(122 92 255 / 45%);
+  background: rgb(29 107 255 / 6%);
+  border: 1px dashed rgb(29 107 255 / 45%);
   border-radius: 18px;
 }
 
 .home-feed-page .comment-preview-title,
-.home-feed-page .preview-label { color: var(--dz-violet); }
+.home-feed-page .preview-label { color: var(--dz-blue); }
 
 .home-feed-page .edit-comment-button {
   background: #fff;
@@ -2541,14 +2541,14 @@ button, summary { -webkit-tap-highlight-color: transparent; }
   color: var(--dz-text-2);
 }
 
-.home-feed-page .edit-comment-button:hover { background: rgb(122 92 255 / 8%); color: var(--dz-violet); }
+.home-feed-page .edit-comment-button:hover { background: rgb(29 107 255 / 8%); color: var(--dz-blue); }
 
 .home-feed-page .send-comment-button {
   background: var(--dz-gradient);
   background-size: 200% 100%;
   border: 0;
   color: #fff;
-  box-shadow: 0 8px 20px rgb(122 92 255 / 32%);
+  box-shadow: 0 8px 20px rgb(29 107 255 / 32%);
 }
 
 .home-feed-page .send-comment-button:hover:not(:disabled) {
@@ -2559,17 +2559,17 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 
 /* ---------- 7. States, media, footer ---------- */
 
-.home-feed-page .media-preview-card { background: #f1eefc; border-color: var(--dz-line); border-radius: 18px; }
+.home-feed-page .media-preview-card { background: #eaf2fe; border-color: var(--dz-line); border-radius: 18px; }
 .home-feed-page .media-preview-card > img,
-.home-feed-page .media-preview-card > video { background: #f1eefc; }
+.home-feed-page .media-preview-card > video { background: #eaf2fe; }
 .home-feed-page .media-preview-footer { background: #fff; border-color: var(--dz-line); }
 .home-feed-page #post-media-name { color: var(--dz-text-2); }
-.home-feed-page .media-remove-button { background: rgb(122 92 255 / 9%); color: var(--dz-text-2); }
+.home-feed-page .media-remove-button { background: rgb(29 107 255 / 9%); color: var(--dz-text-2); }
 .home-feed-page .media-remove-button:hover { background: rgb(229 54 95 / 12%); color: #e5365f; }
 .home-feed-page .media-error { background: rgb(229 54 95 / 8%); color: #d02a52; border: 1px solid rgb(229 54 95 / 25%); }
 
 .home-feed-page .skeleton-block {
-  background: linear-gradient(90deg, rgb(122 92 255 / 7%) 25%, rgb(122 92 255 / 18%) 50%, rgb(122 92 255 / 7%) 75%);
+  background: linear-gradient(90deg, rgb(29 107 255 / 7%) 25%, rgb(29 107 255 / 18%) 50%, rgb(29 107 255 / 7%) 75%);
   background-size: 220% 100%;
   animation: dz-shimmer 1.6s linear infinite;
 }
@@ -2578,9 +2578,9 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 .home-feed-page .feed-state-card p { color: var(--dz-text-2); }
 
 .home-feed-page .feed-state-icon {
-  background: rgb(122 92 255 / 11%);
-  color: var(--dz-violet);
-  box-shadow: 0 10px 30px rgb(122 92 255 / 22%);
+  background: rgb(29 107 255 / 11%);
+  color: var(--dz-blue);
+  box-shadow: 0 10px 30px rgb(29 107 255 / 22%);
 }
 
 .home-feed-page .feed-state-error {
@@ -2592,7 +2592,7 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 .home-feed-page .feed-state-button {
   background: var(--dz-gradient);
   background-size: 200% 100%;
-  box-shadow: 0 10px 24px rgb(122 92 255 / 34%);
+  box-shadow: 0 10px 24px rgb(29 107 255 / 34%);
   border-radius: 14px;
 }
 
@@ -2602,7 +2602,7 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 
 .home-feed-page .feed-footer-logo {
   background: var(--dz-gradient);
-  box-shadow: 0 6px 16px rgb(122 92 255 / 40%);
+  box-shadow: 0 6px 16px rgb(29 107 255 / 40%);
 }
 
 /* header leftovers from earlier layers */
@@ -2626,7 +2626,7 @@ button, summary { -webkit-tap-highlight-color: transparent; }
 
 /* focus ring */
 .home-feed-page :where(button, summary, textarea, label):focus-visible {
-  outline: 3px solid rgb(122 92 255 / 40%);
+  outline: 3px solid rgb(29 107 255 / 40%);
   outline-offset: 2px;
 }
 
