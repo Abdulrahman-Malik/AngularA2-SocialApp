@@ -44,10 +44,7 @@ export interface CommentModel {
   isNew?: boolean;
 }
 
-/**
- * Shape currently used by PostsComponent.
- * It does not contain an `author` object.
- */
+/** Shape used by PostsComponent. */
 export interface FeedCommentInput {
   id: string;
   userName: string;
@@ -86,16 +83,22 @@ const emptyDraft = (): Draft => ({
   imports: [CommonModule],
   templateUrl: './comment.component.html',
   styleUrls: ['./comment.component.css'],
+
+  // Give the component host a light background.
+  host: {
+    '[style.display]': "'block'",
+    '[style.width]': "'100%'",
+    '[style.minWidth]': "'0'",
+    '[style.backgroundColor]': "'#ffffff'",
+    '[style.color]': "'#0f172a'",
+    '[style.colorScheme]': "'light'",
+  },
 })
 export class CommentComponent implements OnInit, OnDestroy {
   /* =======================================================
      INPUTS / OUTPUTS
   ======================================================= */
 
-  /**
-   * Accepts both CommentModel[] and FeedCommentInput[].
-   * Incoming feed comments are normalized into CommentModel.
-   */
   @Input()
   set comments(
     value: CommentModel[] | FeedCommentInput[] | null | undefined,
@@ -230,31 +233,24 @@ export class CommentComponent implements OnInit, OnDestroy {
   sort: 'top' | 'newest' = 'top';
 
   view: CommentModel[] = [];
-
   paged: CommentModel[] = [];
-
   shown = 5;
 
   drafts: Record<string, Draft> = {};
 
   expanded = new Set<string>();
-
   fullText = new Set<string>();
 
   pickerFor: string | null = null;
-
   menuFor: string | null = null;
-
   emojiFor: string | null = null;
 
   editingId: string | null = null;
-
   editText = '';
 
   confirmDeleteId: string | null = null;
 
   replyingId: string | null = null;
-
   replyingParentId: string | null = null;
 
   toast: string | null = null;
@@ -262,31 +258,31 @@ export class CommentComponent implements OnInit, OnDestroy {
   private _comments: CommentModel[] = [];
 
   private pressTimer: ReturnType<typeof setTimeout> | null = null;
-
   private longPressed = false;
 
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
-
   private tick: ReturnType<typeof setInterval> | null = null;
 
   private readonly enterToSend =
     typeof matchMedia === 'function' &&
     matchMedia('(hover: hover) and (pointer: fine)').matches;
 
-  constructor(private host: ElementRef<HTMLElement>) {}
+  constructor(
+    private readonly host: ElementRef<HTMLElement>,
+  ) {}
 
   /* =======================================================
      LIFECYCLE
   ======================================================= */
 
   ngOnInit(): void {
-    this.tick = setInterval(() => {
-      // Keeps a timer available for relative-time refreshes.
-    }, 30000);
-
     this.shown = this.pageSize;
-
     this.refresh();
+
+    // Refresh relative-time labels periodically.
+    this.tick = setInterval(() => {
+      this.refresh();
+    }, 30000);
   }
 
   ngOnDestroy(): void {
@@ -317,15 +313,6 @@ export class CommentComponent implements OnInit, OnDestroy {
      NORMALIZE INCOMING COMMENTS
   ======================================================= */
 
-  /**
-   * Converts the post-feed shape:
-   * { id, userName, text, createdAt }
-   *
-   * into the component shape:
-   * { id, author: { id, name }, text, createdAt }.
-   *
-   * Existing CommentModel values are preserved.
-   */
   private toCommentModel(
     input: CommentModel | FeedCommentInput,
   ): CommentModel {
@@ -370,8 +357,10 @@ export class CommentComponent implements OnInit, OnDestroy {
      DERIVED DATA
   ======================================================= */
 
-  trackById = (_: number, comment: CommentModel) =>
-    comment.id;
+  trackById = (
+    _index: number,
+    comment: CommentModel,
+  ): string => comment.id;
 
   get totalCount(): number {
     return this._comments.reduce(
@@ -475,21 +464,15 @@ export class CommentComponent implements OnInit, OnDestroy {
 
     const minutes = Math.floor(diff / 60);
 
-    if (minutes < 60) {
-      return `${minutes}m`;
-    }
+    if (minutes < 60) return `${minutes}m`;
 
     const hours = Math.floor(minutes / 60);
 
-    if (hours < 24) {
-      return `${hours}h`;
-    }
+    if (hours < 24) return `${hours}h`;
 
     const days = Math.floor(hours / 24);
 
-    if (days < 7) {
-      return `${days}d`;
-    }
+    if (days < 7) return `${days}d`;
 
     return new Date(date).toLocaleDateString(
       undefined,
@@ -955,11 +938,13 @@ export class CommentComponent implements OnInit, OnDestroy {
     const draft = this.getDraft(key);
 
     if (!file.type.startsWith('image/')) {
+      this.clearImage(key);
       draft.error = 'Please choose an image file.';
       return;
     }
 
     if (file.size > this.maxImageMB * 1024 * 1024) {
+      this.clearImage(key);
       draft.error =
         `Image must be smaller than ${this.maxImageMB} MB.`;
       return;
