@@ -1,12 +1,4 @@
-import {
-  Component,
-  ElementRef,
-  inject,
-  OnDestroy,
-  OnInit,
-  signal,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { PostsService } from './components/posts.service';
@@ -120,9 +112,7 @@ export class PostsComponent implements OnInit, OnDestroy {
       const id = user['_id'] ?? user['id'] ?? user['userId'];
 
       this.userId.set(
-        id === null || id === undefined || String(id).trim() === ''
-          ? null
-          : String(id),
+        id === null || id === undefined || String(id).trim() === '' ? null : String(id),
       );
     } catch (error) {
       console.error('Unable to read the current user:', error);
@@ -141,10 +131,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     const record = post as unknown as Record<string, unknown>;
 
     const ownerSource =
-      record['user'] ??
-      record['owner'] ??
-      record['author'] ??
-      record['createdBy'];
+      record['user'] ?? record['owner'] ?? record['author'] ?? record['createdBy'];
 
     const owner = this.asRecord(ownerSource);
 
@@ -168,10 +155,7 @@ export class PostsComponent implements OnInit, OnDestroy {
   }
 
   // Change privacy of the new post.
-  selectNewPostPrivacy(
-    privacy: PostPrivacy,
-    menu: HTMLDetailsElement,
-  ): void {
+  selectNewPostPrivacy(privacy: PostPrivacy, menu: HTMLDetailsElement): void {
     this.newPostPrivacy = privacy;
     menu.open = false;
   }
@@ -253,57 +237,48 @@ export class PostsComponent implements OnInit, OnDestroy {
           this.allposts().map((post) => [String(post.id), post] as const),
         );
 
-        const updatedPosts: FeedPost[] = apiPosts.map(
-          (apiPost): FeedPost => {
-            const previous = previousPosts.get(String(apiPost.id));
+        const updatedPosts: FeedPost[] = apiPosts.map((apiPost): FeedPost => {
+          const previous = previousPosts.get(String(apiPost.id));
 
-            const apiComments = this.normalizeComments(apiPost.comments);
+          const apiComments = this.normalizeComments(apiPost.comments);
 
-            const commentsList = this.mergeComments(
-              apiComments,
-              previous?.commentsList ?? [],
-            );
+          const commentsList = this.mergeComments(apiComments, previous?.commentsList ?? []);
 
-            const commentsCount = Math.max(
-              this.normalizeCount(
-                apiPost.commentsCount,
-                apiPost.comments ?? previous?.commentsCount ?? 0,
-              ),
-              commentsList.length,
-            );
+          const commentsCount = Math.max(
+            this.normalizeCount(
+              apiPost.commentsCount,
+              apiPost.comments ?? previous?.commentsCount ?? 0,
+            ),
+            commentsList.length,
+          );
 
-            return {
-              ...apiPost,
+          return {
+            ...apiPost,
 
-              privacy:
-                this.normalizePrivacy(apiPost.privacy) ??
-                previous?.privacy ??
-                'public',
+            privacy: this.normalizePrivacy(apiPost.privacy) ?? previous?.privacy ?? 'public',
 
-              likesCount: this.normalizeCount(
-                apiPost.likesCount,
-                apiPost.likes ?? previous?.likesCount ?? 0,
-              ),
+            likesCount: this.normalizeCount(
+              apiPost.likesCount,
+              apiPost.likes ?? previous?.likesCount ?? 0,
+            ),
 
-              commentsCount,
+            commentsCount,
 
-              sharesCount: this.normalizeCount(
-                apiPost.sharesCount,
-                apiPost.shares ?? previous?.sharesCount ?? 0,
-              ),
+            sharesCount: this.normalizeCount(
+              apiPost.sharesCount,
+              apiPost.shares ?? previous?.sharesCount ?? 0,
+            ),
 
-              myReaction: previous?.myReaction ?? null,
-              isReactionPickerOpen: false,
-              isSaved: previous?.isSaved ?? false,
-              isFollowing: previous?.isFollowing ?? false,
-              isCommentsOpen: previous?.isCommentsOpen ?? false,
-              commentText: previous?.commentText ?? '',
-              isCommentPreviewOpen:
-                previous?.isCommentPreviewOpen ?? false,
-              commentsList,
-            } as FeedPost;
-          },
-        );
+            myReaction: previous?.myReaction ?? null,
+            isReactionPickerOpen: false,
+            isSaved: previous?.isSaved ?? false,
+            isFollowing: previous?.isFollowing ?? false,
+            isCommentsOpen: previous?.isCommentsOpen ?? false,
+            commentText: previous?.commentText ?? '',
+            isCommentPreviewOpen: previous?.isCommentPreviewOpen ?? false,
+            commentsList,
+          } as FeedPost;
+        });
 
         this.allposts.set(updatedPosts);
         this.loading.set(false);
@@ -316,9 +291,7 @@ export class PostsComponent implements OnInit, OnDestroy {
         console.error('Failed to load posts:', error);
 
         if (this.allposts().length === 0) {
-          this.errorMessage.set(
-            'Unable to load posts. Please try again.',
-          );
+          this.errorMessage.set('Unable to load posts. Please try again.');
         }
 
         this.loading.set(false);
@@ -331,32 +304,21 @@ export class PostsComponent implements OnInit, OnDestroy {
   // =====================================================
 
   private normalizePrivacy(value: unknown): PostPrivacy | null {
-    if (
-      value === 'public' ||
-      value === 'followers' ||
-      value === 'private'
-    ) {
+    if (value === 'public' || value === 'followers' || value === 'private') {
       return value;
     }
 
     return null;
   }
 
-  private normalizeCount(
-    value: unknown,
-    fallback: unknown = 0,
-  ): number {
+  private normalizeCount(value: unknown, fallback: unknown = 0): number {
     const candidate = value ?? fallback ?? 0;
 
     if (Array.isArray(candidate)) {
       return candidate.length;
     }
 
-    if (
-      typeof candidate === 'object' &&
-      candidate !== null &&
-      'length' in candidate
-    ) {
+    if (typeof candidate === 'object' && candidate !== null && 'length' in candidate) {
       const length = Number(candidate.length);
 
       if (Number.isFinite(length) && length >= 0) {
@@ -370,11 +332,7 @@ export class PostsComponent implements OnInit, OnDestroy {
   }
 
   private asRecord(value: unknown): Record<string, unknown> {
-    if (
-      typeof value === 'object' &&
-      value !== null &&
-      !Array.isArray(value)
-    ) {
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
       return value as Record<string, unknown>;
     }
 
@@ -391,23 +349,13 @@ export class PostsComponent implements OnInit, OnDestroy {
         const comment = this.asRecord(item);
 
         const commentUser = this.asRecord(
-          comment['user'] ??
-          comment['commentCreator'] ??
-          comment['author'],
+          comment['user'] ?? comment['commentCreator'] ?? comment['author'],
         );
 
         const rawText =
-          comment['text'] ??
-          comment['content'] ??
-          comment['body'] ??
-          comment['comment'] ??
-          '';
+          comment['text'] ?? comment['content'] ?? comment['body'] ?? comment['comment'] ?? '';
 
-        const rawId =
-          comment['id'] ??
-          comment['_id'] ??
-          comment['commentId'] ??
-          `api-${index}`;
+        const rawId = comment['id'] ?? comment['_id'] ?? comment['commentId'] ?? `api-${index}`;
 
         const rawUserName =
           comment['userName'] ??
@@ -416,11 +364,7 @@ export class PostsComponent implements OnInit, OnDestroy {
           commentUser['username'] ??
           'مستخدم';
 
-        const rawCreatedAt =
-          comment['createdAt'] ??
-          comment['created_at'] ??
-          comment['date'] ??
-          '';
+        const rawCreatedAt = comment['createdAt'] ?? comment['created_at'] ?? comment['date'] ?? '';
 
         return {
           id: String(rawId),
@@ -447,16 +391,9 @@ export class PostsComponent implements OnInit, OnDestroy {
     return Array.from(uniqueComments.values());
   }
 
-  private updatePost(
-    postId: Post['id'],
-    update: (post: FeedPost) => FeedPost,
-  ): void {
+  private updatePost(postId: Post['id'], update: (post: FeedPost) => FeedPost): void {
     this.allposts.update((posts) =>
-      posts.map((post) =>
-        String(post.id) === String(postId)
-          ? update(post)
-          : post,
-      ),
+      posts.map((post) => (String(post.id) === String(postId) ? update(post) : post)),
     );
   }
 
@@ -465,9 +402,7 @@ export class PostsComponent implements OnInit, OnDestroy {
   // =====================================================
 
   getCurrentReaction(post: FeedPost): Reaction | undefined {
-    return this.reactions.find(
-      (reaction) => reaction.type === post.myReaction,
-    );
+    return this.reactions.find((reaction) => reaction.type === post.myReaction);
   }
 
   toggleLike(post: FeedPost): void {
@@ -481,10 +416,7 @@ export class PostsComponent implements OnInit, OnDestroy {
         };
       }
 
-      const likesCount =
-        current.myReaction === null
-          ? current.likesCount + 1
-          : current.likesCount;
+      const likesCount = current.myReaction === null ? current.likesCount + 1 : current.likesCount;
 
       return {
         ...current,
@@ -506,10 +438,7 @@ export class PostsComponent implements OnInit, OnDestroy {
         };
       }
 
-      const likesCount =
-        current.myReaction === null
-          ? current.likesCount + 1
-          : current.likesCount;
+      const likesCount = current.myReaction === null ? current.likesCount + 1 : current.likesCount;
 
       return {
         ...current,
@@ -623,19 +552,12 @@ export class PostsComponent implements OnInit, OnDestroy {
         }),
       };
 
-      const commentsList = [
-        ...current.commentsList,
-        newComment,
-      ];
+      const commentsList = [...current.commentsList, newComment];
 
       return {
         ...current,
         commentsList,
-        commentsCount:
-          Math.max(
-            current.commentsCount,
-            current.commentsList.length,
-          ) + 1,
+        commentsCount: Math.max(current.commentsCount, current.commentsList.length) + 1,
         commentText: '',
         isCommentPreviewOpen: false,
         isCommentsOpen: true,
