@@ -1,201 +1,196 @@
-
 <main class="home-feed-page min-h-screen w-full">
   <!-- =====================================================
        SECTION 1 — CREATE POST
   ====================================================== -->
 
-  <section class="create-post-section w-full px-0 pt-3 sm:pt-4" aria-label="Create a post">
-    <div class="feed-layout mx-auto w-full max-w-[740px] min-w-0 px-0 sm:px-4">
-      <section class="composer-card !mb-2" aria-labelledby="create-post-heading">
-        <!-- Composer Header -->
-        <header class="composer-heading">
-          <div class="composer-heading-icon" aria-hidden="true">
-            <i class="fa-solid fa-pen-to-square"></i>
-          </div>
+<section
+  class="create-post-section w-full px-0 pt-3 sm:pt-4"
+  aria-label="Create a post"
+>
+  <form
+    class="feed-layout mx-auto w-full max-w-[740px] min-w-0 px-0 sm:px-4"
+    (submit)="submitForm($event)"
+    novalidate
+  >
+    <section
+      class="composer-card !mb-2"
+      aria-labelledby="create-post-heading"
+    >
+      <!-- =================================================
+           COMPOSER HEADER
+      ================================================== -->
 
-          <div class="min-w-0">
-            <h2 id="create-post-heading">Create a post</h2>
-            <p>Your thoughts deserve to be shared.</p>
-          </div>
-        </header>
+      <header class="composer-heading">
+        <div class="composer-heading-icon" aria-hidden="true">
+          <i class="fa-solid fa-pen-to-square"></i>
+        </div>
 
-        <div class="composer-content">
-          <!-- Current User -->
-          <div class="composer-profile">
-            <img
-              src="https://i.pravatar.cc/100?img=12"
-              alt="Your profile"
-              class="composer-avatar"
-              width="42"
-              height="42"
-            />
+        <div class="min-w-0">
+          <h2 id="create-post-heading">Create a post</h2>
+          <p>Your thoughts deserve to be shared.</p>
+        </div>
+      </header>
 
-            <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-bold text-slate-900">Abdulrahman Malik</p>
+      <div class="composer-content">
 
-              <p class="mt-1 text-xs text-slate-500">Share with your community</p>
-            </div>
+        <!-- ===============================================
+             CURRENT USER
+        ================================================ -->
 
-            <!-- Privacy Selector -->
-            <details #createAudienceMenu class="audience-menu group relative shrink-0">
-              <summary
-                aria-label="Choose post audience"
-                aria-haspopup="true"
-                class="audience-trigger"
-              >
-                @switch (newPostPrivacy) {
-                  @case ('private') {
-                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                    <span>Only me</span>
-                  }
+        <div class="composer-profile">
+          <img
+            src="https://i.pravatar.cc/100?img=12"
+            alt="Your profile"
+            class="composer-avatar"
+            width="42"
+            height="42"
+          />
 
-                  @case ('followers') {
-                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                    <span>Followers</span>
-                  }
-
-                  @default {
-                    <i class="fa-solid fa-earth-americas" aria-hidden="true"></i>
-                    <span>Public</span>
-                  }
-                }
-
-                <i class="fa-solid fa-chevron-down audience-chevron" aria-hidden="true"></i>
-              </summary>
-
-              <div class="audience-dropdown">
-                <div class="dropdown-heading">
-                  <h3>Post audience</h3>
-                  <p>Who should see your post?</p>
-                </div>
-
-                <!-- Public -->
-                <button
-                  type="button"
-                  class="audience-option"
-                  [class.audience-option-active]="newPostPrivacy === 'public'"
-                  [attr.aria-pressed]="newPostPrivacy === 'public'"
-                  (click)="selectNewPostPrivacy('public', createAudienceMenu)"
-                >
-                  <span class="audience-icon audience-public">
-                    <i class="fa-solid fa-earth-americas" aria-hidden="true"></i>
-                  </span>
-
-                  <span class="audience-copy">
-                    <strong>Public</strong>
-                    <small>Anyone can see this post.</small>
-                  </span>
-
-                  @if (newPostPrivacy === 'public') {
-                    <i class="fa-solid fa-circle-check audience-check" aria-hidden="true"></i>
-                  }
-                </button>
-
-                <!-- Followers -->
-                <button
-                  type="button"
-                  class="audience-option"
-                  [class.audience-option-active]="newPostPrivacy === 'followers'"
-                  [attr.aria-pressed]="newPostPrivacy === 'followers'"
-                  (click)="selectNewPostPrivacy('followers', createAudienceMenu)"
-                >
-                  <span class="audience-icon audience-followers">
-                    <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                  </span>
-
-                  <span class="audience-copy">
-                    <strong>Followers</strong>
-                    <small>People who follow you.</small>
-                  </span>
-
-                  @if (newPostPrivacy === 'followers') {
-                    <i class="fa-solid fa-circle-check audience-check" aria-hidden="true"></i>
-                  }
-                </button>
-
-                <!-- Only Me -->
-                <button
-                  type="button"
-                  class="audience-option"
-                  [class.audience-option-active]="newPostPrivacy === 'private'"
-                  [attr.aria-pressed]="newPostPrivacy === 'private'"
-                  (click)="selectNewPostPrivacy('private', createAudienceMenu)"
-                >
-                  <span class="audience-icon audience-private">
-                    <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                  </span>
-
-                  <span class="audience-copy">
-                    <strong>Only me</strong>
-                    <small>Only you can see this post.</small>
-                  </span>
-
-                  @if (newPostPrivacy === 'private') {
-                    <i class="fa-solid fa-circle-check audience-check" aria-hidden="true"></i>
-                  }
-                </button>
-              </div>
-            </details>
-          </div>
-
-          <!-- Post Text -->
-          <div class="composer-editor">
-            <label for="create-post-text" class="sr-only"> Write a new post </label>
-
-            <textarea
-              id="create-post-text"
-              name="postText"
-              placeholder="What's on your mind?"
-              aria-label="Write a new post"
-              class="composer-textarea"
-              maxlength="5000"
-            ></textarea>
-          </div>
-
-          <!-- Media Error -->
-          @if (mediaError) {
-            <p class="media-error" role="alert">
-              <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
-
-              <span>{{ mediaError }}</span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-bold text-slate-900">
+              Abdulrahman Malik
             </p>
-          }
 
-          <!-- Media Preview -->
+            <p class="mt-1 text-xs text-slate-500">
+              Share with your community
+            </p>
+          </div>
+
+          <!-- =============================================
+               POST PRIVACY
+          ============================================== -->
+
+          <div class="audience-select-wrapper shrink-0">
+            <label for="post-privacy" class="sr-only">
+              Post audience
+            </label>
+
+            <select
+              id="post-privacy"
+              name="privacy"
+              [formControl]="privacy"
+              class="audience-trigger"
+              aria-label="Choose post audience"
+              (change)="newPostPrivacy = privacy.value"
+            >
+              <option value="public">Public</option>
+              <option value="followers">Followers</option>
+              <option value="private">Only me</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ===============================================
+             POST CONTENT
+        ============================================== -->
+
+        <div class="composer-editor">
+          <label for="create-post-text" class="sr-only">
+            Write a new post
+          </label>
+
+          <textarea
+            id="create-post-text"
+            name="content"
+            [formControl]="content"
+            placeholder="What's on your mind?"
+            aria-label="Write a new post"
+            class="composer-textarea"
+            maxlength="5000"
+            rows="4"
+          ></textarea>
+
+          <div class="mt-1 flex justify-end">
+            <span class="text-xs text-slate-400">
+              {{ content.value.length }} / 5000
+            </span>
+          </div>
+        </div>
+
+        <!-- ===============================================
+             MEDIA ERROR
+        ============================================== -->
+
+        @if (mediaError()) {
+          <p class="media-error" role="alert">
+            <i
+              class="fa-solid fa-circle-exclamation"
+              aria-hidden="true"
+            ></i>
+
+            <span>{{ mediaError() }}</span>
+          </p>
+        }
+
+        <!-- ===============================================
+             POST ACTION MESSAGE
+        ============================================== -->
+
+        @if (postActionMessage()) {
+          <p
+            class="my-3 rounded-xl border px-4 py-3 text-sm"
+            role="status"
+            aria-live="polite"
+            [class.border-red-200]="postActionIsError()"
+            [class.bg-red-50]="postActionIsError()"
+            [class.text-red-700]="postActionIsError()"
+            [class.border-green-200]="!postActionIsError()"
+            [class.bg-green-50]="!postActionIsError()"
+            [class.text-green-700]="!postActionIsError()"
+          >
+            {{ postActionMessage() }}
+          </p>
+        }
+
+        <!-- ===============================================
+             MEDIA PREVIEW
+        ============================================== -->
+
+        @if (mediaPreviewUrl(); as previewUrl) {
           <div
             id="post-media-preview"
             class="pb-4"
-            [class.hidden]="!mediaPreviewUrl"
             aria-live="polite"
           >
             <div class="media-preview-card">
-              <!-- Image -->
-              <img
-                id="post-media-image"
-                [src]="mediaType === 'image' ? (mediaPreviewUrl ?? '') : ''"
-                alt="Selected image preview"
-                class="max-h-[420px] w-full object-contain"
-                [class.hidden]="mediaType !== 'image'"
-              />
 
-              <!-- Video -->
-              <video
-                id="post-media-video"
-                [src]="mediaType === 'video' ? (mediaPreviewUrl ?? '') : ''"
-                controls
-                preload="metadata"
-                class="max-h-[420px] w-full"
-                [class.hidden]="mediaType !== 'video'"
-              >
-                Your browser does not support video playback.
-              </video>
+              <!-- Image Preview -->
+              @if (mediaType() === 'image') {
+                <img
+                  id="post-media-image"
+                  [src]="previewUrl"
+                  alt="Selected image preview"
+                  class="max-h-[420px] w-full object-contain"
+                />
+              }
 
-              <!-- File Details -->
+              <!-- Video Preview -->
+              @if (mediaType() === 'video') {
+                <video
+                  id="post-media-video"
+                  [src]="previewUrl"
+                  controls
+                  playsinline
+                  preload="metadata"
+                  class="max-h-[420px] w-full"
+                >
+                  Your browser does not support video playback.
+                </video>
+              }
+
+              <!-- Selected File Details -->
               <div class="media-preview-footer">
-                <i class="fa-solid fa-paperclip text-blue-600" aria-hidden="true"></i>
+                <i
+                  class="fa-solid fa-paperclip text-blue-600"
+                  aria-hidden="true"
+                ></i>
 
-                <p id="post-media-name" class="min-w-0 flex-1">
-                  {{ selectedMediaFile?.name }}
+                <p
+                  id="post-media-name"
+                  class="min-w-0 flex-1 truncate"
+                  [title]="selectedMediaFile()?.name ?? ''"
+                >
+                  {{ selectedMediaFile()?.name ?? 'Selected media' }}
                 </p>
 
                 <button
@@ -204,78 +199,127 @@
                   aria-label="Remove attached media"
                   title="Remove selected file"
                   class="media-remove-button"
+                  [disabled]="publishing()"
                   (click)="removeSelectedMedia()"
                 >
-                  <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                  <i
+                    class="fa-solid fa-trash-can"
+                    aria-hidden="true"
+                  ></i>
                 </button>
               </div>
+
             </div>
           </div>
+        }
 
-          <!-- Add to Post -->
-          <div class="composer-tools">
-            <span class="composer-tools-label"> Add to your post </span>
+        <!-- ===============================================
+             ADD TO POST
+        ============================================== -->
 
-            <div class="composer-tools-actions">
-              <!-- Photo / Video -->
-              <input
-                #postMediaInput
-                id="post-media-file"
-                name="postMedia"
-                type="file"
-                accept="image/*,video/*"
-                class="hidden"
-                aria-label="Choose an image or video"
-                (change)="onMediaSelected($event)"
-              />
+        <div class="composer-tools">
+          <span class="composer-tools-label">
+            Add to your post
+          </span>
 
-              <label
-                for="post-media-file"
-                title="Add photo or video"
-                class="composer-tool composer-tool-photo"
-              >
-                <i class="fa-solid fa-image" aria-hidden="true"></i>
-                <span class="hidden sm:inline">Photo / Video</span>
-              </label>
+          <div class="composer-tools-actions">
 
-              <!-- Tag People -->
-              <button
-                type="button"
-                title="Tag people"
-                aria-label="Tag people"
-                class="composer-tool composer-tool-people"
-              >
-                <i class="fa-solid fa-user-tag" aria-hidden="true"></i>
-                <span class="hidden sm:inline">People</span>
-              </button>
+            <!-- Photo / Video Input -->
+            <input
+              #postMediaInput
+              id="post-media-files"
+              name="postMedia"
+              type="file"
+              accept="image/*,video/*"
+              class="hidden"
+              aria-label="Choose an image or video"
+              [disabled]="publishing()"
+              (change)="onMediaSelected($event)"
+            />
 
-              <!-- Feeling -->
-              <button
-                type="button"
-                title="Feeling or activity"
-                aria-label="Feeling or activity"
-                class="composer-tool composer-tool-feeling"
-              >
-                <i class="fa-regular fa-face-smile" aria-hidden="true"></i>
-                <span class="hidden sm:inline">Feeling</span>
-              </button>
-            </div>
+            <label
+              for="post-media-files"
+              title="Add photo or video"
+              class="composer-tool composer-tool-photo"
+              [class.opacity-50]="publishing()"
+              [class.pointer-events-none]="publishing()"
+            >
+              <i
+                class="fa-solid fa-image"
+                aria-hidden="true"
+              ></i>
+
+              <span class="hidden sm:inline">
+                Photo / Video
+              </span>
+            </label>
+
+            <!-- Tag People -->
+            <button
+              type="button"
+              title="Tag people"
+              aria-label="Tag people"
+              class="composer-tool composer-tool-people"
+              disabled
+            >
+              <i
+                class="fa-solid fa-user-tag"
+                aria-hidden="true"
+              ></i>
+
+              <span class="hidden sm:inline">People</span>
+            </button>
+
+            <!-- Feeling -->
+            <button
+              type="button"
+              title="Feeling or activity"
+              aria-label="Feeling or activity"
+              class="composer-tool composer-tool-feeling"
+              disabled
+            >
+              <i
+                class="fa-regular fa-face-smile"
+                aria-hidden="true"
+              ></i>
+
+              <span class="hidden sm:inline">Feeling</span>
+            </button>
+
           </div>
-
-          <!-- Publish -->
-          <button type="button" class="composer-publish-button">
-            <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
-            <span>Publish post</span>
-          </button>
         </div>
-      </section>
-    </div>
-  </section>
 
+        <!-- ===============================================
+             PUBLISH POST
+        ============================================== -->
 
+        <button
+          type="submit"
+          class="composer-publish-button"
+          [disabled]="publishing()"
+          [attr.aria-busy]="publishing()"
+        >
+          @if (publishing()) {
+            <i
+              class="fa-solid fa-spinner animate-spin"
+              aria-hidden="true"
+            ></i>
 
+            <span>Publishing...</span>
+          } @else {
+            <i
+              class="fa-solid fa-paper-plane"
+              aria-hidden="true"
+            ></i>
 
+            <span>Publish post</span>
+          }
+        </button>
 
+      </div>
+    </section>
+  </form>
+</section>
 
 
 

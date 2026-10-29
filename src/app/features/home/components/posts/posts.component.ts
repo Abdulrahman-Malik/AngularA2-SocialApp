@@ -1,10 +1,13 @@
 import { Component, ElementRef, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+
 import { Subscription } from 'rxjs';
 
 import { PostsService } from './components/posts.service';
 import { Post } from './models/post.interface';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 
 export type ReactionType = 'like' | 'love' | 'haha' | 'wow' | 'sad' | 'angry';
+
 export type PostPrivacy = 'public' | 'followers' | 'private';
 
 export interface Reaction {
@@ -48,30 +51,74 @@ export type FeedPost = Omit<Post, 'privacy' | 'likesCount' | 'commentsCount' | '
 @Component({
   selector: 'app-posts',
   standalone: true,
-  imports: [],
+  imports: [ReactiveFormsModule],
   templateUrl: './posts.component.html',
   styleUrl: './posts.component.css',
 })
 export class PostsComponent implements OnInit, OnDestroy {
   private readonly postsService = inject(PostsService);
+
   private postsSubscription?: Subscription;
+  private createPostSubscription?: Subscription;
+
+  // =====================================================
+  // FORM CONTROLS
+  // =====================================================
+
+  // Post content is optional.
+  readonly content = new FormControl('', {
+    nonNullable: true,
+  });
+
+  // Privacy defaults to public and has no required validator.
+  readonly privacy = new FormControl<PostPrivacy>('public', {
+    nonNullable: true,
+  });
+
+  readonly publishing = signal(false);
+
+  readonly postActionMessage = signal('');
+
+  readonly postActionIsError = signal(false);
+
+  // =====================================================
+  // CURRENT USER AND POSTS
+  // =====================================================
 
   readonly userId = signal<string | null>(null);
+
   readonly allposts = signal<FeedPost[]>([]);
+
   readonly loading = signal(false);
+
   readonly errorMessage = signal('');
+
+  // =====================================================
+  // NEW POST PRIVACY
+  // =====================================================
 
   newPostPrivacy: PostPrivacy = 'public';
 
-  // Selected attachment for the new post.
-  // The file stays local until the publishing API is connected.
-  selectedMediaFile: File | null = null;
-  mediaPreviewUrl: string | null = null;
-  mediaType: 'image' | 'video' | null = null;
-  mediaError = '';
+  // =====================================================
+  // IMAGE / VIDEO FILE SIGNALS
+  // =====================================================
+
+  // Stores the original selected File object.
+  readonly selectedMediaFile = signal<File | null>(null);
+
+  // Temporary URL used to preview the selected media.
+  readonly mediaPreviewUrl = signal<string | null>(null);
+
+  readonly mediaType = signal<'image' | 'video' | null>(null);
+
+  readonly mediaError = signal('');
 
   @ViewChild('postMediaInput')
   private postMediaInput?: ElementRef<HTMLInputElement>;
+
+  // =====================================================
+  // AVAILABLE REACTIONS
+  // =====================================================
 
   readonly reactions: readonly Reaction[] = [
     { type: 'like', emoji: '👍', label: 'Like' },
@@ -82,6 +129,10 @@ export class PostsComponent implements OnInit, OnDestroy {
     { type: 'angry', emoji: '😡', label: 'Angry' },
   ];
 
+  // =====================================================
+  // LIFECYCLE
+  // =====================================================
+
   ngOnInit(): void {
     this.loadCurrentUserId();
     this.getPostsData();
@@ -89,10 +140,15 @@ export class PostsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.postsSubscription?.unsubscribe();
+    this.createPostSubscription?.unsubscribe();
+
     this.releaseMediaPreview();
   }
 
-  // Read the currently logged-in user's ID from localStorage.
+  // =====================================================
+  // CURRENT USER
+  // =====================================================
+
   private loadCurrentUserId(): void {
     if (typeof localStorage === 'undefined') {
       this.userId.set(null);
@@ -109,6 +165,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     try {
       const parsedUser: unknown = JSON.parse(storedUser);
       const user = this.asRecord(parsedUser);
+
       const id = user['_id'] ?? user['id'] ?? user['userId'];
 
       this.userId.set(
@@ -120,7 +177,10 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Check whether the current user owns this post.
+  // =====================================================
+  // CHECK POST OWNERSHIP
+  // =====================================================
+
   isOwnPost(post: FeedPost): boolean {
     const currentUserId = this.userId();
 
@@ -154,18 +214,130 @@ export class PostsComponent implements OnInit, OnDestroy {
     return String(ownerId) === currentUserId;
   }
 
-  // Change privacy of the new post.
+  // =====================================================
+  // NEW POST PRIVACY
+  // =====================================================
+
   selectNewPostPrivacy(privacy: PostPrivacy, menu: HTMLDetailsElement): void {
     this.newPostPrivacy = privacy;
+
+    // Keep the FormControl synchronized with the privacy dropdown.
+    this.privacy.setValue(privacy);
+
     menu.open = false;
   }
 
   // =====================================================
-  // ADD IMAGE OR VIDEO
+  // SUBMIT POST
+  // =====================================================
+
+  submitForm(event?: Event): void {
+    event?.preventDefault();
+
+    if (this.publishing()) {
+      return;
+    }
+
+    // 1. Get privacy from FormControl.
+    const privacy = this.privacy.value;
+
+    // 2. Get content from FormControl.
+    const content = this.content.value.trim();
+
+    // 3. Get the actual selected file from the Signal.
+    const file = this.selectedMediaFile();
+
+    // Content and image are both optional,
+    // but at least one must be supplied.
+    if (!content && !file) {
+      this.postActionIsError.set(true);
+
+      this.postActionMessage.set('Please write a post or select an image.');
+
+      return;
+    }
+
+    // This request currently sends images through the image field.
+    if (file && !file.type.startsWith('image/')) {
+      this.mediaError.set('Please select an image. Video publishing requires backend support.');
+
+      return;
+    }
+
+    // Prepare multipart/form-data.
+    const formData = new FormData();
+
+    // Privacy value.
+    formData.append('privacy', this.privacy.value);
+
+    // Content value is optional.
+    if (content) {
+      formData.append('body', this.content.value);
+    }
+
+    // Image file is optional.
+    if (file) {
+      formData.append('image', file, file.name);
+    }
+
+    // Verify the three values before sending.
+    console.log('Privacy:', privacy);
+    console.log('Content:', content);
+    console.log('File:', file);
+
+    this.publishing.set(true);
+    this.postActionMessage.set('');
+    this.postActionIsError.set(false);
+    this.mediaError.set('');
+
+    this.createPostSubscription?.unsubscribe();
+
+    // Use the actual method name from PostsService.
+    this.createPostSubscription = this.postsService.createPosts(formData).subscribe({
+      next: () => {
+        // Reset the form after successful creation.
+        this.content.reset('');
+        this.privacy.setValue('public');
+        this.newPostPrivacy = 'public';
+
+        this.removeSelectedMedia();
+
+        this.publishing.set(false);
+        this.postActionIsError.set(false);
+
+        this.postActionMessage.set('Post published successfully.');
+
+        // Refresh posts from the backend.
+        this.getPostsData();
+      },
+
+      error: (error: unknown) => {
+        console.error('Failed to publish post:', error);
+
+        const errorRecord = this.asRecord(error);
+        const errorBody = this.asRecord(errorRecord['error']);
+        const apiMessage = errorBody['message'];
+
+        this.publishing.set(false);
+        this.postActionIsError.set(true);
+
+        this.postActionMessage.set(
+          typeof apiMessage === 'string'
+            ? apiMessage
+            : 'Unable to publish post. Check your login and try again.',
+        );
+      },
+    });
+  }
+
+  // =====================================================
+  // SELECT IMAGE OR VIDEO
   // =====================================================
 
   onMediaSelected(event: Event): void {
     const input = event.currentTarget as HTMLInputElement;
+
+    // Read the selected File object.
     const file = input.files?.[0];
 
     if (!file) {
@@ -175,44 +347,60 @@ export class PostsComponent implements OnInit, OnDestroy {
     const isImage = file.type.startsWith('image/');
     const isVideo = file.type.startsWith('video/');
 
-    // Reject files other than images and videos.
+    // Reject unsupported file types.
     if (!isImage && !isVideo) {
-      this.mediaError = 'Please select an image or video file.';
+      this.mediaError.set('Please select an image or video file.');
+
       input.value = '';
       return;
     }
 
-    // Remove the old preview before selecting a new attachment.
+    // Release the previous attachment and preview.
     this.releaseMediaPreview();
 
-    this.selectedMediaFile = file;
-    this.mediaType = isImage ? 'image' : 'video';
-    this.mediaPreviewUrl = URL.createObjectURL(file);
-    this.mediaError = '';
+    // Save the original File object in the Signal.
+    this.selectedMediaFile.set(file);
 
-    // Allow the user to select the same file again.
+    // Determine the selected media type.
+    this.mediaType.set(isImage ? 'image' : 'video');
+
+    // Create a temporary URL for preview only.
+    this.mediaPreviewUrl.set(URL.createObjectURL(file));
+
+    this.mediaError.set('');
+
+    // Allow selecting the same file again.
     input.value = '';
   }
 
-  // Remove the selected attachment from the unsent post.
+  // =====================================================
+  // REMOVE SELECTED MEDIA
+  // =====================================================
+
   removeSelectedMedia(): void {
     this.releaseMediaPreview();
-    this.mediaError = '';
+
+    this.mediaError.set('');
 
     if (this.postMediaInput) {
       this.postMediaInput.nativeElement.value = '';
     }
   }
 
-  // Free the temporary URL and clear the attachment data.
+  // =====================================================
+  // RELEASE MEDIA PREVIEW
+  // =====================================================
+
   private releaseMediaPreview(): void {
-    if (this.mediaPreviewUrl) {
-      URL.revokeObjectURL(this.mediaPreviewUrl);
+    const previewUrl = this.mediaPreviewUrl();
+
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
     }
 
-    this.mediaPreviewUrl = null;
-    this.mediaType = null;
-    this.selectedMediaFile = null;
+    this.mediaPreviewUrl.set(null);
+    this.mediaType.set(null);
+    this.selectedMediaFile.set(null);
   }
 
   // =====================================================
@@ -270,12 +458,19 @@ export class PostsComponent implements OnInit, OnDestroy {
             ),
 
             myReaction: previous?.myReaction ?? null,
+
             isReactionPickerOpen: false,
+
             isSaved: previous?.isSaved ?? false,
+
             isFollowing: previous?.isFollowing ?? false,
+
             isCommentsOpen: previous?.isCommentsOpen ?? false,
+
             commentText: previous?.commentText ?? '',
+
             isCommentPreviewOpen: previous?.isCommentPreviewOpen ?? false,
+
             commentsList,
           } as FeedPost;
         });
@@ -287,7 +482,7 @@ export class PostsComponent implements OnInit, OnDestroy {
         console.log('Posts count:', updatedPosts.length);
       },
 
-      error: (error) => {
+      error: (error: unknown) => {
         console.error('Failed to load posts:', error);
 
         if (this.allposts().length === 0) {
