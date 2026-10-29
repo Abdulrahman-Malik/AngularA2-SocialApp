@@ -8,12 +8,20 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
+
 import { CommonModule } from '@angular/common';
 
-/* ------------------------------------------------------------------ */
-/*  Models                                                             */
-/* ------------------------------------------------------------------ */
-export type ReactionKey = 'like' | 'love' | 'haha' | 'wow' | 'sad' | 'angry';
+/* =========================================================
+   MODELS
+========================================================= */
+
+export type ReactionKey =
+  | 'like'
+  | 'love'
+  | 'haha'
+  | 'wow'
+  | 'sad'
+  | 'angry';
 
 export interface CommentUser {
   id: string;
@@ -29,13 +37,22 @@ export interface CommentModel {
   createdAt: Date | string | number;
   editedAt?: Date | string | number | null;
   isPostAuthor?: boolean;
-  /** Name of the person this reply answers (only for replies to a reply). */
   replyTo?: string | null;
   reactions?: Partial<Record<ReactionKey, number>>;
   myReaction?: ReactionKey | null;
   replies?: CommentModel[];
-  /** UI-only: highlights a just-posted comment. */
   isNew?: boolean;
+}
+
+/**
+ * Shape currently used by PostsComponent.
+ * It does not contain an `author` object.
+ */
+export interface FeedCommentInput {
+  id: string;
+  userName: string;
+  text: string;
+  createdAt: Date | string | number;
 }
 
 export interface Reaction {
@@ -52,11 +69,17 @@ interface Draft {
   error: string | null;
 }
 
-const emptyDraft = (): Draft => ({ text: '', file: null, preview: null, error: null });
+const emptyDraft = (): Draft => ({
+  text: '',
+  file: null,
+  preview: null,
+  error: null,
+});
 
-/* ------------------------------------------------------------------ */
-/*  Component                                                          */
-/* ------------------------------------------------------------------ */
+/* =========================================================
+   COMPONENT
+========================================================= */
+
 @Component({
   selector: 'app-comment',
   standalone: true,
@@ -65,156 +88,429 @@ const emptyDraft = (): Draft => ({ text: '', file: null, preview: null, error: n
   styleUrls: ['./comment.component.css'],
 })
 export class CommentComponent implements OnInit, OnDestroy {
-  /* ---------- Inputs / Outputs ---------- */
-  @Input() set comments(value: CommentModel[] | null | undefined) {
-    this._comments = value ? [...value] : [];
-    this._comments.forEach((c) => this.normalize(c));
+  /* =======================================================
+     INPUTS / OUTPUTS
+  ======================================================= */
+
+  /**
+   * Accepts both CommentModel[] and FeedCommentInput[].
+   * Incoming feed comments are normalized into CommentModel.
+   */
+  @Input()
+  set comments(
+    value: CommentModel[] | FeedCommentInput[] | null | undefined,
+  ) {
+    this._comments = (value ?? []).map((comment) =>
+      this.toCommentModel(comment),
+    );
+
+    this._comments.forEach((comment) =>
+      this.normalize(comment),
+    );
+
     this.shown = this.pageSize;
     this.refresh();
   }
-  @Input() currentUser: CommentUser = { id: 'me', name: 'You', avatar: '' };
+
+  @Input() currentUser: CommentUser = {
+    id: 'me',
+    name: 'You',
+    avatar: '',
+  };
+
   @Input() maxLength = 1000;
   @Input() maxImageMB = 5;
   @Input() pageSize = 5;
 
-  /** Emitted when the user posts a comment/reply. `file` is the attached image (upload it yourself). */
-  @Output() commentAdded = new EventEmitter<{ comment: CommentModel; parentId: string | null; file: File | null }>();
-  @Output() commentEdited = new EventEmitter<{ id: string; text: string }>();
-  @Output() commentDeleted = new EventEmitter<{ id: string; parentId: string | null }>();
-  @Output() reacted = new EventEmitter<{ id: string; reaction: ReactionKey | null }>();
-  @Output() reported = new EventEmitter<{ id: string }>();
-  @Output() profileOpened = new EventEmitter<CommentUser>();
+  @Output()
+  commentAdded = new EventEmitter<{
+    comment: CommentModel;
+    parentId: string | null;
+    file: File | null;
+  }>();
 
-  /* ---------- Static data ---------- */
+  @Output()
+  commentEdited = new EventEmitter<{
+    id: string;
+    text: string;
+  }>();
+
+  @Output()
+  commentDeleted = new EventEmitter<{
+    id: string;
+    parentId: string | null;
+  }>();
+
+  @Output()
+  reacted = new EventEmitter<{
+    id: string;
+    reaction: ReactionKey | null;
+  }>();
+
+  @Output()
+  reported = new EventEmitter<{ id: string }>();
+
+  @Output()
+  profileOpened = new EventEmitter<CommentUser>();
+
+  /* =======================================================
+     STATIC DATA
+  ======================================================= */
+
   readonly reactions: Reaction[] = [
-    { key: 'like', emoji: '👍', label: 'Like', color: '#0866ff' },
-    { key: 'love', emoji: '❤️', label: 'Love', color: '#f33e58' },
-    { key: 'haha', emoji: '😂', label: 'Haha', color: '#d99a00' },
-    { key: 'wow', emoji: '😮', label: 'Wow', color: '#d99a00' },
-    { key: 'sad', emoji: '😢', label: 'Sad', color: '#d99a00' },
-    { key: 'angry', emoji: '😡', label: 'Angry', color: '#e9710f' },
+    {
+      key: 'like',
+      emoji: '👍',
+      label: 'Like',
+      color: '#0866ff',
+    },
+    {
+      key: 'love',
+      emoji: '❤️',
+      label: 'Love',
+      color: '#f33e58',
+    },
+    {
+      key: 'haha',
+      emoji: '😂',
+      label: 'Haha',
+      color: '#d99a00',
+    },
+    {
+      key: 'wow',
+      emoji: '😮',
+      label: 'Wow',
+      color: '#d99a00',
+    },
+    {
+      key: 'sad',
+      emoji: '😢',
+      label: 'Sad',
+      color: '#d99a00',
+    },
+    {
+      key: 'angry',
+      emoji: '😡',
+      label: 'Angry',
+      color: '#e9710f',
+    },
   ];
-  readonly emojis = ['😀', '😂', '😍', '🥰', '😎', '🤔', '😢', '😡', '👍', '👏', '🙏', '🔥', '🎉', '❤️', '💯', '✨', '👀', '😅', '🤝', '💪', '🙌', '😭', '🤩', '😴'];
 
-  /* ---------- State ---------- */
+  readonly emojis = [
+    '😀',
+    '😂',
+    '😍',
+    '🥰',
+    '😎',
+    '🤔',
+    '😢',
+    '😡',
+    '👍',
+    '👏',
+    '🙏',
+    '🔥',
+    '🎉',
+    '❤️',
+    '💯',
+    '✨',
+    '👀',
+    '😅',
+    '🤝',
+    '💪',
+    '🙌',
+    '😭',
+    '🤩',
+    '😴',
+  ];
+
+  /* =======================================================
+     STATE
+  ======================================================= */
+
   sort: 'top' | 'newest' = 'top';
+
   view: CommentModel[] = [];
+
   paged: CommentModel[] = [];
+
   shown = 5;
 
   drafts: Record<string, Draft> = {};
-  expanded = new Set<string>(); // threads showing all replies
-  fullText = new Set<string>(); // long comments expanded
+
+  expanded = new Set<string>();
+
+  fullText = new Set<string>();
 
   pickerFor: string | null = null;
+
   menuFor: string | null = null;
+
   emojiFor: string | null = null;
+
   editingId: string | null = null;
+
   editText = '';
+
   confirmDeleteId: string | null = null;
+
   replyingId: string | null = null;
+
   replyingParentId: string | null = null;
+
   toast: string | null = null;
 
   private _comments: CommentModel[] = [];
+
   private pressTimer: ReturnType<typeof setTimeout> | null = null;
+
   private longPressed = false;
+
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
+
   private tick: ReturnType<typeof setInterval> | null = null;
+
   private readonly enterToSend =
-    typeof matchMedia === 'function' && matchMedia('(hover: hover) and (pointer: fine)').matches;
+    typeof matchMedia === 'function' &&
+    matchMedia('(hover: hover) and (pointer: fine)').matches;
 
   constructor(private host: ElementRef<HTMLElement>) {}
 
+  /* =======================================================
+     LIFECYCLE
+  ======================================================= */
+
   ngOnInit(): void {
-    // Re-render every 30s so "6s", "2m" labels stay fresh.
-    this.tick = setInterval(() => {}, 30000);
+    this.tick = setInterval(() => {
+      // Keeps a timer available for relative-time refreshes.
+    }, 30000);
+
     this.shown = this.pageSize;
+
     this.refresh();
   }
 
   ngOnDestroy(): void {
-    if (this.tick) clearInterval(this.tick);
-    if (this.toastTimer) clearTimeout(this.toastTimer);
-    Object.values(this.drafts).forEach((d) => d.preview && URL.revokeObjectURL(d.preview));
+    if (this.tick) {
+      clearInterval(this.tick);
+    }
+
+    if (this.toastTimer) {
+      clearTimeout(this.toastTimer);
+    }
+
+    if (this.pressTimer) {
+      clearTimeout(this.pressTimer);
+    }
+
+    Object.values(this.drafts).forEach((draft) => {
+      if (draft.preview) {
+        URL.revokeObjectURL(draft.preview);
+      }
+    });
+
+    this._comments.forEach((comment) =>
+      this.releaseImages(comment),
+    );
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Derived data                                                       */
-  /* ------------------------------------------------------------------ */
-  trackById = (_: number, c: CommentModel) => c.id;
+  /* =======================================================
+     NORMALIZE INCOMING COMMENTS
+  ======================================================= */
+
+  /**
+   * Converts the post-feed shape:
+   * { id, userName, text, createdAt }
+   *
+   * into the component shape:
+   * { id, author: { id, name }, text, createdAt }.
+   *
+   * Existing CommentModel values are preserved.
+   */
+  private toCommentModel(
+    input: CommentModel | FeedCommentInput,
+  ): CommentModel {
+    const raw = input as Partial<CommentModel> &
+      Partial<FeedCommentInput>;
+
+    const rawName =
+      raw.author?.name?.trim() ||
+      raw.userName?.trim() ||
+      'User';
+
+    const fallbackAuthorId =
+      `feed-user-${rawName.toLowerCase().replace(/\s+/g, '-')}`;
+
+    const author: CommentUser = {
+      id: String(raw.author?.id ?? fallbackAuthorId),
+      name: rawName,
+      avatar: raw.author?.avatar ?? '',
+    };
+
+    const replies = (raw.replies ?? []).map((reply) =>
+      this.toCommentModel(reply),
+    );
+
+    return {
+      id: String(raw.id ?? this.uid()),
+      author,
+      text: String(raw.text ?? ''),
+      image: raw.image ?? null,
+      createdAt: raw.createdAt ?? new Date(),
+      editedAt: raw.editedAt ?? null,
+      isPostAuthor: raw.isPostAuthor ?? false,
+      replyTo: raw.replyTo ?? null,
+      reactions: raw.reactions ?? {},
+      myReaction: raw.myReaction ?? null,
+      replies,
+      isNew: raw.isNew ?? false,
+    };
+  }
+
+  /* =======================================================
+     DERIVED DATA
+  ======================================================= */
+
+  trackById = (_: number, comment: CommentModel) =>
+    comment.id;
 
   get totalCount(): number {
-    return this._comments.reduce((n, c) => n + 1 + (c.replies?.length ?? 0), 0);
+    return this._comments.reduce(
+      (count, comment) =>
+        count + 1 + (comment.replies?.length ?? 0),
+      0,
+    );
   }
 
-  reactionTotal(c: CommentModel): number {
-    return Object.values((c.reactions ?? {}) as Record<string, number>).reduce((a, b) => a + (b || 0), 0);
+  reactionTotal(comment: CommentModel): number {
+    return Object.values(
+      comment.reactions ?? {},
+    ).reduce(
+      (total, count) => total + (count || 0),
+      0,
+    );
   }
 
-  /** Up to 3 most-used reaction emojis, as one string (e.g. "❤️👍"). */
-  reactionEmojis(c: CommentModel): string {
-    const counts = (c.reactions ?? {}) as Record<string, number>;
+  reactionEmojis(comment: CommentModel): string {
+    const counts = comment.reactions ?? {};
+
     return this.reactions
-      .filter((r) => (counts[r.key] || 0) > 0)
-      .sort((a, b) => (counts[b.key] || 0) - (counts[a.key] || 0))
+      .filter((reaction) => (counts[reaction.key] || 0) > 0)
+      .sort(
+        (a, b) =>
+          (counts[b.key] || 0) -
+          (counts[a.key] || 0),
+      )
       .slice(0, 3)
-      .map((r) => r.emoji)
+      .map((reaction) => reaction.emoji)
       .join('');
   }
 
-  reactionOf(key: ReactionKey | null | undefined): Reaction | undefined {
-    return this.reactions.find((r) => r.key === key);
+  reactionOf(
+    key: ReactionKey | null | undefined,
+  ): Reaction | undefined {
+    return this.reactions.find(
+      (reaction) => reaction.key === key,
+    );
   }
 
-  isOwn(c: CommentModel): boolean {
-    return c.author.id === this.currentUser.id;
+  isOwn(comment: CommentModel): boolean {
+    return comment.author.id === this.currentUser.id;
   }
 
-  isLong(c: CommentModel): boolean {
-    return (c.text?.length ?? 0) > 280 || (c.text?.split('\n').length ?? 0) > 6;
+  isLong(comment: CommentModel): boolean {
+    return (
+      (comment.text?.length ?? 0) > 280 ||
+      (comment.text?.split('\n').length ?? 0) > 6
+    );
   }
 
-  replyLimit(c: CommentModel): number {
-    return this.expanded.has(c.id) ? Number.MAX_SAFE_INTEGER : 1;
+  replyLimit(comment: CommentModel): number {
+    return this.expanded.has(comment.id)
+      ? Number.MAX_SAFE_INTEGER
+      : 1;
   }
 
-  getReplyTarget(c: CommentModel): CommentModel {
-    if (this.replyingId === c.id) return c;
-    return c.replies?.find((r) => r.id === this.replyingId) ?? c;
+  getReplyTarget(comment: CommentModel): CommentModel {
+    if (this.replyingId === comment.id) {
+      return comment;
+    }
+
+    return (
+      comment.replies?.find(
+        (reply) => reply.id === this.replyingId,
+      ) ?? comment
+    );
   }
 
   initials(name: string): string {
     return (name || '?')
       .split(/\s+/)
       .slice(0, 2)
-      .map((p) => p[0]?.toUpperCase() ?? '')
+      .map((part) => part[0]?.toUpperCase() ?? '')
       .join('');
   }
 
-  iso(d: Date | string | number): string {
-    return new Date(d).toISOString();
+  iso(date: Date | string | number): string {
+    const parsedDate = new Date(date);
+
+    return Number.isNaN(parsedDate.getTime())
+      ? new Date().toISOString()
+      : parsedDate.toISOString();
   }
 
-  timeAgo(d: Date | string | number): string {
-    const diff = Math.max(0, Math.floor((Date.now() - new Date(d).getTime()) / 1000));
+  timeAgo(date: Date | string | number): string {
+    const timestamp = new Date(date).getTime();
+
+    if (Number.isNaN(timestamp)) {
+      return '';
+    }
+
+    const diff = Math.max(
+      0,
+      Math.floor((Date.now() - timestamp) / 1000),
+    );
+
     if (diff < 5) return 'Just now';
     if (diff < 60) return `${diff}s`;
-    const m = Math.floor(diff / 60);
-    if (m < 60) return `${m}m`;
-    const h = Math.floor(m / 60);
-    if (h < 24) return `${h}h`;
-    const days = Math.floor(h / 24);
-    if (days < 7) return `${days}d`;
-    return new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: days > 300 ? 'numeric' : undefined });
+
+    const minutes = Math.floor(diff / 60);
+
+    if (minutes < 60) {
+      return `${minutes}m`;
+    }
+
+    const hours = Math.floor(minutes / 60);
+
+    if (hours < 24) {
+      return `${hours}h`;
+    }
+
+    const days = Math.floor(hours / 24);
+
+    if (days < 7) {
+      return `${days}d`;
+    }
+
+    return new Date(date).toLocaleDateString(
+      undefined,
+      {
+        month: 'short',
+        day: 'numeric',
+        year: days > 300 ? 'numeric' : undefined,
+      },
+    );
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Sorting / paging                                                   */
-  /* ------------------------------------------------------------------ */
-  setSort(s: 'top' | 'newest'): void {
-    if (this.sort === s) return;
-    this.sort = s;
+  /* =======================================================
+     SORTING / PAGING
+  ======================================================= */
+
+  setSort(sort: 'top' | 'newest'): void {
+    if (this.sort === sort) {
+      return;
+    }
+
+    this.sort = sort;
     this.shown = this.pageSize;
     this.refresh();
   }
@@ -224,51 +520,91 @@ export class CommentComponent implements OnInit, OnDestroy {
     this.paged = this.view.slice(0, this.shown);
   }
 
-  private score(c: CommentModel): number {
-    return this.reactionTotal(c) + (c.replies?.length ?? 0) * 0.5;
+  private score(comment: CommentModel): number {
+    return (
+      this.reactionTotal(comment) +
+      (comment.replies?.length ?? 0) * 0.5
+    );
   }
 
   private refresh(): void {
-    const time = (c: CommentModel) => new Date(c.createdAt).getTime();
+    const timestamp = (comment: CommentModel) =>
+      new Date(comment.createdAt).getTime();
+
     const list = [...this._comments];
+
     list.sort(
       this.sort === 'newest'
-        ? (a, b) => time(b) - time(a)
-        : (a, b) => this.score(b) - this.score(a) || time(b) - time(a)
+        ? (a, b) => timestamp(b) - timestamp(a)
+        : (a, b) =>
+            this.score(b) - this.score(a) ||
+            timestamp(b) - timestamp(a),
     );
+
     this.view = list;
     this.paged = list.slice(0, this.shown);
   }
 
-  private normalize(c: CommentModel): void {
-    c.reactions ??= {};
-    c.replies ??= [];
-    c.myReaction ??= null;
-    c.replies.forEach((r) => this.normalize(r));
+  private normalize(comment: CommentModel): void {
+    comment.reactions ??= {};
+    comment.replies ??= [];
+    comment.myReaction ??= null;
+
+    comment.replies.forEach((reply) =>
+      this.normalize(reply),
+    );
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Reactions                                                          */
-  /* ------------------------------------------------------------------ */
-  react(c: CommentModel, key: ReactionKey): void {
-    c.reactions ??= {};
-    const prev = c.myReaction ?? null;
-    if (prev) c.reactions[prev] = Math.max(0, (c.reactions[prev] ?? 0) - 1);
-    const next = prev === key ? null : key;
-    if (next) c.reactions[next] = (c.reactions[next] ?? 0) + 1;
-    c.myReaction = next;
+  /* =======================================================
+     REACTIONS
+  ======================================================= */
+
+  react(
+    comment: CommentModel,
+    key: ReactionKey,
+  ): void {
+    comment.reactions ??= {};
+
+    const previous = comment.myReaction ?? null;
+
+    if (previous) {
+      comment.reactions[previous] = Math.max(
+        0,
+        (comment.reactions[previous] ?? 0) - 1,
+      );
+    }
+
+    const next = previous === key ? null : key;
+
+    if (next) {
+      comment.reactions[next] =
+        (comment.reactions[next] ?? 0) + 1;
+    }
+
+    comment.myReaction = next;
     this.pickerFor = null;
-    this.reacted.emit({ id: c.id, reaction: next });
+
+    this.reacted.emit({
+      id: comment.id,
+      reaction: next,
+    });
   }
 
-  onLikeDown(e: PointerEvent, c: CommentModel): void {
-    if (e.pointerType === 'mouse') return;
+  onLikeDown(
+    event: PointerEvent,
+    comment: CommentModel,
+  ): void {
+    if (event.pointerType === 'mouse') {
+      return;
+    }
+
     this.cancelPress();
+
     this.pressTimer = setTimeout(() => {
       this.longPressed = true;
       this.menuFor = null;
       this.emojiFor = null;
-      this.pickerFor = c.id;
+      this.pickerFor = comment.id;
     }, 380);
   }
 
@@ -276,116 +612,208 @@ export class CommentComponent implements OnInit, OnDestroy {
     this.cancelPress();
   }
 
-  onLikeClick(c: CommentModel): void {
+  onLikeClick(comment: CommentModel): void {
     if (this.longPressed) {
       this.longPressed = false;
       return;
     }
-    this.react(c, c.myReaction ?? 'like');
+
+    this.react(comment, comment.myReaction ?? 'like');
   }
 
   private cancelPress(): void {
-    if (this.pressTimer) clearTimeout(this.pressTimer);
+    if (this.pressTimer) {
+      clearTimeout(this.pressTimer);
+    }
+
     this.pressTimer = null;
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Menu: edit / delete / copy / report                                */
-  /* ------------------------------------------------------------------ */
-  toggleMenu(c: CommentModel, ev: Event): void {
-    ev.stopPropagation();
+  /* =======================================================
+     MENU: EDIT / DELETE / COPY / REPORT
+  ======================================================= */
+
+  toggleMenu(
+    comment: CommentModel,
+    event: Event,
+  ): void {
+    event.stopPropagation();
+
     this.pickerFor = null;
     this.emojiFor = null;
-    this.menuFor = this.menuFor === c.id ? null : c.id;
+
+    this.menuFor =
+      this.menuFor === comment.id
+        ? null
+        : comment.id;
   }
 
-  startEdit(c: CommentModel): void {
+  startEdit(comment: CommentModel): void {
     this.menuFor = null;
     this.confirmDeleteId = null;
-    this.editingId = c.id;
-    this.editText = c.text;
+    this.editingId = comment.id;
+    this.editText = comment.text;
+
     setTimeout(() => {
-      const el = document.getElementById('edit-' + c.id) as HTMLTextAreaElement | null;
-      if (el) {
-        this.autosize(el);
-        el.focus();
-        el.setSelectionRange(el.value.length, el.value.length);
+      const element = document.getElementById(
+        'edit-' + comment.id,
+      ) as HTMLTextAreaElement | null;
+
+      if (element) {
+        this.autosize(element);
+        element.focus();
+
+        element.setSelectionRange(
+          element.value.length,
+          element.value.length,
+        );
       }
     });
   }
 
-  onEditInput(ev: Event): void {
-    const el = ev.target as HTMLTextAreaElement;
-    this.editText = el.value;
-    this.autosize(el);
+  onEditInput(event: Event): void {
+    const element =
+      event.target as HTMLTextAreaElement;
+
+    this.editText = element.value;
+    this.autosize(element);
   }
 
-  onEditEnter(ev: Event, c: CommentModel): void {
-    const k = ev as KeyboardEvent;
-    if (k.shiftKey || k.isComposing || !this.enterToSend) return;
-    k.preventDefault();
-    this.saveEdit(c);
+  onEditEnter(
+    event: Event,
+    comment: CommentModel,
+  ): void {
+    const keyboardEvent = event as KeyboardEvent;
+
+    if (
+      keyboardEvent.shiftKey ||
+      keyboardEvent.isComposing ||
+      !this.enterToSend
+    ) {
+      return;
+    }
+
+    keyboardEvent.preventDefault();
+    this.saveEdit(comment);
   }
 
-  saveEdit(c: CommentModel): void {
+  saveEdit(comment: CommentModel): void {
     const text = this.editText.trim();
-    if (!text) return;
-    if (text === c.text) return this.cancelEdit();
-    c.text = text;
-    c.editedAt = new Date();
+
+    if (!text) {
+      return;
+    }
+
+    if (text === comment.text) {
+      this.cancelEdit();
+      return;
+    }
+
+    comment.text = text;
+    comment.editedAt = new Date();
+
     this.editingId = null;
-    this.commentEdited.emit({ id: c.id, text });
+
+    this.commentEdited.emit({
+      id: comment.id,
+      text,
+    });
   }
 
   cancelEdit(): void {
     this.editingId = null;
   }
 
-  askDelete(c: CommentModel): void {
+  askDelete(comment: CommentModel): void {
     this.menuFor = null;
-    this.confirmDeleteId = c.id;
+    this.confirmDeleteId = comment.id;
   }
 
-  confirmDelete(c: CommentModel, parent: CommentModel | null): void {
+  confirmDelete(
+    comment: CommentModel,
+    parent: CommentModel | null,
+  ): void {
     if (parent) {
-      parent.replies = (parent.replies ?? []).filter((r) => r.id !== c.id);
+      parent.replies = (parent.replies ?? []).filter(
+        (reply) => reply.id !== comment.id,
+      );
     } else {
-      this._comments = this._comments.filter((x) => x.id !== c.id);
-      this.view = this.view.filter((x) => x.id !== c.id);
+      this._comments = this._comments.filter(
+        (item) => item.id !== comment.id,
+      );
+
+      this.view = this.view.filter(
+        (item) => item.id !== comment.id,
+      );
+
       this.paged = this.view.slice(0, this.shown);
     }
-    this.releaseImages(c);
+
+    this.releaseImages(comment);
     this.confirmDeleteId = null;
-    if (this.replyingParentId === c.id || this.replyingId === c.id) this.cancelReply();
-    this.commentDeleted.emit({ id: c.id, parentId: parent?.id ?? null });
+
+    if (
+      this.replyingParentId === comment.id ||
+      this.replyingId === comment.id
+    ) {
+      this.cancelReply();
+    }
+
+    this.commentDeleted.emit({
+      id: comment.id,
+      parentId: parent?.id ?? null,
+    });
+
     this.showToast('Comment deleted');
   }
 
-  copy(c: CommentModel): void {
+  copy(comment: CommentModel): void {
     this.menuFor = null;
-    if (!navigator.clipboard) return this.showToast('Copy is not supported in this browser');
-    navigator.clipboard.writeText(c.text).then(
+
+    if (!navigator.clipboard) {
+      this.showToast(
+        'Copy is not supported in this browser',
+      );
+      return;
+    }
+
+    navigator.clipboard.writeText(comment.text).then(
       () => this.showToast('Copied to clipboard'),
-      () => this.showToast('Could not copy')
+      () => this.showToast('Could not copy'),
     );
   }
 
-  report(c: CommentModel): void {
+  report(comment: CommentModel): void {
     this.menuFor = null;
-    this.reported.emit({ id: c.id });
-    this.showToast('Thanks, we received your report');
+
+    this.reported.emit({
+      id: comment.id,
+    });
+
+    this.showToast(
+      'Thanks, we received your report',
+    );
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Replies / threads                                                  */
-  /* ------------------------------------------------------------------ */
-  openReply(target: CommentModel, parent: CommentModel | null): void {
+  /* =======================================================
+     REPLIES / THREADS
+  ======================================================= */
+
+  openReply(
+    target: CommentModel,
+    parent: CommentModel | null,
+  ): void {
     const root = parent ?? target;
+
     this.replyingId = target.id;
     this.replyingParentId = root.id;
+
     this.expanded.add(root.id);
     this.menuFor = null;
-    setTimeout(() => this.focusKey('reply:' + root.id));
+
+    setTimeout(() =>
+      this.focusKey('reply:' + root.id),
+    );
   }
 
   cancelReply(): void {
@@ -393,122 +821,221 @@ export class CommentComponent implements OnInit, OnDestroy {
     this.replyingParentId = null;
   }
 
-  toggleReplies(c: CommentModel): void {
-    this.expanded.has(c.id) ? this.expanded.delete(c.id) : this.expanded.add(c.id);
+  toggleReplies(comment: CommentModel): void {
+    if (this.expanded.has(comment.id)) {
+      this.expanded.delete(comment.id);
+    } else {
+      this.expanded.add(comment.id);
+    }
   }
 
-  toggleText(c: CommentModel): void {
-    this.fullText.has(c.id) ? this.fullText.delete(c.id) : this.fullText.add(c.id);
+  toggleText(comment: CommentModel): void {
+    if (this.fullText.has(comment.id)) {
+      this.fullText.delete(comment.id);
+    } else {
+      this.fullText.add(comment.id);
+    }
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Composer                                                           */
-  /* ------------------------------------------------------------------ */
+  /* =======================================================
+     COMPOSER
+  ======================================================= */
+
   getDraft(key: string): Draft {
     return (this.drafts[key] ??= emptyDraft());
   }
 
-  canSend(d: Draft): boolean {
-    return !!d.text.trim() || !!d.file;
+  canSend(draft: Draft): boolean {
+    return !!draft.text.trim() || !!draft.file;
   }
 
-  onInput(key: string, ta: HTMLTextAreaElement): void {
-    this.getDraft(key).text = ta.value;
-    this.autosize(ta);
+  onInput(
+    key: string,
+    textarea: HTMLTextAreaElement,
+  ): void {
+    this.getDraft(key).text = textarea.value;
+    this.autosize(textarea);
   }
 
-  onEnter(ev: Event, key: string, ta: HTMLTextAreaElement, parent: CommentModel | null, target: CommentModel | null): void {
-    const k = ev as KeyboardEvent;
-    if (k.shiftKey || k.isComposing || !this.enterToSend) return;
-    k.preventDefault();
-    this.send(key, ta, parent, target);
+  onEnter(
+    event: Event,
+    key: string,
+    textarea: HTMLTextAreaElement,
+    parent: CommentModel | null,
+    target: CommentModel | null,
+  ): void {
+    const keyboardEvent = event as KeyboardEvent;
+
+    if (
+      keyboardEvent.shiftKey ||
+      keyboardEvent.isComposing ||
+      !this.enterToSend
+    ) {
+      return;
+    }
+
+    keyboardEvent.preventDefault();
+
+    this.send(key, textarea, parent, target);
   }
 
-  send(key: string, ta: HTMLTextAreaElement, parent?: CommentModel | null, target?: CommentModel | null): void {
-    const d = this.getDraft(key);
-    const text = d.text.trim();
-    if (!text && !d.file) return;
+  send(
+    key: string,
+    textarea: HTMLTextAreaElement,
+    parent?: CommentModel | null,
+    target?: CommentModel | null,
+  ): void {
+    const draft = this.getDraft(key);
+    const text = draft.text.trim();
+
+    if (!text && !draft.file) {
+      return;
+    }
 
     const comment: CommentModel = {
       id: this.uid(),
       author: this.currentUser,
       text,
-      image: d.preview,
+      image: draft.preview,
       createdAt: new Date(),
       reactions: {},
       myReaction: null,
       replies: [],
       isNew: true,
-      replyTo: parent && target && target.id !== parent.id ? target.author.name : null,
+      replyTo:
+        parent &&
+        target &&
+        target.id !== parent.id
+          ? target.author.name
+          : null,
     };
 
     if (parent) {
-      parent.replies = [...(parent.replies ?? []), comment];
+      parent.replies = [
+        ...(parent.replies ?? []),
+        comment,
+      ];
+
       this.expanded.add(parent.id);
       this.cancelReply();
     } else {
       this._comments.unshift(comment);
       this.view.unshift(comment);
+
       this.paged = this.view.slice(0, this.shown);
     }
 
-    this.commentAdded.emit({ comment, parentId: parent?.id ?? null, file: d.file });
-    this.drafts[key] = emptyDraft(); // the preview URL now belongs to the comment
+    this.commentAdded.emit({
+      comment,
+      parentId: parent?.id ?? null,
+      file: draft.file,
+    });
+
+    // The preview URL is now attached to the comment.
+    this.drafts[key] = emptyDraft();
+
     this.emojiFor = null;
-    ta.style.height = '';
-    setTimeout(() => (comment.isNew = false), 2000);
+    textarea.style.height = '';
+
+    setTimeout(() => {
+      comment.isNew = false;
+    }, 2000);
   }
 
-  onFile(key: string, ev: Event): void {
-    const input = ev.target as HTMLInputElement;
+  onFile(key: string, event: Event): void {
+    const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
+
     input.value = '';
-    if (!file) return;
-    const d = this.getDraft(key);
+
+    if (!file) {
+      return;
+    }
+
+    const draft = this.getDraft(key);
+
     if (!file.type.startsWith('image/')) {
-      d.error = 'Please choose an image file.';
+      draft.error = 'Please choose an image file.';
       return;
     }
+
     if (file.size > this.maxImageMB * 1024 * 1024) {
-      d.error = `Image must be smaller than ${this.maxImageMB} MB.`;
+      draft.error =
+        `Image must be smaller than ${this.maxImageMB} MB.`;
       return;
     }
+
     this.clearImage(key);
-    d.file = file;
-    d.preview = URL.createObjectURL(file);
-    d.error = null;
+
+    draft.file = file;
+    draft.preview = URL.createObjectURL(file);
+    draft.error = null;
   }
 
   clearImage(key: string): void {
-    const d = this.getDraft(key);
-    if (d.preview) URL.revokeObjectURL(d.preview);
-    d.file = null;
-    d.preview = null;
+    const draft = this.getDraft(key);
+
+    if (draft.preview) {
+      URL.revokeObjectURL(draft.preview);
+    }
+
+    draft.file = null;
+    draft.preview = null;
   }
 
-  toggleEmoji(key: string, ev: Event): void {
-    ev.stopPropagation();
+  toggleEmoji(key: string, event: Event): void {
+    event.stopPropagation();
+
     this.pickerFor = null;
     this.menuFor = null;
-    this.emojiFor = this.emojiFor === key ? null : key;
+
+    this.emojiFor =
+      this.emojiFor === key ? null : key;
   }
 
-  insertEmoji(key: string, emoji: string, ta: HTMLTextAreaElement): void {
-    const start = ta.selectionStart ?? ta.value.length;
-    const end = ta.selectionEnd ?? ta.value.length;
-    if (ta.value.length + emoji.length > this.maxLength) return;
-    ta.setRangeText(emoji, start, end, 'end');
-    this.getDraft(key).text = ta.value;
-    this.autosize(ta);
-    ta.focus();
+  insertEmoji(
+    key: string,
+    emoji: string,
+    textarea: HTMLTextAreaElement,
+  ): void {
+    const start =
+      textarea.selectionStart ?? textarea.value.length;
+
+    const end =
+      textarea.selectionEnd ?? textarea.value.length;
+
+    if (
+      textarea.value.length + emoji.length >
+      this.maxLength
+    ) {
+      return;
+    }
+
+    textarea.setRangeText(
+      emoji,
+      start,
+      end,
+      'end',
+    );
+
+    this.getDraft(key).text = textarea.value;
+
+    this.autosize(textarea);
+    textarea.focus();
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Global listeners                                                   */
-  /* ------------------------------------------------------------------ */
+  /* =======================================================
+     GLOBAL LISTENERS
+  ======================================================= */
+
   @HostListener('document:click', ['$event'])
-  onDocClick(e: Event): void {
-    if ((e.target as HTMLElement)?.closest?.('[data-popover]')) return;
+  onDocClick(event: Event): void {
+    const target = event.target as HTMLElement | null;
+
+    if (target?.closest?.('[data-popover]')) {
+      return;
+    }
+
     this.closePopovers();
   }
 
@@ -523,31 +1050,53 @@ export class CommentComponent implements OnInit, OnDestroy {
     this.emojiFor = null;
   }
 
-  /* ------------------------------------------------------------------ */
-  /*  Helpers                                                            */
-  /* ------------------------------------------------------------------ */
-  autosize(el: HTMLTextAreaElement): void {
-    el.style.height = 'auto';
-    el.style.height = Math.min(el.scrollHeight, 160) + 'px';
+  /* =======================================================
+     HELPERS
+  ======================================================= */
+
+  autosize(element: HTMLTextAreaElement): void {
+    element.style.height = 'auto';
+
+    element.style.height =
+      Math.min(element.scrollHeight, 160) + 'px';
   }
 
   private focusKey(key: string): void {
-    const el = this.host.nativeElement.querySelector<HTMLTextAreaElement>(`textarea[data-key="${key}"]`);
-    el?.focus();
+    const element =
+      this.host.nativeElement.querySelector<HTMLTextAreaElement>(
+        `textarea[data-key="${key}"]`,
+      );
+
+    element?.focus();
   }
 
-  private showToast(msg: string): void {
-    this.toast = msg;
-    if (this.toastTimer) clearTimeout(this.toastTimer);
-    this.toastTimer = setTimeout(() => (this.toast = null), 2400);
+  private showToast(message: string): void {
+    this.toast = message;
+
+    if (this.toastTimer) {
+      clearTimeout(this.toastTimer);
+    }
+
+    this.toastTimer = setTimeout(() => {
+      this.toast = null;
+    }, 2400);
   }
 
-  private releaseImages(c: CommentModel): void {
-    if (c.image?.startsWith('blob:')) URL.revokeObjectURL(c.image);
-    c.replies?.forEach((r) => this.releaseImages(r));
+  private releaseImages(comment: CommentModel): void {
+    if (comment.image?.startsWith('blob:')) {
+      URL.revokeObjectURL(comment.image);
+    }
+
+    comment.replies?.forEach((reply) =>
+      this.releaseImages(reply),
+    );
   }
 
   private uid(): string {
-    return 'c' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    return (
+      'c' +
+      Date.now().toString(36) +
+      Math.random().toString(36).slice(2, 7)
+    );
   }
 }
