@@ -1,0 +1,391 @@
+
+/* =========================================
+   Route Posts — PWA Install Card
+   ========================================= */
+
+.pwa-install-card {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 99999;
+
+  width: min(370px, calc(100vw - 32px));
+  padding: 20px;
+
+  color: #fff;
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      rgba(59, 130, 246, 0.26),
+      transparent 44%
+    ),
+    linear-gradient(145deg, #0b1225 0%, #142b55 100%);
+
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: 24px;
+
+  box-shadow:
+    0 24px 65px rgba(10, 25, 55, 0.28),
+    0 4px 15px rgba(15, 23, 42, 0.15);
+
+  font-family: inherit;
+  direction: rtl;
+
+  animation: pwa-card-enter 450ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.pwa-install-card.is-leaving {
+  animation: pwa-card-exit 650ms ease forwards;
+  pointer-events: none;
+}
+
+.pwa-install-card__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-left: 12px;
+}
+
+.pwa-install-card__icon {
+  display: flex;
+  flex: 0 0 54px;
+  width: 54px;
+  height: 54px;
+  align-items: center;
+  justify-content: center;
+
+  color: #fff;
+  background: linear-gradient(145deg, #3b82f6, #1d4ed8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 17px;
+
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.3);
+}
+
+.pwa-install-card__content {
+  min-width: 0;
+  padding-top: 1px;
+}
+
+.pwa-install-card__eyebrow {
+  display: block;
+  margin-bottom: 5px;
+
+  color: #93c5fd;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+}
+
+.pwa-install-card__content h3 {
+  margin: 0;
+  padding: 0;
+
+  color: #fff;
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.pwa-install-card__content p {
+  margin: 6px 0 0;
+
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.8;
+}
+
+.pwa-install-card__close {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+
+  display: flex;
+  width: 29px;
+  height: 29px;
+  align-items: center;
+  justify-content: center;
+
+  color: #cbd5e1;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 50%;
+
+  font-size: 21px;
+  line-height: 1;
+  cursor: pointer;
+
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.pwa-install-card__close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.16);
+  transform: rotate(90deg);
+}
+
+.pwa-install-card__action {
+  display: flex;
+  width: 100%;
+  min-height: 47px;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+
+  margin-top: 18px;
+  padding: 12px 16px;
+
+  color: #163b83;
+  background: linear-gradient(135deg, #fff 0%, #eaf2ff 100%);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 14px;
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background 180ms ease;
+}
+
+.pwa-install-card__action:hover {
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  transform: translateY(-2px);
+}
+
+.pwa-install-card__action:active {
+  transform: translateY(0) scale(0.985);
+}
+
+.pwa-install-card__action:focus-visible,
+.pwa-install-card__close:focus-visible {
+  outline: 3px solid #93c5fd;
+  outline-offset: 3px;
+}
+
+.pwa-install-card__hint {
+  margin: 12px 0 0;
+  color: #94a3b8;
+  font-size: 10px;
+  text-align: center;
+}
+
+.pwa-install-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100000;
+
+  max-width: min(380px, calc(100vw - 40px));
+  padding: 14px 18px;
+
+  color: #fff;
+  background: #142b55;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.2);
+
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.8;
+
+  animation: pwa-card-enter 250ms ease both;
+}
+
+@keyframes pwa-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pwa-card-exit {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 480px) {
+  .pwa-install-card {
+    right: 16px;
+    bottom: 16px;
+    width: calc(100vw - 32px);
+    padding: 17px;
+    border-radius: 21px;
+  }
+
+  .pwa-install-card__content h3 {
+    font-size: 16px;
+  }
+
+  .pwa-install-card__action {
+    min-height: 45px;
+  }
+
+  .pwa-install-toast {
+    top: 14px;
+    right: 14px;
+    max-width: calc(100vw - 28px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pwa-install-card,
+  .pwa-install-card.is-leaving,
+  .pwa-install-toast {
+    animation-duration: 1ms;
+  }
+}
+
+/* =========================================
+   PWA Install Card — Responsive All Screens
+   ========================================= */
+
+.pwa-install-card,
+.pwa-install-card * {
+  box-sizing: border-box;
+}
+
+.pwa-install-card {
+  position: fixed;
+  z-index: 99999;
+
+  /* Keep the card inside the viewport */
+  right: max(12px, env(safe-area-inset-right, 0px));
+  bottom: max(12px, env(safe-area-inset-bottom, 0px));
+
+  width: min(370px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
+  max-height: calc(100dvh - 24px);
+
+  overflow-y: auto;
+  overflow-x: hidden;
+  overflow-wrap: anywhere;
+
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .pwa-install-card {
+    right: 12px;
+    bottom: max(12px, env(safe-area-inset-bottom, 0px));
+
+    width: calc(100vw - 24px);
+    max-width: 370px;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .pwa-install-card__header {
+    gap: 11px;
+    padding-left: 10px;
+  }
+
+  .pwa-install-card__icon {
+    flex-basis: 46px;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+  }
+
+  .pwa-install-card__content h3 {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .pwa-install-card__content p {
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .pwa-install-card__action {
+    width: 100%;
+    min-height: 46px;
+    margin-top: 15px;
+    padding: 11px;
+    font-size: 13px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+  .pwa-install-card {
+    padding: 13px;
+    border-radius: 17px;
+  }
+
+  .pwa-install-card__header {
+    gap: 9px;
+    padding-left: 12px;
+  }
+
+  .pwa-install-card__icon {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .pwa-install-card__content h3 {
+    font-size: 14px;
+  }
+
+  .pwa-install-card__content p {
+    font-size: 11px;
+  }
+
+  .pwa-install-card__hint {
+    font-size: 9px;
+  }
+}
+
+/* Tablets */
+@media (min-width: 481px) and (max-width: 1024px) {
+  .pwa-install-card {
+    right: 20px;
+    bottom: 20px;
+    width: min(350px, calc(100vw - 40px));
+  }
+}
+
+/* Landscape phones and short screens */
+@media (max-height: 500px) and (orientation: landscape) {
+  .pwa-install-card {
+    right: 10px;
+    bottom: 10px;
+
+    width: min(340px, calc(100vw - 20px));
+    max-height: calc(100dvh - 20px);
+
+    padding: 12px;
+  }
+
+  .pwa-install-card__action {
+    margin-top: 10px;
+    min-height: 40px;
+  }
+
+  .pwa-install-card__hint {
+    margin-top: 7px;
+  }
+}

@@ -1,1 +1,87 @@
-<router-outlet></router-outlet>
+
+<router-outlet />
+
+@if (installBannerVisible()) {
+  <aside
+    class="pwa-install-card"
+    [class.is-leaving]="installBannerFading()"
+    dir="rtl"
+    aria-label="تثبيت تطبيق Route Posts"
+  >
+    <button
+      type="button"
+      class="pwa-install-card__close"
+      (click)="dismissInstallBanner()"
+      aria-label="إغلاق بطاقة التثبيت"
+      title="إخفاء"
+    >
+      &times;
+    </button>
+
+    <div class="pwa-install-card__header">
+      <div class="pwa-install-card__icon" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          width="28"
+          height="28"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="6" y="2.5" width="12" height="19" rx="3" />
+          <path d="M10 18h4" />
+          <path d="M12 6v7" />
+          <path d="m9 10 3 3 3-3" />
+        </svg>
+      </div>
+
+      <div class="pwa-install-card__content">
+        <span class="pwa-install-card__eyebrow">
+          ROUTE POSTS
+        </span>
+
+        <h3>خلّي مجتمعك أقرب ليك</h3>
+
+        <p>
+          ثبّت التطبيق وافتحه بسهولة من الشاشة الرئيسية.
+        </p>
+      </div>
+    </div>
+
+    <button
+      type="button"
+      class="pwa-install-card__action"
+      (click)="installApp()"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="19"
+        height="19"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 3v12" />
+        <path d="m7 10 5 5 5-5" />
+        <path d="M5 17v4h14v-4" />
+      </svg>
+
+      <span>تثبيت التطبيق</span>
+    </button>
+
+    <p class="pwa-install-card__hint">
+      ستختفي هذه الرسالة تلقائيًا
+    </p>
+  </aside>
+}
+
+@if (installMessage()) {
+  <div class="pwa-install-toast" role="status" dir="rtl">
+    {{ installMessage() }}
+  </div>
+}
