@@ -1,12 +1,27 @@
-import { Component, ElementRef, inject, OnDestroy, OnInit, signal, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 
 import { PostsService } from './components/posts.service';
 import { Post } from './models/post.interface';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { CommentComponent } from './comment/comment.component';
 
-export type ReactionType = 'like' | 'love' | 'haha' | 'wow' | 'sad' | 'angry';
+export type ReactionType =
+  | 'like'
+  | 'love'
+  | 'haha'
+  | 'wow'
+  | 'sad'
+  | 'angry';
 
 export type PostPrivacy = 'public' | 'followers' | 'private';
 
@@ -23,7 +38,10 @@ export interface FeedComment {
   createdAt: string;
 }
 
-type ApiPost = Omit<Post, 'privacy' | 'likesCount' | 'commentsCount' | 'sharesCount'> & {
+type ApiPost = Omit<
+  Post,
+  'privacy' | 'likesCount' | 'commentsCount' | 'sharesCount'
+> & {
   privacy?: PostPrivacy | null;
   likesCount?: unknown;
   commentsCount?: unknown;
@@ -33,7 +51,10 @@ type ApiPost = Omit<Post, 'privacy' | 'likesCount' | 'commentsCount' | 'sharesCo
   shares?: unknown;
 };
 
-export type FeedPost = Omit<Post, 'privacy' | 'likesCount' | 'commentsCount' | 'sharesCount'> & {
+export type FeedPost = Omit<
+  Post,
+  'privacy' | 'likesCount' | 'commentsCount' | 'sharesCount'
+> & {
   privacy: PostPrivacy;
   likesCount: number;
   commentsCount: number;
@@ -51,7 +72,7 @@ export type FeedPost = Omit<Post, 'privacy' | 'likesCount' | 'commentsCount' | '
 @Component({
   selector: 'app-posts',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule , CommentComponent],
   templateUrl: './posts.component.html',
   styleUrl: './posts.component.css',
 })
@@ -65,20 +86,16 @@ export class PostsComponent implements OnInit, OnDestroy {
   // FORM CONTROLS
   // =====================================================
 
-  // Post content is optional.
   readonly content = new FormControl('', {
     nonNullable: true,
   });
 
-  // Privacy defaults to public and has no required validator.
   readonly privacy = new FormControl<PostPrivacy>('public', {
     nonNullable: true,
   });
 
   readonly publishing = signal(false);
-
   readonly postActionMessage = signal('');
-
   readonly postActionIsError = signal(false);
 
   // =====================================================
@@ -86,11 +103,10 @@ export class PostsComponent implements OnInit, OnDestroy {
   // =====================================================
 
   readonly userId = signal<string | null>(null);
-
+  readonly currentUserName = signal<string>('User');
   readonly allposts = signal<FeedPost[]>([]);
 
   readonly loading = signal(false);
-
   readonly errorMessage = signal('');
 
   // =====================================================
@@ -103,14 +119,9 @@ export class PostsComponent implements OnInit, OnDestroy {
   // IMAGE / VIDEO FILE SIGNALS
   // =====================================================
 
-  // Stores the original selected File object.
   readonly selectedMediaFile = signal<File | null>(null);
-
-  // Temporary URL used to preview the selected media.
   readonly mediaPreviewUrl = signal<string | null>(null);
-
   readonly mediaType = signal<'image' | 'video' | null>(null);
-
   readonly mediaError = signal('');
 
   @ViewChild('postMediaInput')
@@ -141,7 +152,6 @@ export class PostsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.postsSubscription?.unsubscribe();
     this.createPostSubscription?.unsubscribe();
-
     this.releaseMediaPreview();
   }
 
@@ -150,30 +160,72 @@ export class PostsComponent implements OnInit, OnDestroy {
   // =====================================================
 
   private loadCurrentUserId(): void {
+    this.userId.set(null);
+    this.currentUserName.set('User');
+
     if (typeof localStorage === 'undefined') {
-      this.userId.set(null);
       return;
     }
 
-    const storedUser = localStorage.getItem('user');
+    let storedUser: string | null;
+
+    try {
+      storedUser = localStorage.getItem('user');
+    } catch (error) {
+      console.error('Unable to access local storage:', error);
+      return;
+    }
 
     if (!storedUser) {
-      this.userId.set(null);
       return;
     }
 
     try {
       const parsedUser: unknown = JSON.parse(storedUser);
-      const user = this.asRecord(parsedUser);
+      const parsedRecord = this.asRecord(parsedUser);
 
-      const id = user['_id'] ?? user['id'] ?? user['userId'];
+      // Supports both a direct user object and a nested user object.
+      const nestedUser = this.asRecord(
+        parsedRecord['user'] ?? parsedRecord['data'],
+      );
+
+      const user =
+        Object.keys(nestedUser).length > 0
+          ? nestedUser
+          : parsedRecord;
+
+      const id =
+        user['_id'] ??
+        user['id'] ??
+        user['userId'];
 
       this.userId.set(
-        id === null || id === undefined || String(id).trim() === '' ? null : String(id),
+        id === null ||
+          id === undefined ||
+          String(id).trim() === ''
+          ? null
+          : String(id),
+      );
+
+      const rawName =
+        user['name'] ??
+        user['username'] ??
+        user['userName'] ??
+        user['fullName'] ??
+        user['displayName'] ??
+        user['firstName'] ??
+        user['email'];
+
+      this.currentUserName.set(
+        typeof rawName === 'string' && rawName.trim().length > 0
+          ? rawName.trim()
+          : 'User',
       );
     } catch (error) {
       console.error('Unable to read the current user:', error);
+
       this.userId.set(null);
+      this.currentUserName.set('User');
     }
   }
 
@@ -191,7 +243,10 @@ export class PostsComponent implements OnInit, OnDestroy {
     const record = post as unknown as Record<string, unknown>;
 
     const ownerSource =
-      record['user'] ?? record['owner'] ?? record['author'] ?? record['createdBy'];
+      record['user'] ??
+      record['owner'] ??
+      record['author'] ??
+      record['createdBy'];
 
     const owner = this.asRecord(ownerSource);
 
@@ -203,7 +258,8 @@ export class PostsComponent implements OnInit, OnDestroy {
       record['ownerId'] ??
       record['authorId'] ??
       record['createdById'] ??
-      (typeof ownerSource === 'string' || typeof ownerSource === 'number'
+      (typeof ownerSource === 'string' ||
+      typeof ownerSource === 'number'
         ? ownerSource
         : undefined);
 
@@ -218,12 +274,12 @@ export class PostsComponent implements OnInit, OnDestroy {
   // NEW POST PRIVACY
   // =====================================================
 
-  selectNewPostPrivacy(privacy: PostPrivacy, menu: HTMLDetailsElement): void {
+  selectNewPostPrivacy(
+    privacy: PostPrivacy,
+    menu: HTMLDetailsElement,
+  ): void {
     this.newPostPrivacy = privacy;
-
-    // Keep the FormControl synchronized with the privacy dropdown.
     this.privacy.setValue(privacy);
-
     menu.open = false;
   }
 
@@ -238,49 +294,39 @@ export class PostsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // 1. Get privacy from FormControl.
     const privacy = this.privacy.value;
-
-    // 2. Get content from FormControl.
     const content = this.content.value.trim();
-
-    // 3. Get the actual selected file from the Signal.
     const file = this.selectedMediaFile();
 
-    // Content and image are both optional,
-    // but at least one must be supplied.
+    // A post must contain text, an image, or both.
     if (!content && !file) {
       this.postActionIsError.set(true);
-
-      this.postActionMessage.set('Please write a post or select an image.');
-
+      this.postActionMessage.set(
+        'Please write a post or select an image.',
+      );
       return;
     }
 
-    // This request currently sends images through the image field.
+    // The current API request supports image uploads only.
     if (file && !file.type.startsWith('image/')) {
-      this.mediaError.set('Please select an image. Video publishing requires backend support.');
-
+      this.mediaError.set(
+        'Please select an image. Video publishing requires backend support.',
+      );
       return;
     }
 
-    // Prepare multipart/form-data.
     const formData = new FormData();
 
-    // Privacy value.
-    formData.append('privacy', this.privacy.value);
+    formData.append('privacy', privacy);
 
-    // Content value is optional.
     if (content) {
-      formData.append('body', this.content.value);
+      formData.append('body', content);
     }
 
-    // Image file is optional.
     if (file) {
       formData.append('image', file, file.name);
     }
 
-    // Verify the three values before sending.
     console.log('Privacy:', privacy);
     console.log('Content:', content);
     console.log('File:', file);
@@ -292,42 +338,41 @@ export class PostsComponent implements OnInit, OnDestroy {
 
     this.createPostSubscription?.unsubscribe();
 
-    // Use the actual method name from PostsService.
-    this.createPostSubscription = this.postsService.createPosts(formData).subscribe({
-      next: () => {
-        // Reset the form after successful creation.
-        this.content.reset('');
-        this.privacy.setValue('public');
-        this.newPostPrivacy = 'public';
+    this.createPostSubscription =
+      this.postsService.createPosts(formData).subscribe({
+        next: () => {
+          this.content.reset('');
+          this.privacy.setValue('public');
+          this.newPostPrivacy = 'public';
 
-        this.removeSelectedMedia();
+          this.removeSelectedMedia();
 
-        this.publishing.set(false);
-        this.postActionIsError.set(false);
+          this.publishing.set(false);
+          this.postActionIsError.set(false);
+          this.postActionMessage.set(
+            'Post published successfully.',
+          );
 
-        this.postActionMessage.set('Post published successfully.');
+          this.getPostsData();
+        },
 
-        // Refresh posts from the backend.
-        this.getPostsData();
-      },
+        error: (error: unknown) => {
+          console.error('Failed to publish post:', error);
 
-      error: (error: unknown) => {
-        console.error('Failed to publish post:', error);
+          const errorRecord = this.asRecord(error);
+          const errorBody = this.asRecord(errorRecord['error']);
+          const apiMessage = errorBody['message'];
 
-        const errorRecord = this.asRecord(error);
-        const errorBody = this.asRecord(errorRecord['error']);
-        const apiMessage = errorBody['message'];
+          this.publishing.set(false);
+          this.postActionIsError.set(true);
 
-        this.publishing.set(false);
-        this.postActionIsError.set(true);
-
-        this.postActionMessage.set(
-          typeof apiMessage === 'string'
-            ? apiMessage
-            : 'Unable to publish post. Check your login and try again.',
-        );
-      },
-    });
+          this.postActionMessage.set(
+            typeof apiMessage === 'string'
+              ? apiMessage
+              : 'Unable to publish post. Check your login and try again.',
+          );
+        },
+      });
   }
 
   // =====================================================
@@ -336,8 +381,6 @@ export class PostsComponent implements OnInit, OnDestroy {
 
   onMediaSelected(event: Event): void {
     const input = event.currentTarget as HTMLInputElement;
-
-    // Read the selected File object.
     const file = input.files?.[0];
 
     if (!file) {
@@ -347,29 +390,23 @@ export class PostsComponent implements OnInit, OnDestroy {
     const isImage = file.type.startsWith('image/');
     const isVideo = file.type.startsWith('video/');
 
-    // Reject unsupported file types.
     if (!isImage && !isVideo) {
-      this.mediaError.set('Please select an image or video file.');
+      this.mediaError.set(
+        'Please select an image or video file.',
+      );
 
       input.value = '';
       return;
     }
 
-    // Release the previous attachment and preview.
     this.releaseMediaPreview();
 
-    // Save the original File object in the Signal.
     this.selectedMediaFile.set(file);
-
-    // Determine the selected media type.
     this.mediaType.set(isImage ? 'image' : 'video');
-
-    // Create a temporary URL for preview only.
     this.mediaPreviewUrl.set(URL.createObjectURL(file));
-
     this.mediaError.set('');
 
-    // Allow selecting the same file again.
+    // Allows the user to select the same file again.
     input.value = '';
   }
 
@@ -379,7 +416,6 @@ export class PostsComponent implements OnInit, OnDestroy {
 
   removeSelectedMedia(): void {
     this.releaseMediaPreview();
-
     this.mediaError.set('');
 
     if (this.postMediaInput) {
@@ -422,58 +458,80 @@ export class PostsComponent implements OnInit, OnDestroy {
         const apiPosts = (res?.data?.posts ?? []) as ApiPost[];
 
         const previousPosts = new Map(
-          this.allposts().map((post) => [String(post.id), post] as const),
+          this.allposts().map(
+            (post) => [String(post.id), post] as const,
+          ),
         );
 
-        const updatedPosts: FeedPost[] = apiPosts.map((apiPost): FeedPost => {
-          const previous = previousPosts.get(String(apiPost.id));
+        const updatedPosts: FeedPost[] = apiPosts.map(
+          (apiPost): FeedPost => {
+            const previous = previousPosts.get(
+              String(apiPost.id),
+            );
 
-          const apiComments = this.normalizeComments(apiPost.comments);
+            const apiComments = this.normalizeComments(
+              apiPost.comments,
+            );
 
-          const commentsList = this.mergeComments(apiComments, previous?.commentsList ?? []);
+            const commentsList = this.mergeComments(
+              apiComments,
+              previous?.commentsList ?? [],
+            );
 
-          const commentsCount = Math.max(
-            this.normalizeCount(
-              apiPost.commentsCount,
-              apiPost.comments ?? previous?.commentsCount ?? 0,
-            ),
-            commentsList.length,
-          );
+            const commentsCount = Math.max(
+              this.normalizeCount(
+                apiPost.commentsCount,
+                apiPost.comments ??
+                  previous?.commentsCount ??
+                  0,
+              ),
+              commentsList.length,
+            );
 
-          return {
-            ...apiPost,
+            return {
+              ...apiPost,
 
-            privacy: this.normalizePrivacy(apiPost.privacy) ?? previous?.privacy ?? 'public',
+              privacy:
+                this.normalizePrivacy(apiPost.privacy) ??
+                previous?.privacy ??
+                'public',
 
-            likesCount: this.normalizeCount(
-              apiPost.likesCount,
-              apiPost.likes ?? previous?.likesCount ?? 0,
-            ),
+              likesCount: this.normalizeCount(
+                apiPost.likesCount,
+                apiPost.likes ??
+                  previous?.likesCount ??
+                  0,
+              ),
 
-            commentsCount,
+              commentsCount,
 
-            sharesCount: this.normalizeCount(
-              apiPost.sharesCount,
-              apiPost.shares ?? previous?.sharesCount ?? 0,
-            ),
+              sharesCount: this.normalizeCount(
+                apiPost.sharesCount,
+                apiPost.shares ??
+                  previous?.sharesCount ??
+                  0,
+              ),
 
-            myReaction: previous?.myReaction ?? null,
+              myReaction: previous?.myReaction ?? null,
 
-            isReactionPickerOpen: false,
+              isReactionPickerOpen: false,
 
-            isSaved: previous?.isSaved ?? false,
+              isSaved: previous?.isSaved ?? false,
 
-            isFollowing: previous?.isFollowing ?? false,
+              isFollowing: previous?.isFollowing ?? false,
 
-            isCommentsOpen: previous?.isCommentsOpen ?? false,
+              isCommentsOpen:
+                previous?.isCommentsOpen ?? false,
 
-            commentText: previous?.commentText ?? '',
+              commentText: previous?.commentText ?? '',
 
-            isCommentPreviewOpen: previous?.isCommentPreviewOpen ?? false,
+              isCommentPreviewOpen:
+                previous?.isCommentPreviewOpen ?? false,
 
-            commentsList,
-          } as FeedPost;
-        });
+              commentsList,
+            } as FeedPost;
+          },
+        );
 
         this.allposts.set(updatedPosts);
         this.loading.set(false);
@@ -486,7 +544,9 @@ export class PostsComponent implements OnInit, OnDestroy {
         console.error('Failed to load posts:', error);
 
         if (this.allposts().length === 0) {
-          this.errorMessage.set('Unable to load posts. Please try again.');
+          this.errorMessage.set(
+            'Unable to load posts. Please try again.',
+          );
         }
 
         this.loading.set(false);
@@ -498,43 +558,69 @@ export class PostsComponent implements OnInit, OnDestroy {
   // DATA HELPERS
   // =====================================================
 
-  private normalizePrivacy(value: unknown): PostPrivacy | null {
-    if (value === 'public' || value === 'followers' || value === 'private') {
+  private normalizePrivacy(
+    value: unknown,
+  ): PostPrivacy | null {
+    if (
+      value === 'public' ||
+      value === 'followers' ||
+      value === 'private'
+    ) {
       return value;
     }
 
     return null;
   }
 
-  private normalizeCount(value: unknown, fallback: unknown = 0): number {
+  private normalizeCount(
+    value: unknown,
+    fallback: unknown = 0,
+  ): number {
     const candidate = value ?? fallback ?? 0;
 
     if (Array.isArray(candidate)) {
       return candidate.length;
     }
 
-    if (typeof candidate === 'object' && candidate !== null && 'length' in candidate) {
+    if (
+      typeof candidate === 'object' &&
+      candidate !== null &&
+      'length' in candidate
+    ) {
       const length = Number(candidate.length);
 
-      if (Number.isFinite(length) && length >= 0) {
+      if (
+        Number.isFinite(length) &&
+        length >= 0
+      ) {
         return length;
       }
     }
 
     const count = Number(candidate);
 
-    return Number.isFinite(count) && count >= 0 ? count : 0;
+    return Number.isFinite(count) && count >= 0
+      ? count
+      : 0;
   }
 
-  private asRecord(value: unknown): Record<string, unknown> {
-    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+  private asRecord(
+    value: unknown,
+  ): Record<string, unknown> {
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value)
+    ) {
       return value as Record<string, unknown>;
     }
 
     return {};
   }
 
-  private normalizeComments(value: unknown): FeedComment[] {
+  private normalizeComments(
+    value: unknown,
+  ): FeedComment[] {
     if (!Array.isArray(value)) {
       return [];
     }
@@ -544,13 +630,23 @@ export class PostsComponent implements OnInit, OnDestroy {
         const comment = this.asRecord(item);
 
         const commentUser = this.asRecord(
-          comment['user'] ?? comment['commentCreator'] ?? comment['author'],
+          comment['user'] ??
+            comment['commentCreator'] ??
+            comment['author'],
         );
 
         const rawText =
-          comment['text'] ?? comment['content'] ?? comment['body'] ?? comment['comment'] ?? '';
+          comment['text'] ??
+          comment['content'] ??
+          comment['body'] ??
+          comment['comment'] ??
+          '';
 
-        const rawId = comment['id'] ?? comment['_id'] ?? comment['commentId'] ?? `api-${index}`;
+        const rawId =
+          comment['id'] ??
+          comment['_id'] ??
+          comment['commentId'] ??
+          `api-${index}`;
 
         const rawUserName =
           comment['userName'] ??
@@ -559,7 +655,11 @@ export class PostsComponent implements OnInit, OnDestroy {
           commentUser['username'] ??
           'مستخدم';
 
-        const rawCreatedAt = comment['createdAt'] ?? comment['created_at'] ?? comment['date'] ?? '';
+        const rawCreatedAt =
+          comment['createdAt'] ??
+          comment['created_at'] ??
+          comment['date'] ??
+          '';
 
         return {
           id: String(rawId),
@@ -568,16 +668,24 @@ export class PostsComponent implements OnInit, OnDestroy {
           createdAt: String(rawCreatedAt),
         };
       })
-      .filter((comment) => comment.text.trim().length > 0);
+      .filter(
+        (comment) => comment.text.trim().length > 0,
+      );
   }
 
   private mergeComments(
     apiComments: FeedComment[],
     previousComments: FeedComment[],
   ): FeedComment[] {
-    const uniqueComments = new Map<string, FeedComment>();
+    const uniqueComments = new Map<
+      string,
+      FeedComment
+    >();
 
-    for (const comment of [...apiComments, ...previousComments]) {
+    for (const comment of [
+      ...apiComments,
+      ...previousComments,
+    ]) {
       if (!uniqueComments.has(comment.id)) {
         uniqueComments.set(comment.id, comment);
       }
@@ -586,9 +694,16 @@ export class PostsComponent implements OnInit, OnDestroy {
     return Array.from(uniqueComments.values());
   }
 
-  private updatePost(postId: Post['id'], update: (post: FeedPost) => FeedPost): void {
+  private updatePost(
+    postId: Post['id'],
+    update: (post: FeedPost) => FeedPost,
+  ): void {
     this.allposts.update((posts) =>
-      posts.map((post) => (String(post.id) === String(postId) ? update(post) : post)),
+      posts.map((post) =>
+        String(post.id) === String(postId)
+          ? update(post)
+          : post,
+      ),
     );
   }
 
@@ -596,8 +711,12 @@ export class PostsComponent implements OnInit, OnDestroy {
   // REACTIONS
   // =====================================================
 
-  getCurrentReaction(post: FeedPost): Reaction | undefined {
-    return this.reactions.find((reaction) => reaction.type === post.myReaction);
+  getCurrentReaction(
+    post: FeedPost,
+  ): Reaction | undefined {
+    return this.reactions.find(
+      (reaction) => reaction.type === post.myReaction,
+    );
   }
 
   toggleLike(post: FeedPost): void {
@@ -606,12 +725,18 @@ export class PostsComponent implements OnInit, OnDestroy {
         return {
           ...current,
           myReaction: null,
-          likesCount: Math.max(0, current.likesCount - 1),
+          likesCount: Math.max(
+            0,
+            current.likesCount - 1,
+          ),
           isReactionPickerOpen: false,
         };
       }
 
-      const likesCount = current.myReaction === null ? current.likesCount + 1 : current.likesCount;
+      const likesCount =
+        current.myReaction === null
+          ? current.likesCount + 1
+          : current.likesCount;
 
       return {
         ...current,
@@ -622,18 +747,27 @@ export class PostsComponent implements OnInit, OnDestroy {
     });
   }
 
-  selectReaction(post: FeedPost, type: ReactionType): void {
+  selectReaction(
+    post: FeedPost,
+    type: ReactionType,
+  ): void {
     this.updatePost(post.id, (current) => {
       if (current.myReaction === type) {
         return {
           ...current,
           myReaction: null,
-          likesCount: Math.max(0, current.likesCount - 1),
+          likesCount: Math.max(
+            0,
+            current.likesCount - 1,
+          ),
           isReactionPickerOpen: false,
         };
       }
 
-      const likesCount = current.myReaction === null ? current.likesCount + 1 : current.likesCount;
+      const likesCount =
+        current.myReaction === null
+          ? current.likesCount + 1
+          : current.likesCount;
 
       return {
         ...current,
@@ -647,7 +781,8 @@ export class PostsComponent implements OnInit, OnDestroy {
   toggleReactionPicker(post: FeedPost): void {
     this.updatePost(post.id, (current) => ({
       ...current,
-      isReactionPickerOpen: !current.isReactionPickerOpen,
+      isReactionPickerOpen:
+        !current.isReactionPickerOpen,
     }));
   }
 
@@ -662,7 +797,10 @@ export class PostsComponent implements OnInit, OnDestroy {
   // POST PRIVACY, SAVING AND FOLLOWING
   // =====================================================
 
-  setPrivacy(post: FeedPost, privacy: PostPrivacy): void {
+  setPrivacy(
+    post: FeedPost,
+    privacy: PostPrivacy,
+  ): void {
     if (!this.isOwnPost(post)) {
       return;
     }
@@ -698,7 +836,10 @@ export class PostsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  setCommentText(post: FeedPost, value: string): void {
+  setCommentText(
+    post: FeedPost,
+    value: string,
+  ): void {
     this.updatePost(post.id, (current) => ({
       ...current,
       commentText: value,
@@ -739,20 +880,30 @@ export class PostsComponent implements OnInit, OnDestroy {
 
       const newComment: FeedComment = {
         id: `${String(current.id)}-local-${Date.now()}`,
-        userName: 'أنت',
+        userName: this.currentUserName(),
         text,
-        createdAt: new Date().toLocaleTimeString('ar-EG', {
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
+        createdAt: new Date().toLocaleTimeString(
+          'ar-EG',
+          {
+            hour: '2-digit',
+            minute: '2-digit',
+          },
+        ),
       };
 
-      const commentsList = [...current.commentsList, newComment];
+      const commentsList = [
+        ...current.commentsList,
+        newComment,
+      ];
 
       return {
         ...current,
         commentsList,
-        commentsCount: Math.max(current.commentsCount, current.commentsList.length) + 1,
+        commentsCount:
+          Math.max(
+            current.commentsCount,
+            current.commentsList.length,
+          ) + 1,
         commentText: '',
         isCommentPreviewOpen: false,
         isCommentsOpen: true,
@@ -764,7 +915,9 @@ export class PostsComponent implements OnInit, OnDestroy {
   // SHARE POST
   // =====================================================
 
-  async sharePost(post: FeedPost): Promise<void> {
+  async sharePost(
+    post: FeedPost,
+  ): Promise<void> {
     const text = String(post.body ?? '');
 
     if (typeof navigator === 'undefined') {
@@ -787,5 +940,41 @@ export class PostsComponent implements OnInit, OnDestroy {
     } catch {
       // The user may cancel the native share dialog.
     }
+  }
+
+  // =====================================================
+  // DELETE POST
+  // =====================================================
+
+  deleteItem(id: string): void {
+    this.postActionMessage.set('');
+    this.postActionIsError.set(false);
+
+    this.postsService.deletePosts(id).subscribe({
+      next: (res) => {
+        if (res?.success) {
+          this.postActionMessage.set(
+            'Post deleted successfully.',
+          );
+          this.postActionIsError.set(false);
+          this.getPostsData();
+          return;
+        }
+
+        this.postActionIsError.set(true);
+        this.postActionMessage.set(
+          'Unable to delete this post. Please try again.',
+        );
+      },
+
+      error: (error: unknown) => {
+        console.error('Failed to delete post:', error);
+
+        this.postActionIsError.set(true);
+        this.postActionMessage.set(
+          'Unable to delete this post. Please try again.',
+        );
+      },
+    });
   }
 }

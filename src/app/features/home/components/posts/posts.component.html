@@ -46,15 +46,17 @@
             height="42"
           />
 
-          <div class="min-w-0 flex-1">
+    <div class="min-w-0 flex-1">
             <p class="truncate text-sm font-bold text-slate-900">
-              Abdulrahman Malik
+                  {{ currentUserName() }}
             </p>
 
             <p class="mt-1 text-xs text-slate-500">
               Share with your community
             </p>
           </div>
+
+        
 
           <!-- =============================================
                POST PRIVACY
@@ -314,6 +316,8 @@
 
             <span>Publish post</span>
           }
+            {{ publishing() ? 'Publishing...' : 'Publish' }}
+
         </button>
 
       </div>
@@ -327,502 +331,570 @@
        SECTION 2 — POSTS FEED
        Immediately follows the composer
   ====================================================== -->
+<section
+  class="posts-feed-section w-full !mt-0 pt-0"
+  aria-label="Posts feed"
+>
+  <div
+    class="feed-layout mx-auto w-full max-w-[740px] min-w-0 px-0 sm:px-4"
+  >
+    <!-- Loading -->
+    @if (loading() && allposts().length === 0) {
+      <section
+        class="feed-loading-list"
+        aria-label="Loading posts"
+      >
+        @for (item of [1, 2, 3]; track item) {
+          <article class="feed-skeleton" aria-hidden="true">
+            <div class="flex items-center gap-3">
+              <div class="skeleton-block h-11 w-11 rounded-full"></div>
 
-  <section class="posts-feed-section w-full !mt-0 pt-0" aria-label="Posts feed">
-    <div class="feed-layout mx-auto w-full max-w-[740px] min-w-0 px-0 sm:px-4">
-      <!-- Loading -->
-      @if (loading() && allposts().length === 0) {
-        <section class="feed-loading-list" aria-label="Loading posts">
-          @for (item of [1, 2, 3]; track item) {
-            <article class="feed-skeleton" aria-hidden="true">
-              <div class="flex items-center gap-3">
-                <div class="skeleton-block h-11 w-11 rounded-full"></div>
-
-                <div class="flex-1 space-y-2">
-                  <div class="skeleton-block h-3 w-32 rounded"></div>
-                  <div class="skeleton-block h-3 w-20 rounded"></div>
-                </div>
+              <div class="flex-1 space-y-2">
+                <div class="skeleton-block h-3 w-32 rounded"></div>
+                <div class="skeleton-block h-3 w-20 rounded"></div>
               </div>
+            </div>
 
-              <div class="skeleton-block mt-5 h-3 w-full rounded"></div>
-              <div class="skeleton-block mt-2 h-3 w-4/5 rounded"></div>
-              <div class="skeleton-block mt-5 h-56 rounded-2xl"></div>
-            </article>
+            <div class="skeleton-block mt-5 h-3 w-full rounded"></div>
+            <div class="skeleton-block mt-2 h-3 w-4/5 rounded"></div>
+            <div class="skeleton-block mt-5 h-56 rounded-2xl"></div>
+          </article>
+        }
+      </section>
+    }
+
+    <!-- Error -->
+    @else if (errorMessage() && allposts().length === 0) {
+      <section
+        class="feed-state-card"
+        aria-labelledby="feed-error-heading"
+      >
+        <span class="feed-state-icon feed-state-error">
+          <i
+            class="fa-solid fa-triangle-exclamation"
+            aria-hidden="true"
+          ></i>
+        </span>
+
+        <h2 id="feed-error-heading">
+          We couldn't load your feed
+        </h2>
+
+        <p role="alert">
+          {{ errorMessage() }}
+        </p>
+
+        <button
+          type="button"
+          (click)="getPostsData()"
+          [disabled]="loading()"
+          class="feed-state-button"
+        >
+          @if (loading()) {
+            <i
+              class="fa-solid fa-spinner animate-spin"
+              aria-hidden="true"
+            ></i>
+            <span>Loading...</span>
+          } @else {
+            <i
+              class="fa-solid fa-rotate-right"
+              aria-hidden="true"
+            ></i>
+            <span>Try again</span>
           }
-        </section>
-      }
+        </button>
+      </section>
+    }
 
-      <!-- Error -->
-      @else if (errorMessage() && allposts().length === 0) {
-        <section class="feed-state-card" aria-labelledby="feed-error-heading">
-          <span class="feed-state-icon feed-state-error">
-            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-          </span>
+    <!-- Empty -->
+    @else if (allposts().length === 0) {
+      <section
+        class="feed-state-card"
+        aria-labelledby="empty-feed-heading"
+      >
+        <span class="feed-state-icon">
+          <i
+            class="fa-regular fa-comments"
+            aria-hidden="true"
+          ></i>
+        </span>
 
-          <h2 id="feed-error-heading">We couldn't load your feed</h2>
+        <h2 id="empty-feed-heading">
+          It's quiet here for now.
+        </h2>
 
-          <p role="alert">
-            {{ errorMessage() }}
-          </p>
+        <p>
+          When posts become available, you'll find them here.
+        </p>
 
-          <button
-            type="button"
-            (click)="getPostsData()"
-            [disabled]="loading()"
-            class="feed-state-button"
+        <button
+          type="button"
+          (click)="getPostsData()"
+          [disabled]="loading()"
+          class="feed-state-button"
+        >
+          <i
+            class="fa-solid fa-rotate-right"
+            aria-hidden="true"
+          ></i>
+          <span>Refresh feed</span>
+        </button>
+      </section>
+    }
+
+    <!-- Posts -->
+    @else {
+      <div class="posts-list">
+        @for (post of allposts(); track post.id) {
+          <article
+            class="post-card"
+            [attr.data-post-id]="post.id"
           >
-            @if (loading()) {
-              <i class="fa-solid fa-spinner animate-spin" aria-hidden="true"></i>
-              <span>Loading...</span>
-            } @else {
-              <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
-              <span>Try again</span>
-            }
-          </button>
-        </section>
-      }
+            <!-- Post Header -->
+            <header class="post-header">
+              <img
+                [src]="post.user.photo"
+                [alt]="post.user.name"
+                loading="lazy"
+                width="42"
+                height="42"
+                class="post-avatar"
+              />
 
-      <!-- Empty -->
-      @else if (allposts().length === 0) {
-        <section class="feed-state-card" aria-labelledby="empty-feed-heading">
-          <span class="feed-state-icon">
-            <i class="fa-regular fa-comments" aria-hidden="true"></i>
-          </span>
+              <div class="post-author">
+                <h3>{{ post.user.name }}</h3>
 
-          <h2 id="empty-feed-heading">It's quiet here for now.</h2>
+                <div class="post-meta">
+                  <span class="post-username">
+                    {{ post.user.username }}
+                  </span>
 
-          <p>When posts become available, you'll find them here.</p>
+                  <span class="post-meta-dot" aria-hidden="true">
+                    ·
+                  </span>
 
-          <button
-            type="button"
-            (click)="getPostsData()"
-            [disabled]="loading()"
-            class="feed-state-button"
-          >
-            <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
-            <span>Refresh feed</span>
-          </button>
-        </section>
-      }
+                  <time>{{ post.createdAt }}</time>
 
-      <!-- Posts -->
-      @else {
-        <div class="posts-list">
-          @for (post of allposts(); track post.id) {
-            <article class="post-card" [attr.data-post-id]="post.id">
-              <!-- Post Header -->
-              <header class="post-header">
-                <img
-                  [src]="post.user.photo"
-                  [alt]="post.user.name"
-                  loading="lazy"
-                  width="42"
-                  height="42"
-                  class="post-avatar"
-                />
-
-                <div class="post-author">
-                  <h3>{{ post.user.name }}</h3>
-
-                  <div class="post-meta">
-                    <span class="post-username">
-                      {{ post.user.username }}
+                  <!-- Owner Privacy -->
+                  @if (isOwnPost(post)) {
+                    <span class="post-meta-dot" aria-hidden="true">
+                      ·
                     </span>
 
-                    <span class="post-meta-dot" aria-hidden="true">·</span>
-
-                    <time>{{ post.createdAt }}</time>
-
-                    <!-- Owner Privacy -->
-                    @if (isOwnPost(post)) {
-                      <span class="post-meta-dot" aria-hidden="true">·</span>
-
-                      <details #postAudienceMenu class="audience-menu group relative">
-                        <summary
-                          aria-label="Change post audience"
-                          aria-haspopup="true"
-                          class="post-audience-trigger"
-                        >
-                          @switch (post.privacy) {
-                            @case ('private') {
-                              <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                              <span>Only me</span>
-                            }
-
-                            @case ('followers') {
-                              <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                              <span>Followers</span>
-                            }
-
-                            @default {
-                              <i class="fa-solid fa-earth-americas" aria-hidden="true"></i>
-                              <span>Public</span>
-                            }
+                    <details
+                      #postAudienceMenu
+                      class="audience-menu group relative"
+                    >
+                      <summary
+                        aria-label="Change post audience"
+                        aria-haspopup="true"
+                        class="post-audience-trigger"
+                      >
+                        @switch (post.privacy) {
+                          @case ('private') {
+                            <i
+                              class="fa-solid fa-lock"
+                              aria-hidden="true"
+                            ></i>
+                            <span>Only me</span>
                           }
 
-                          <i
-                            class="fa-solid fa-chevron-down audience-chevron"
-                            aria-hidden="true"
-                          ></i>
-                        </summary>
+                          @case ('followers') {
+                            <i
+                              class="fa-solid fa-user-group"
+                              aria-hidden="true"
+                            ></i>
+                            <span>Followers</span>
+                          }
 
-                        <div class="audience-dropdown post-audience-dropdown">
-                          <div class="dropdown-heading">
-                            <h3>Post audience</h3>
-                            <p>Choose who can see this post.</p>
-                          </div>
-
-                          <!-- Public -->
-                          <button
-                            type="button"
-                            class="audience-option"
-                            [class.audience-option-active]="post.privacy === 'public'"
-                            [attr.aria-pressed]="post.privacy === 'public'"
-                            (click)="setPrivacy(post, 'public'); postAudienceMenu.open = false"
-                          >
-                            <span class="audience-icon audience-public">
-                              <i class="fa-solid fa-earth-americas" aria-hidden="true"></i>
-                            </span>
-
-                            <span class="audience-copy">
-                              <strong>Public</strong>
-                              <small>Anyone can see this post.</small>
-                            </span>
-
-                            @if (post.privacy === 'public') {
-                              <i
-                                class="fa-solid fa-circle-check audience-check"
-                                aria-hidden="true"
-                              ></i>
-                            }
-                          </button>
-
-                          <!-- Followers -->
-                          <button
-                            type="button"
-                            class="audience-option"
-                            [class.audience-option-active]="post.privacy === 'followers'"
-                            [attr.aria-pressed]="post.privacy === 'followers'"
-                            (click)="setPrivacy(post, 'followers'); postAudienceMenu.open = false"
-                          >
-                            <span class="audience-icon audience-followers">
-                              <i class="fa-solid fa-user-group" aria-hidden="true"></i>
-                            </span>
-
-                            <span class="audience-copy">
-                              <strong>Followers</strong>
-                              <small>People who follow you.</small>
-                            </span>
-
-                            @if (post.privacy === 'followers') {
-                              <i
-                                class="fa-solid fa-circle-check audience-check"
-                                aria-hidden="true"
-                              ></i>
-                            }
-                          </button>
-
-                          <!-- Only Me -->
-                          <button
-                            type="button"
-                            class="audience-option"
-                            [class.audience-option-active]="post.privacy === 'private'"
-                            [attr.aria-pressed]="post.privacy === 'private'"
-                            (click)="setPrivacy(post, 'private'); postAudienceMenu.open = false"
-                          >
-                            <span class="audience-icon audience-private">
-                              <i class="fa-solid fa-lock" aria-hidden="true"></i>
-                            </span>
-
-                            <span class="audience-copy">
-                              <strong>Only me</strong>
-                              <small>Only you can see this post.</small>
-                            </span>
-
-                            @if (post.privacy === 'private') {
-                              <i
-                                class="fa-solid fa-circle-check audience-check"
-                                aria-hidden="true"
-                              ></i>
-                            }
-                          </button>
-                        </div>
-                      </details>
-                    }
-                  </div>
-                </div>
-
-                <!-- Post Options -->
-                <details class="post-menu group relative shrink-0">
-                  <summary aria-label="Post options" aria-haspopup="true" class="post-menu-trigger">
-                    <i class="fa-solid fa-ellipsis" aria-hidden="true"></i>
-                  </summary>
-
-                  <div class="post-menu-dropdown">
-                    <button type="button" (click)="toggleSave(post)" class="post-menu-option">
-                      <span class="post-menu-option-icon" aria-hidden="true">
-                        @if (post.isSaved) {
-                          <i class="fa-solid fa-bookmark"></i>
-                        } @else {
-                          <i class="fa-regular fa-bookmark"></i>
+                          @default {
+                            <i
+                              class="fa-solid fa-earth-americas"
+                              aria-hidden="true"
+                            ></i>
+                            <span>Public</span>
+                          }
                         }
-                      </span>
 
-                      <span>
-                        {{ post.isSaved ? 'Remove saved post' : 'Save post' }}
-                      </span>
-                    </button>
+                        <i
+                          class="fa-solid fa-chevron-down audience-chevron"
+                          aria-hidden="true"
+                        ></i>
+                      </summary>
 
-                    <button type="button" (click)="toggleFollow(post)" class="post-menu-option">
-                      <span class="post-menu-option-icon" aria-hidden="true">
-                        <i class="fa-regular fa-bell"></i>
-                      </span>
+                      <div class="audience-dropdown post-audience-dropdown">
+                        <div class="dropdown-heading">
+                          <h3>Post audience</h3>
+                          <p>Choose who can see this post.</p>
+                        </div>
 
-                      <span>
-                        {{ post.isFollowing ? 'Turn off notifications' : 'Turn on notifications' }}
-                      </span>
-                    </button>
+                        <!-- Public -->
+                        <button
+                          type="button"
+                          class="audience-option"
+                          [class.audience-option-active]="post.privacy === 'public'"
+                          [attr.aria-pressed]="post.privacy === 'public'"
+                          (click)="
+                            setPrivacy(post, 'public');
+                            postAudienceMenu.open = false
+                          "
+                        >
+                          <span class="audience-icon audience-public">
+                            <i
+                              class="fa-solid fa-earth-americas"
+                              aria-hidden="true"
+                            ></i>
+                          </span>
 
-                    <div class="post-menu-divider" aria-hidden="true"></div>
+                          <span class="audience-copy">
+                            <strong>Public</strong>
+                            <small>Anyone can see this post.</small>
+                          </span>
 
-                    <button type="button" class="post-menu-option post-menu-report">
-                      <span class="post-menu-option-icon" aria-hidden="true">
-                        <i class="fa-regular fa-flag"></i>
-                      </span>
+                          @if (post.privacy === 'public') {
+                            <i
+                              class="fa-solid fa-circle-check audience-check"
+                              aria-hidden="true"
+                            ></i>
+                          }
+                        </button>
 
-                      <span>Report post</span>
-                    </button>
-                  </div>
-                </details>
-              </header>
+                        <!-- Followers -->
+                        <button
+                          type="button"
+                          class="audience-option"
+                          [class.audience-option-active]="post.privacy === 'followers'"
+                          [attr.aria-pressed]="post.privacy === 'followers'"
+                          (click)="
+                            setPrivacy(post, 'followers');
+                            postAudienceMenu.open = false
+                          "
+                        >
+                          <span class="audience-icon audience-followers">
+                            <i
+                              class="fa-solid fa-user-group"
+                              aria-hidden="true"
+                            ></i>
+                          </span>
 
-              <!-- Post Body -->
-              @if (post.body) {
-                <div class="post-body">
-                  <p>{{ post.body }}</p>
-                </div>
-              }
+                          <span class="audience-copy">
+                            <strong>Followers</strong>
+                            <small>People who follow you.</small>
+                          </span>
 
-              <!-- Post Image -->
-              @if (post.image) {
-                <figure class="post-media">
-                  <img [src]="post.image" [alt]="post.body || 'Post image'" loading="lazy" />
-                </figure>
-              }
+                          @if (post.privacy === 'followers') {
+                            <i
+                              class="fa-solid fa-circle-check audience-check"
+                              aria-hidden="true"
+                            ></i>
+                          }
+                        </button>
 
-              <!-- Statistics -->
-              <div class="post-stats">
-                <div class="post-likes" [attr.aria-label]="post.likesCount + ' likes'">
-                  <span class="post-like-icon" aria-hidden="true">
-                    <i class="fa-solid fa-thumbs-up"></i>
-                  </span>
+                        <!-- Only Me -->
+                        <button
+                          type="button"
+                          class="audience-option"
+                          [class.audience-option-active]="post.privacy === 'private'"
+                          [attr.aria-pressed]="post.privacy === 'private'"
+                          (click)="
+                            setPrivacy(post, 'private');
+                            postAudienceMenu.open = false
+                          "
+                        >
+                          <span class="audience-icon audience-private">
+                            <i
+                              class="fa-solid fa-lock"
+                              aria-hidden="true"
+                            ></i>
+                          </span>
 
-                  <span>{{ post.likesCount }}</span>
-                </div>
+                          <span class="audience-copy">
+                            <strong>Only me</strong>
+                            <small>Only you can see this post.</small>
+                          </span>
 
-                <div class="post-stats-links">
-                  <button
-                    type="button"
-                    (click)="toggleComments(post)"
-                    [attr.aria-expanded]="post.isCommentsOpen"
-                  >
-                    {{ post.commentsCount }}
-                    {{ post.commentsCount === 1 ? 'comment' : 'comments' }}
-                  </button>
-
-                  <span>
-                    {{ post.sharesCount }}
-                    {{ post.sharesCount === 1 ? 'share' : 'shares' }}
-                  </span>
+                          @if (post.privacy === 'private') {
+                            <i
+                              class="fa-solid fa-circle-check audience-check"
+                              aria-hidden="true"
+                            ></i>
+                          }
+                        </button>
+                      </div>
+                    </details>
+                  }
                 </div>
               </div>
 
-              <!-- Actions -->
-              <div class="post-actions">
-                <!-- Reactions -->
-                <div class="reaction-action">
+              <!-- Post Options -->
+              <details class="post-menu group relative shrink-0">
+                <summary
+                  aria-label="Post options"
+                  aria-haspopup="true"
+                  class="post-menu-trigger"
+                >
+                  <i
+                    class="fa-solid fa-ellipsis"
+                    aria-hidden="true"
+                  ></i>
+                </summary>
+
+                <div class="post-menu-dropdown">
+                  <!-- Save -->
                   <button
                     type="button"
-                    (click)="toggleLike(post)"
-                    [attr.aria-pressed]="!!post.myReaction"
-                    [attr.aria-label]="post.myReaction ? 'Remove reaction' : 'Like post'"
-                    class="reaction-main-action"
-                    [class.reaction-selected]="!!post.myReaction"
+                    (click)="toggleSave(post)"
+                    class="post-menu-option"
                   >
-                    @if (getCurrentReaction(post); as reaction) {
-                      <span class="reaction-emoji" aria-hidden="true">
-                        {{ reaction.emoji }}
-                      </span>
-
-                      <span>{{ reaction.label }}</span>
-                    } @else {
-                      <i class="fa-regular fa-thumbs-up" aria-hidden="true"></i>
-
-                      <span>Like</span>
-                    }
-                  </button>
-
-                  <button
-                    type="button"
-                    class="reaction-trigger"
-                    (click)="toggleReactionPicker(post)"
-                    [attr.aria-expanded]="post.isReactionPickerOpen"
-                    [attr.aria-label]="
-                      post.isReactionPickerOpen ? 'Close reactions' : 'Choose a reaction'
-                    "
-                  >
-                    <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>
-                  </button>
-
-                  @if (post.isReactionPickerOpen) {
-                    <div class="reaction-picker" role="group" aria-label="Choose a reaction">
-                      @for (reaction of reactions; track reaction.type) {
-                        <button
-                          type="button"
-                          (click)="selectReaction(post, reaction.type)"
-                          [attr.title]="reaction.label"
-                          [attr.aria-label]="reaction.label"
-                          [attr.aria-pressed]="post.myReaction === reaction.type"
-                        >
-                          {{ reaction.emoji }}
-                        </button>
+                    <span class="post-menu-option-icon" aria-hidden="true">
+                      @if (post.isSaved) {
+                        <i class="fa-solid fa-bookmark"></i>
+                      } @else {
+                        <i class="fa-regular fa-bookmark"></i>
                       }
-                    </div>
-                  }
-                </div>
+                    </span>
 
-                <!-- Comment -->
+                    <span>
+                      {{
+                        post.isSaved
+                          ? 'Remove saved post'
+                          : 'Save post'
+                      }}
+                    </span>
+                  </button>
+
+                  <!-- Follow -->
+                  <button
+                    type="button"
+                    (click)="toggleFollow(post)"
+                    class="post-menu-option"
+                  >
+                    <span class="post-menu-option-icon" aria-hidden="true">
+                      <i class="fa-regular fa-bell"></i>
+                    </span>
+
+                    <span>
+                      {{
+                        post.isFollowing
+                          ? 'Turn off notifications'
+                          : 'Turn on notifications'
+                      }}
+                    </span>
+                  </button>
+
+                  <div
+                    class="post-menu-divider"
+                    aria-hidden="true"
+                  ></div>
+
+                  <!-- Delete -->
+                  <button
+                    type="button"
+                    (click)="deleteItem(post.id)"
+                    class="post-menu-option post-menu-report"
+                  >
+                    <span class="post-menu-option-icon" aria-hidden="true">
+                      <i class="fa-regular fa-trash-can"></i>
+                    </span>
+
+                    <span>Delete post</span>
+                  </button>
+                </div>
+              </details>
+            </header>
+
+            <!-- Post Body -->
+            @if (post.body) {
+              <div class="post-body">
+                <p>{{ post.body }}</p>
+              </div>
+            }
+
+            <!-- Post Image -->
+            @if (post.image) {
+              <figure class="post-media">
+                <img
+                  [src]="post.image"
+                  [alt]="post.body || 'Post image'"
+                  loading="lazy"
+                />
+              </figure>
+            }
+
+            <!-- Statistics -->
+            <div class="post-stats">
+              <div
+                class="post-likes"
+                [attr.aria-label]="post.likesCount + ' likes'"
+              >
+                <span class="post-like-icon" aria-hidden="true">
+                  <i class="fa-solid fa-thumbs-up"></i>
+                </span>
+
+                <span>{{ post.likesCount }}</span>
+              </div>
+
+              <!-- Comment Count -->
+              <div class="post-stats-links">
                 <button
                   type="button"
                   (click)="toggleComments(post)"
                   [attr.aria-expanded]="post.isCommentsOpen"
-                  class="post-action-button"
+                  [attr.aria-controls]="'comments-' + post.id"
                 >
-                  <i class="fa-regular fa-comment" aria-hidden="true"></i>
-                  <span>Comment</span>
+                  {{ post.commentsCount }}
+                  {{
+                    post.commentsCount === 1
+                      ? 'comment'
+                      : 'comments'
+                  }}
                 </button>
 
-                <!-- Share -->
-                <button type="button" (click)="sharePost(post)" class="post-action-button">
-                  <i class="fa-solid fa-share" aria-hidden="true"></i>
-                  <span>Share</span>
+                <span>
+                  {{ post.sharesCount }}
+                  {{
+                    post.sharesCount === 1
+                      ? 'share'
+                      : 'shares'
+                  }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="post-actions">
+              <!-- Like / Reactions -->
+              <div class="reaction-action">
+                <button
+                  type="button"
+                  (click)="toggleLike(post)"
+                  [attr.aria-pressed]="!!post.myReaction"
+                  [attr.aria-label]="
+                    post.myReaction
+                      ? 'Remove reaction'
+                      : 'Like post'
+                  "
+                  class="reaction-main-action"
+                  [class.reaction-selected]="!!post.myReaction"
+                >
+                  @if (getCurrentReaction(post); as reaction) {
+                    <span class="reaction-emoji" aria-hidden="true">
+                      {{ reaction.emoji }}
+                    </span>
+
+                    <span>{{ reaction.label }}</span>
+                  } @else {
+                    <i
+                      class="fa-regular fa-thumbs-up"
+                      aria-hidden="true"
+                    ></i>
+
+                    <span>Like</span>
+                  }
                 </button>
+
+                <button
+                  type="button"
+                  class="reaction-trigger"
+                  (click)="toggleReactionPicker(post)"
+                  [attr.aria-expanded]="post.isReactionPickerOpen"
+                  [attr.aria-label]="
+                    post.isReactionPickerOpen
+                      ? 'Close reactions'
+                      : 'Choose a reaction'
+                  "
+                >
+                  <i
+                    class="fa-solid fa-chevron-up"
+                    aria-hidden="true"
+                  ></i>
+                </button>
+
+                @if (post.isReactionPickerOpen) {
+                  <div
+                    class="reaction-picker"
+                    role="group"
+                    aria-label="Choose a reaction"
+                  >
+                    @for (reaction of reactions; track reaction.type) {
+                      <button
+                        type="button"
+                        (click)="selectReaction(post, reaction.type)"
+                        [attr.title]="reaction.label"
+                        [attr.aria-label]="reaction.label"
+                        [attr.aria-pressed]="post.myReaction === reaction.type"
+                      >
+                        {{ reaction.emoji }}
+                      </button>
+                    }
+                  </div>
+                }
               </div>
 
-              <!-- Comments -->
-              @if (post.isCommentsOpen) {
-                <section class="comments-panel" aria-label="Post comments">
-                  <header class="comments-panel-heading">
-                    <h4>Comments</h4>
-                    <span>{{ post.commentsCount }}</span>
-                  </header>
+              <!-- Comment Button -->
+              <button
+                type="button"
+                (click)="toggleComments(post)"
+                [attr.aria-expanded]="post.isCommentsOpen"
+                [attr.aria-controls]="'comments-' + post.id"
+                class="post-action-button"
+              >
+                <i
+                  class="fa-regular fa-comment"
+                  aria-hidden="true"
+                ></i>
 
-                  <!-- Existing Comments -->
-                  @if (post.commentsList.length > 0) {
-                    <div class="posted-comments">
-                      @for (comment of post.commentsList; track comment.id) {
-                        <article class="posted-comment">
-                          <div class="comment-avatar" aria-hidden="true">
-                            {{ comment.userName.charAt(0) || 'U' }}
-                          </div>
+                <span>Comment</span>
+              </button>
 
-                          <div class="comment-bubble">
-                            <strong>{{ comment.userName }}</strong>
-                            <p>{{ comment.text }}</p>
-                            <time>{{ comment.createdAt }}</time>
-                          </div>
-                        </article>
-                      }
-                    </div>
-                  } @else {
-                    <p class="comments-empty">No comments yet. Start the conversation.</p>
-                  }
+              <!-- Share -->
+              <button
+                type="button"
+                (click)="sharePost(post)"
+                class="post-action-button"
+              >
+                <i
+                  class="fa-solid fa-share"
+                  aria-hidden="true"
+                ></i>
 
-                  <!-- Comment Editor -->
-                  @if (!post.isCommentPreviewOpen) {
-                    <form
-                      class="comment-compose"
-                      (submit)="$event.preventDefault(); previewComment(post)"
-                    >
-                      <label class="sr-only" [attr.for]="'comment-' + post.id">
-                        Write a comment
-                      </label>
+                <span>Share</span>
+              </button>
+            </div>
 
-                      <textarea
-                        [id]="'comment-' + post.id"
-                        [value]="post.commentText"
-                        (input)="setCommentText(post, $any($event.target).value)"
-                        placeholder="Write a comment..."
-                        rows="2"
-                        maxlength="1000"
-                        required
-                      ></textarea>
+            <!-- Lazy-loaded Comment Component -->
+            <!-- Comments Component -->
+@defer (when post.isCommentsOpen) {
+  @if (post.isCommentsOpen) {
+    <section
+      [id]="'comments-' + post.id"
+      class="mt-4"
+      aria-label="Post comments"
+    >
+      <app-comment
+        [comments]="post.commentsList"
+      ></app-comment>
+    </section>
+  }
+} @placeholder {
+  <!-- Comments load when opened -->
+} @error {
+  <p class="mt-3 text-sm text-red-600" role="alert">
+    Unable to load comments.
+  </p>
+}
+          </article>
+        }
+      </div>
+    }
 
-                      <div class="comment-compose-footer">
-                        <span> {{ post.commentText.length }}/1000 </span>
-
-                        <button type="submit" [disabled]="!post.commentText.trim()">
-                          <i class="fa-regular fa-eye" aria-hidden="true"></i>
-                          <span>Preview</span>
-                        </button>
-                      </div>
-                    </form>
-                  }
-
-                  <!-- Comment Preview -->
-                  @if (post.isCommentPreviewOpen) {
-                    <div class="comment-preview">
-                      <p class="comment-preview-title">
-                        <i class="fa-regular fa-eye" aria-hidden="true"></i>
-                        <span>Preview your comment</span>
-                      </p>
-
-                      <article class="posted-comment">
-                        <div class="comment-avatar" aria-hidden="true">U</div>
-
-                        <div class="comment-bubble">
-                          <strong>You</strong>
-                          <p>{{ post.commentText }}</p>
-                          <span class="preview-label">Preview only</span>
-                        </div>
-                      </article>
-
-                      <div class="comment-preview-actions">
-                        <button
-                          type="button"
-                          class="edit-comment-button"
-                          (click)="editComment(post)"
-                        >
-                          Edit
-                        </button>
-
-                        <button
-                          type="button"
-                          class="send-comment-button"
-                          [disabled]="!post.commentText.trim()"
-                          (click)="addComment(post)"
-                        >
-                          <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
-
-                          <span>Send comment</span>
-                        </button>
-                      </div>
-                    </div>
-                  }
-                </section>
-              }
-            </article>
-          }
-        </div>
-      }
-
-      <!-- Feed Footer -->
-      <footer class="feed-footer">
-        <span class="feed-footer-logo" aria-hidden="true">R</span>
-        <span>Route Posts</span>
-        <span class="feed-footer-separator" aria-hidden="true">·</span>
-        <span>Made for meaningful connections.</span>
-      </footer>
-    </div>
-  </section>
-</main>
+    <!-- Feed Footer -->
+    <footer class="feed-footer">
+      <span class="feed-footer-logo" aria-hidden="true">R</span>
+      <span>Route Posts</span>
+      <span class="feed-footer-separator" aria-hidden="true">·</span>
+      <span>Made for meaningful connections.</span>
+    </footer>
+  </div>
+</section>

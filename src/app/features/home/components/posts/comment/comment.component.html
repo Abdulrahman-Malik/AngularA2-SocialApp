@@ -1,0 +1,412 @@
+<!-- =====================================================================
+  Comments — Facebook-style, Angular (standalone, no hardcoded data)
+  Needs: Tailwind (darkMode: 'class') + Font Awesome. Styles: comment.component.css
+====================================================================== -->
+
+<section
+  class="comment-composer relative w-full min-w-0 rounded-2xl border border-slate-200 bg-white p-3 shadow-sm sm:p-4 lg:p-5 dark:border-white/10 dark:bg-[#242526]"
+  aria-label="Comments"
+>
+  <!-- ===================== HEADER ===================== -->
+  <header class="mb-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+    <h3 class="text-base font-bold text-slate-900 dark:text-[#e4e6eb]">
+      Comments <span class="font-semibold text-slate-500 dark:text-[#b0b3b8]">· {{ totalCount }}</span>
+    </h3>
+
+    <div
+      *ngIf="view.length > 1"
+      class="inline-flex rounded-full bg-slate-100 p-0.5 text-[13px] font-semibold dark:bg-white/10"
+      role="tablist"
+      aria-label="Sort comments"
+    >
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="sort === 'top'"
+        (click)="setSort('top')"
+        class="rounded-full px-3 py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866ff]"
+        [ngClass]="sort === 'top'
+          ? 'bg-white text-slate-900 shadow-sm dark:bg-[#3a3b3c] dark:text-[#e4e6eb]'
+          : 'text-slate-500 hover:text-slate-900 dark:text-[#b0b3b8] dark:hover:text-white'"
+      >Top</button>
+      <button
+        type="button"
+        role="tab"
+        [attr.aria-selected]="sort === 'newest'"
+        (click)="setSort('newest')"
+        class="rounded-full px-3 py-1 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866ff]"
+        [ngClass]="sort === 'newest'
+          ? 'bg-white text-slate-900 shadow-sm dark:bg-[#3a3b3c] dark:text-[#e4e6eb]'
+          : 'text-slate-500 hover:text-slate-900 dark:text-[#b0b3b8] dark:hover:text-white'"
+      >Newest</button>
+    </div>
+  </header>
+
+  <!-- ===================== EMPTY STATE ===================== -->
+  <div *ngIf="!paged.length" class="flex flex-col items-center px-4 py-8 text-center">
+    <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-xl text-slate-400 dark:bg-white/10 dark:text-[#b0b3b8]">
+      <i class="fa-regular fa-comment-dots"></i>
+    </div>
+    <p class="text-[15px] font-semibold text-slate-900 dark:text-[#e4e6eb]">No comments yet</p>
+    <p class="mt-0.5 text-sm text-slate-500 dark:text-[#b0b3b8]">Be the first to share what you think.</p>
+  </div>
+
+  <!-- ===================== LIST ===================== -->
+  <div *ngIf="paged.length" class="space-y-4">
+    <ng-container *ngFor="let c of paged; trackBy: trackById">
+      <ng-container *ngTemplateOutlet="commentTpl; context: { $implicit: c, parent: null }"></ng-container>
+    </ng-container>
+  </div>
+
+  <button
+    *ngIf="view.length > paged.length"
+    type="button"
+    (click)="showMore()"
+    class="mt-3 inline-flex min-h-9 items-center rounded-lg px-1 text-sm font-semibold text-slate-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866ff] dark:text-[#b0b3b8]"
+  >
+    View {{ view.length - paged.length }} more {{ view.length - paged.length === 1 ? 'comment' : 'comments' }}
+  </button>
+
+  <!-- ===================== MAIN COMPOSER ===================== -->
+  <div class="mt-5">
+    <ng-container
+      *ngTemplateOutlet="composerTpl; context: { key: 'main', parent: null, target: null, small: false, ph: 'Write a comment...' }"
+    ></ng-container>
+  </div>
+
+  <p class="mt-2 pl-10 text-[11px] text-slate-400 sm:pl-11 dark:text-[#8a8d91]">
+    Keep the conversation friendly and respectful.
+  </p>
+
+  <!-- ===================== TOAST ===================== -->
+  <div *ngIf="toast" class="toast" role="status" aria-live="polite">{{ toast }}</div>
+</section>
+
+<!-- =====================================================================
+  TEMPLATE: avatar (clickable)
+====================================================================== -->
+<ng-template #avatarTpl let-u let-sm="sm">
+  <button
+    type="button"
+    class="avatar shrink-0 overflow-hidden rounded-full bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866ff] dark:bg-[#3a3b3c]"
+    [class.avatar-sm]="sm"
+    (click)="profileOpened.emit(u)"
+    [attr.aria-label]="u.name + ' profile'"
+  >
+    <img *ngIf="u.avatar; else initialsTpl" [src]="u.avatar" [alt]="u.name" loading="lazy" class="h-full w-full object-cover" />
+    <ng-template #initialsTpl>
+      <span class="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-500 to-indigo-500 text-[11px] font-bold text-white">
+        {{ initials(u.name) }}
+      </span>
+    </ng-template>
+  </button>
+</ng-template>
+
+<!-- =====================================================================
+  TEMPLATE: reactions badge (👍❤️ 12)
+====================================================================== -->
+<ng-template #badgeTpl let-c>
+  <span
+    class="absolute -bottom-3 right-2 inline-flex items-center rounded-full bg-white py-0.5 pl-1.5 pr-2 text-xs font-medium text-slate-600 shadow ring-1 ring-black/5 dark:bg-[#242526] dark:text-[#b0b3b8]"
+    [attr.aria-label]="reactionTotal(c) + ' reactions'"
+  >
+    <span class="text-[13px] leading-none tracking-[-0.12em]" aria-hidden="true">{{ reactionEmojis(c) }}</span>
+    <span class="ml-1.5">{{ reactionTotal(c) }}</span>
+  </span>
+</ng-template>
+
+<!-- =====================================================================
+  TEMPLATE: one comment (used for comments AND replies)
+====================================================================== -->
+<ng-template #commentTpl let-c let-parent="parent">
+  <article
+    class="flex min-w-0 gap-2"
+    [class.has-replies]="!parent && (c.replies?.length || replyingParentId === c.id)"
+    [class.reply]="!!parent"
+    [class.comment-new]="c.isNew"
+  >
+    <ng-container *ngTemplateOutlet="avatarTpl; context: { $implicit: c.author, sm: !!parent }"></ng-container>
+
+    <div class="min-w-0 flex-1">
+      <!-- ============ EDIT MODE ============ -->
+      <ng-container *ngIf="editingId === c.id; else viewMode">
+        <div class="rounded-2xl bg-[#f0f2f5] p-2 focus-within:ring-2 focus-within:ring-[#0866ff]/40 dark:bg-[#3a3b3c]">
+          <textarea
+            [id]="'edit-' + c.id"
+            rows="1"
+            [attr.maxlength]="maxLength"
+            [value]="editText"
+            (input)="onEditInput($event)"
+            (keydown.enter)="onEditEnter($event, c)"
+            (keydown.escape)="cancelEdit()"
+            aria-label="Edit comment"
+            class="comment-input block w-full resize-none border-0 bg-transparent px-1.5 py-1 text-base leading-6 text-slate-900 outline-none focus:ring-0 sm:text-[15px] dark:text-[#e4e6eb]"
+          ></textarea>
+          <div class="mt-1 flex items-center justify-end gap-1.5 text-[13px] font-semibold">
+            <button type="button" (click)="cancelEdit()" class="rounded-full px-3 py-1.5 text-slate-600 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866ff] dark:text-[#b0b3b8] dark:hover:bg-white/10">
+              Cancel
+            </button>
+            <button type="button" (click)="saveEdit(c)" [disabled]="!editText.trim()" class="rounded-full bg-[#0866ff] px-3.5 py-1.5 text-white transition hover:bg-[#0757d8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866ff]/50 disabled:cursor-not-allowed disabled:opacity-40">
+              Save
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ============ VIEW MODE ============ -->
+      <ng-template #viewMode>
+        <div class="bubble-row flex min-w-0 items-center gap-1">
+          <!-- Bubble -->
+          <div
+            *ngIf="c.text; else nameOnly"
+            class="comment-bubble relative min-w-0 max-w-full rounded-2xl bg-[#f0f2f5] px-3 py-2 dark:bg-[#3a3b3c]"
+            [class.mb-3]="reactionTotal(c) > 0"
+          >
+            <div class="flex min-w-0 items-center gap-1.5">
+              <button type="button" (click)="profileOpened.emit(c.author)" class="truncate text-[13px] font-semibold leading-5 text-slate-900 hover:underline focus-visible:outline-none focus-visible:underline dark:text-[#e4e6eb]">
+                {{ c.author.name }}
+              </button>
+              <span *ngIf="c.isPostAuthor" class="shrink-0 rounded-md bg-[#0866ff]/10 px-1.5 text-[10px] font-bold leading-4 text-[#0866ff] dark:bg-[#0866ff]/25 dark:text-[#6ea8ff]">Author</span>
+            </div>
+
+            <p
+              class="whitespace-pre-wrap break-words text-[15px] leading-[1.35] text-slate-900 [overflow-wrap:anywhere] dark:text-[#e4e6eb]"
+              [class.clamp-5]="isLong(c) && !fullText.has(c.id)"
+            ><span *ngIf="c.replyTo" class="mr-1 font-semibold text-[#0866ff] dark:text-[#6ea8ff]">{{ c.replyTo }}</span><span>{{ c.text }}</span></p>
+
+            <button *ngIf="isLong(c)" type="button" (click)="toggleText(c)" class="mt-0.5 text-[13px] font-semibold text-slate-600 hover:underline focus-visible:outline-none focus-visible:underline dark:text-[#b0b3b8]">
+              {{ fullText.has(c.id) ? 'See less' : 'See more' }}
+            </button>
+
+            <ng-container *ngIf="reactionTotal(c) > 0">
+              <ng-container *ngTemplateOutlet="badgeTpl; context: { $implicit: c }"></ng-container>
+            </ng-container>
+          </div>
+          <ng-template #nameOnly>
+            <button type="button" (click)="profileOpened.emit(c.author)" class="truncate px-3 text-[13px] font-semibold text-slate-900 hover:underline dark:text-[#e4e6eb]">
+              {{ c.author.name }}
+            </button>
+          </ng-template>
+
+          <!-- Options menu -->
+          <div class="relative shrink-0" data-popover [class.mb-3]="c.text && reactionTotal(c) > 0">
+            <button
+              type="button"
+              class="opt-btn inline-flex h-8 w-8 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866ff] dark:text-[#b0b3b8] dark:hover:bg-white/10"
+              aria-haspopup="menu"
+              [attr.aria-expanded]="menuFor === c.id"
+              aria-label="More comment options"
+              title="More options"
+              (click)="toggleMenu(c, $event)"
+            >
+              <i class="fa-solid fa-ellipsis"></i>
+            </button>
+
+            <div
+              *ngIf="menuFor === c.id"
+              role="menu"
+              class="pop absolute right-0 top-full z-30 mt-1 w-44 max-w-[80vw] overflow-hidden rounded-xl bg-white py-1 text-sm shadow-xl ring-1 ring-black/10 dark:bg-[#3a3b3c] dark:ring-white/10"
+            >
+              <ng-container *ngIf="isOwn(c); else otherMenu">
+                <button type="button" role="menuitem" class="menu-item" (click)="startEdit(c)">
+                  <i class="fa-regular fa-pen-to-square w-4 text-center"></i> Edit
+                </button>
+                <button type="button" role="menuitem" class="menu-item danger" (click)="askDelete(c)">
+                  <i class="fa-regular fa-trash-can w-4 text-center"></i> Delete
+                </button>
+              </ng-container>
+              <ng-template #otherMenu>
+                <button type="button" role="menuitem" class="menu-item" (click)="report(c)">
+                  <i class="fa-regular fa-flag w-4 text-center"></i> Report
+                </button>
+              </ng-template>
+              <button *ngIf="c.text" type="button" role="menuitem" class="menu-item" (click)="copy(c)">
+                <i class="fa-regular fa-copy w-4 text-center"></i> Copy text
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attached image -->
+        <div *ngIf="c.image" class="relative mt-1 inline-block max-w-full" [class.mb-3]="!c.text && reactionTotal(c) > 0">
+          <img [src]="c.image" alt="Comment attachment" loading="lazy" class="max-h-64 max-w-full rounded-2xl object-cover ring-1 ring-black/5 sm:max-h-80 dark:ring-white/10" />
+          <ng-container *ngIf="!c.text && reactionTotal(c) > 0">
+            <ng-container *ngTemplateOutlet="badgeTpl; context: { $implicit: c }"></ng-container>
+          </ng-container>
+        </div>
+
+        <!-- Delete confirmation -->
+        <div
+          *ngIf="confirmDeleteId === c.id; else actionsRow"
+          class="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl bg-rose-50 px-3 py-2 text-[13px] dark:bg-rose-500/10"
+          role="alertdialog"
+          aria-label="Confirm delete"
+        >
+          <span class="font-semibold text-rose-700 dark:text-rose-300">Delete this comment?</span>
+          <span class="flex items-center gap-1">
+            <button type="button" (click)="confirmDelete(c, parent)" class="rounded-full bg-rose-600 px-3 py-1 font-semibold text-white hover:bg-rose-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-400">Delete</button>
+            <button type="button" (click)="confirmDeleteId = null" class="rounded-full px-3 py-1 font-semibold text-slate-600 hover:bg-black/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866ff] dark:text-[#b0b3b8] dark:hover:bg-white/10">Cancel</button>
+          </span>
+        </div>
+
+        <!-- Actions row -->
+        <ng-template #actionsRow>
+          <div
+            class="actions-row flex flex-wrap items-center gap-x-3 px-3 text-xs font-semibold text-slate-500 dark:text-[#b0b3b8]"
+            [ngClass]="c.text && reactionTotal(c) > 0 ? '-mt-1' : 'mt-0.5'"
+          >
+            <div class="react-wrap" data-popover>
+              <div class="react-picker" [class.open]="pickerFor === c.id" role="group" aria-label="Choose a reaction">
+                <button *ngFor="let r of reactions" type="button" [attr.aria-label]="r.label" [title]="r.label" (click)="react(c, r.key)">{{ r.emoji }}</button>
+              </div>
+
+              <button
+                type="button"
+                class="like-btn act-btn"
+                [attr.aria-pressed]="!!c.myReaction"
+                [style.color]="c.myReaction ? reactionOf(c.myReaction)?.color : null"
+                (pointerdown)="onLikeDown($event, c)"
+                (pointerup)="onLikeUp()"
+                (pointercancel)="onLikeUp()"
+                (pointerleave)="onLikeUp()"
+                (contextmenu)="$event.preventDefault()"
+                (click)="onLikeClick(c)"
+              >
+                <span *ngIf="c.myReaction; else thumb" class="like-icon">{{ reactionOf(c.myReaction)?.emoji }}</span>
+                <ng-template #thumb><i class="fa-regular fa-thumbs-up like-icon"></i></ng-template>
+                {{ c.myReaction ? reactionOf(c.myReaction)?.label : 'Like' }}
+              </button>
+            </div>
+
+            <button type="button" class="act-btn" (click)="openReply(c, parent)">Reply</button>
+
+            <time class="font-normal" [attr.datetime]="iso(c.createdAt)" [title]="c.createdAt | date: 'medium'">
+              {{ timeAgo(c.createdAt) }}
+            </time>
+            <span *ngIf="c.editedAt" class="font-normal">· Edited</span>
+          </div>
+        </ng-template>
+      </ng-template>
+
+      <!-- ============ REPLIES (top-level comments only) ============ -->
+      <div *ngIf="!parent && (c.replies?.length || replyingParentId === c.id)" class="replies space-y-2">
+        <ng-container *ngFor="let r of c.replies; trackBy: trackById; let i = index">
+          <ng-container *ngIf="i < replyLimit(c)">
+            <ng-container *ngTemplateOutlet="commentTpl; context: { $implicit: r, parent: c }"></ng-container>
+          </ng-container>
+        </ng-container>
+
+        <!-- Show / hide extra replies -->
+        <div class="reply" *ngIf="c.replies && c.replies.length > 1">
+          <button type="button" (click)="toggleReplies(c)" class="act-btn text-[13px] font-semibold text-slate-600 hover:underline focus-visible:outline-none focus-visible:underline dark:text-[#b0b3b8]">
+            {{ expanded.has(c.id)
+              ? 'Hide replies'
+              : 'View ' + (c.replies.length - 1) + ' more ' + (c.replies.length - 1 === 1 ? 'reply' : 'replies') }}
+          </button>
+        </div>
+
+        <!-- Reply composer -->
+        <div class="reply" *ngIf="replyingParentId === c.id">
+          <ng-container
+            *ngTemplateOutlet="composerTpl; context: {
+              key: 'reply:' + c.id,
+              parent: c,
+              target: getReplyTarget(c),
+              small: true,
+              ph: 'Reply to ' + getReplyTarget(c).author.name + '...'
+            }"
+          ></ng-container>
+        </div>
+      </div>
+    </div>
+  </article>
+</ng-template>
+
+<!-- =====================================================================
+  TEMPLATE: composer (main + replies)
+====================================================================== -->
+<ng-template #composerTpl let-key="key" let-parent="parent" let-target="target" let-small="small" let-ph="ph">
+  <ng-container *ngIf="getDraft(key) as d">
+    <form class="flex min-w-0 items-start gap-2" novalidate (submit)="$event.preventDefault(); send(key, ta, parent, target)">
+      <!-- Current user avatar -->
+      <div class="avatar shrink-0 overflow-hidden rounded-full bg-slate-200 dark:bg-[#3a3b3c]" [class.avatar-sm]="small">
+        <img *ngIf="currentUser.avatar; else meInitials" [src]="currentUser.avatar" [alt]="currentUser.name" loading="lazy" class="h-full w-full object-cover" />
+        <ng-template #meInitials>
+          <span class="flex h-full w-full items-center justify-center bg-gradient-to-br from-sky-500 to-indigo-500 text-[11px] font-bold text-white">{{ initials(currentUser.name) }}</span>
+        </ng-template>
+      </div>
+
+      <div class="min-w-0 flex-1">
+        <div class="relative rounded-[20px] bg-[#f0f2f5] transition focus-within:ring-2 focus-within:ring-[#0866ff]/40 dark:bg-[#3a3b3c]" data-popover>
+          <!-- Emoji panel -->
+          <div
+            *ngIf="emojiFor === key"
+            class="pop absolute inset-x-0 bottom-full z-30 mb-2 grid grid-cols-6 gap-0.5 rounded-2xl bg-white p-2 shadow-xl ring-1 ring-black/10 sm:grid-cols-8 dark:bg-[#3a3b3c] dark:ring-white/10"
+            role="group"
+            aria-label="Emoji"
+          >
+            <button *ngFor="let e of emojis" type="button" (click)="insertEmoji(key, e, ta)" class="h-9 rounded-lg text-xl hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0866ff] dark:hover:bg-white/10">{{ e }}</button>
+          </div>
+
+          <!-- Image preview -->
+          <div *ngIf="d.preview" class="relative m-2 mb-0 inline-block max-w-[calc(100%-1rem)]">
+            <img [src]="d.preview" alt="Selected image preview" class="max-h-40 max-w-full rounded-xl object-cover" />
+            <button type="button" (click)="clearImage(key)" aria-label="Remove image" class="absolute right-1 top-1 flex h-7 w-7 items-center justify-center rounded-full bg-black/60 text-xs text-white hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+
+          <textarea
+            #ta
+            rows="1"
+            [attr.data-key]="key"
+            [attr.maxlength]="maxLength"
+            [value]="d.text"
+            [placeholder]="ph"
+            [attr.aria-label]="ph"
+            (input)="onInput(key, ta)"
+            (keydown.enter)="onEnter($event, key, ta, parent, target)"
+            class="comment-input block w-full resize-none border-0 bg-transparent px-3.5 pb-1 pt-2.5 text-base leading-6 text-slate-900 outline-none placeholder:text-slate-500 focus:ring-0 sm:text-[15px] dark:text-[#e4e6eb] dark:placeholder:text-[#b0b3b8]"
+          ></textarea>
+
+          <div class="flex items-center justify-between px-2 pb-1.5">
+            <div class="flex items-center">
+              <button
+                type="button"
+                (click)="toggleEmoji(key, $event)"
+                [attr.aria-expanded]="emojiFor === key"
+                aria-label="Add emoji"
+                title="Emoji"
+                class="tool-btn tool-emoji"
+              >
+                <i class="fa-regular fa-face-smile"></i>
+              </button>
+              <label class="tool-btn tool-photo cursor-pointer" title="Attach a photo">
+                <input type="file" accept="image/*" class="sr-only" aria-label="Attach an image" (change)="onFile(key, $event)" />
+                <i class="fa-regular fa-image"></i>
+              </label>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <span
+                *ngIf="d.text.length >= maxLength * 0.8"
+                class="text-[11px] tabular-nums text-slate-400 dark:text-[#8a8d91]"
+                [class.text-rose-600]="d.text.length >= maxLength"
+              >{{ d.text.length }}/{{ maxLength }}</span>
+              <button type="submit" class="send-btn tool-btn" [disabled]="!canSend(d)" aria-label="Post comment" title="Comment">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <p *ngIf="d.error" role="alert" class="px-3 pt-1 text-xs text-rose-600 dark:text-rose-400">{{ d.error }}</p>
+
+        <p *ngIf="target" class="px-3 pt-1 text-xs text-slate-500 dark:text-[#b0b3b8]">
+          Replying to <span class="font-semibold">{{ target.author.name }}</span> ·
+          <button type="button" (click)="cancelReply()" class="font-semibold hover:underline focus-visible:outline-none focus-visible:underline">Cancel</button>
+        </p>
+      </div>
+    </form>
+  </ng-container>
+</ng-template>

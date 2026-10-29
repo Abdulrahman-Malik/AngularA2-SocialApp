@@ -1,0 +1,206 @@
+/* comment.component.css — Facebook-style comments (Angular component styles) */
+
+:host { display: block; }
+
+.comment-composer {
+  --c-card: #ffffff;
+  --c-line: #dfe3e8;
+  --c-accent: #0866ff;
+  --av: 36px;   /* avatar of a top-level comment */
+  --av-r: 28px; /* avatar of a reply */
+}
+:host-context(.dark) .comment-composer {
+  --c-card: #242526;
+  --c-line: #3e4042;
+}
+@media (max-width: 639px) {
+  .comment-composer { --av: 32px; --av-r: 26px; }
+}
+
+/* ---------- Avatars ---------- */
+.avatar { width: var(--av); height: var(--av); margin-top: 2px; }
+.avatar-sm { width: var(--av-r); height: var(--av-r); }
+
+/* ---------- Inputs ---------- */
+.comment-input { min-height: 24px; max-height: 160px; overflow-y: auto; }
+
+.tool-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px; border-radius: 999px;
+  color: #65676b; transition: background-color .15s ease, color .15s ease, transform .15s ease;
+}
+.tool-btn:hover { background: rgb(0 0 0 / .05); }
+.tool-btn:focus-visible,
+.tool-btn:focus-within { outline: none; box-shadow: 0 0 0 2px var(--c-accent); }
+.tool-emoji:hover { color: #f59e0b; }
+.tool-photo:hover { color: #10b981; }
+:host-context(.dark) .tool-emoji:hover { color: #fbbf24; }
+:host-context(.dark) .tool-photo:hover { color: #34d399; }
+:host-context(.dark) .tool-btn { color: #b0b3b8; }
+:host-context(.dark) .tool-btn:hover { background: rgb(255 255 255 / .1); }
+
+.send-btn { color: var(--c-accent); }
+:host-context(.dark) .send-btn { color: #6ea8ff; }
+.send-btn:disabled { color: #bcc0c4; cursor: not-allowed; background: transparent; }
+:host-context(.dark) .send-btn:disabled { color: #4e4f50; }
+.send-btn:not(:disabled):active { transform: scale(.9); }
+
+/* ---------- Actions row ---------- */
+.actions-row { position: relative; }
+.act-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  min-height: 28px; border-radius: 6px;
+}
+.act-btn:hover { text-decoration: underline; }
+.act-btn:focus-visible { outline: none; text-decoration: underline; box-shadow: 0 0 0 2px var(--c-accent); }
+
+/* ---------- Reactions picker ---------- */
+.react-picker {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 4px;
+  display: flex;
+  gap: 2px;
+  padding: 4px 6px;
+  border-radius: 999px;
+  background: var(--c-card);
+  box-shadow: 0 8px 24px rgb(0 0 0 / .18), 0 0 0 1px rgb(0 0 0 / .06);
+  opacity: 0;
+  transform: translateY(6px) scale(.96);
+  transform-origin: bottom left;
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease;
+  z-index: 20;
+  max-width: calc(100vw - 24px);
+}
+/* hover bridge so the picker doesn't close while the mouse travels up */
+.react-picker::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 12px; }
+.react-picker.open,
+.react-wrap:has(:focus-visible) .react-picker {
+  opacity: 1; transform: none; pointer-events: auto;
+}
+@media (hover: hover) and (pointer: fine) {
+  .react-wrap:hover .react-picker {
+    opacity: 1; transform: none; pointer-events: auto; transition-delay: .25s;
+  }
+}
+.react-picker button {
+  width: 38px; height: 38px; font-size: 24px; line-height: 1; border-radius: 999px;
+  transition: transform .15s cubic-bezier(.2, .9, .3, 1.5);
+}
+.react-picker button:hover,
+.react-picker button:focus-visible { transform: translateY(-6px) scale(1.3); outline: none; }
+@media (max-width: 639px) {
+  .react-picker { padding: 3px 4px; }
+  .react-picker button { width: 32px; height: 32px; font-size: 21px; }
+}
+
+/* Like button: no text selection / callout on long-press */
+.like-btn { -webkit-touch-callout: none; user-select: none; touch-action: manipulation; }
+.like-btn[aria-pressed="true"] .like-icon { animation: like-pop .3s cubic-bezier(.2, .9, .3, 1.6); }
+@keyframes like-pop { 50% { transform: scale(1.35); } }
+
+/* ---------- Options button: hover-reveal on mouse, always visible on touch ---------- */
+.opt-btn { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  .opt-btn { opacity: 0; transition: opacity .15s ease; }
+  .bubble-row:hover .opt-btn,
+  .opt-btn:focus-visible,
+  .opt-btn[aria-expanded="true"] { opacity: 1; }
+}
+
+/* ---------- Popovers ---------- */
+.pop { animation: pop-in .14s ease-out; transform-origin: top right; }
+@keyframes pop-in { from { opacity: 0; transform: translateY(-4px) scale(.97); } }
+
+.menu-item {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 9px 12px; text-align: left; font-weight: 600;
+  color: #1c1e21;
+}
+.menu-item:hover, .menu-item:focus-visible { background: rgb(0 0 0 / .05); outline: none; }
+:host-context(.dark) .menu-item { color: #e4e6eb; }
+:host-context(.dark) .menu-item:hover,
+:host-context(.dark) .menu-item:focus-visible { background: rgb(255 255 255 / .1); }
+.menu-item.danger { color: #e11d48; }
+:host-context(.dark) .menu-item.danger { color: #fb7185; }
+
+/* ---------- Long text clamp ---------- */
+.clamp-5 { display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; }
+
+/* ---------- Thread lines (sized from the avatar variables) ---------- */
+.has-replies { position: relative; }
+.has-replies::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--av) / 2 - 1px);
+  top: calc(var(--av) + 6px);
+  bottom: 0;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--c-line);
+}
+.replies { margin-top: 6px; }
+.reply { position: relative; }
+/* curved connector into each reply */
+.reply::before {
+  content: "";
+  position: absolute;
+  left: calc(-1 * (var(--av) / 2 + 9px));
+  top: -6px;
+  width: calc(var(--av) / 2 + 5px);
+  height: calc(var(--av-r) / 2 + 8px);
+  border-left: 2px solid var(--c-line);
+  border-bottom: 2px solid var(--c-line);
+  border-bottom-left-radius: 12px;
+  pointer-events: none;
+}
+/* hides the parent's line below the last child's curve */
+.reply:last-child::after {
+  content: "";
+  position: absolute;
+  left: calc(-1 * (var(--av) / 2 + 9px) - 3px);
+  top: calc(var(--av-r) / 2 + 2px);
+  bottom: -2px;
+  width: 8px;
+  background: var(--c-card);
+  pointer-events: none;
+}
+
+/* ---------- Just-posted comment highlight ---------- */
+.comment-new .comment-bubble { animation: comment-flash 1.8s ease-out; }
+@keyframes comment-flash { from { background-color: rgb(8 102 255 / .2); } }
+
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  max-width: calc(100vw - 32px);
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: #1c1e21;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  box-shadow: 0 8px 24px rgb(0 0 0 / .3);
+  z-index: 60;
+  animation: toast-in .2s ease-out;
+}
+@keyframes toast-in { from { opacity: 0; transform: translate(-50%, 8px); } }
+
+/* ---------- Bigger touch targets on touch screens ---------- */
+@media (pointer: coarse) {
+  .act-btn { min-height: 36px; padding-inline: 2px; }
+  .tool-btn { width: 36px; height: 36px; }
+  .opt-btn { width: 36px; height: 36px; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .comment-new .comment-bubble,
+  .like-btn[aria-pressed="true"] .like-icon,
+  .pop, .toast { animation: none; }
+  .react-picker, .react-picker button { transition: none; }
+}
