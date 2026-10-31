@@ -1,3 +1,4 @@
+
 import {
   Component,
   ElementRef,
@@ -14,6 +15,10 @@ import { Subscription } from 'rxjs';
 import { PostsService } from './components/posts.service';
 import { Post } from './models/post.interface';
 import { CommentComponent } from './comment/comment.component';
+
+/* =========================================================
+   TYPES
+========================================================= */
 
 export type ReactionType =
   | 'like'
@@ -69,22 +74,31 @@ export type FeedPost = Omit<
   commentsList: FeedComment[];
 };
 
+/* =========================================================
+   POSTS COMPONENT
+========================================================= */
+
 @Component({
   selector: 'app-posts',
   standalone: true,
-  imports: [ReactiveFormsModule , CommentComponent],
+  imports: [
+    ReactiveFormsModule,
+    CommentComponent,
+  ],
   templateUrl: './posts.component.html',
   styleUrl: './posts.component.css',
 })
 export class PostsComponent implements OnInit, OnDestroy {
+
   private readonly postsService = inject(PostsService);
 
   private postsSubscription?: Subscription;
   private createPostSubscription?: Subscription;
 
-  // =====================================================
-  // FORM CONTROLS
-  // =====================================================
+  /* =========================================================
+     SECTION 1: FORM CONTROLS
+     إنشاء البوست
+  ========================================================= */
 
   readonly content = new FormControl('', {
     nonNullable: true,
@@ -95,41 +109,64 @@ export class PostsComponent implements OnInit, OnDestroy {
   });
 
   readonly publishing = signal(false);
+
   readonly postActionMessage = signal('');
+
   readonly postActionIsError = signal(false);
 
-  // =====================================================
-  // CURRENT USER AND POSTS
-  // =====================================================
+  /* =========================================================
+     SECTION 2: CURRENT USER
+     بيانات المستخدم الحالي
+  ========================================================= */
+
+  readonly defaultAvatar = '/assets/default-profile.png';
 
   readonly userId = signal<string | null>(null);
+
   readonly currentUserName = signal<string>('User');
+
+  readonly currentUserPhoto = signal<string>(
+    this.defaultAvatar,
+  );
+
+  /* =========================================================
+     SECTION 3: POSTS STATE
+     بيانات البوستات
+  ========================================================= */
+
   readonly allposts = signal<FeedPost[]>([]);
 
   readonly loading = signal(false);
+
   readonly errorMessage = signal('');
 
-  // =====================================================
-  // NEW POST PRIVACY
-  // =====================================================
+  /* =========================================================
+     SECTION 4: NEW POST PRIVACY
+     خصوصية البوست الجديد
+  ========================================================= */
 
   newPostPrivacy: PostPrivacy = 'public';
 
-  // =====================================================
-  // IMAGE / VIDEO FILE SIGNALS
-  // =====================================================
+  /* =========================================================
+     SECTION 5: IMAGE / VIDEO STATE
+     الصور والفيديوهات
+  ========================================================= */
 
   readonly selectedMediaFile = signal<File | null>(null);
+
   readonly mediaPreviewUrl = signal<string | null>(null);
+
   readonly mediaType = signal<'image' | 'video' | null>(null);
+
   readonly mediaError = signal('');
 
   @ViewChild('postMediaInput')
   private postMediaInput?: ElementRef<HTMLInputElement>;
 
-  // =====================================================
-  // AVAILABLE REACTIONS
-  // =====================================================
+  /* =========================================================
+     SECTION 6: AVAILABLE REACTIONS
+     التفاعلات المتاحة
+  ========================================================= */
 
   readonly reactions: readonly Reaction[] = [
     { type: 'like', emoji: '👍', label: 'Like' },
@@ -140,28 +177,35 @@ export class PostsComponent implements OnInit, OnDestroy {
     { type: 'angry', emoji: '😡', label: 'Angry' },
   ];
 
-  // =====================================================
-  // LIFECYCLE
-  // =====================================================
+  /* =========================================================
+     SECTION 7: LIFECYCLE
+     دورة حياة المكون
+  ========================================================= */
 
   ngOnInit(): void {
-    this.loadCurrentUserId();
+    this.loadCurrentUser();
     this.getPostsData();
   }
 
   ngOnDestroy(): void {
     this.postsSubscription?.unsubscribe();
+
     this.createPostSubscription?.unsubscribe();
+
     this.releaseMediaPreview();
   }
 
-  // =====================================================
-  // CURRENT USER
-  // =====================================================
+  /* =========================================================
+     SECTION 8: LOAD CURRENT USER
+     تحميل بيانات المستخدم وصورة البروفايل
+  ========================================================= */
 
-  private loadCurrentUserId(): void {
+  private loadCurrentUser(): void {
     this.userId.set(null);
+
     this.currentUserName.set('User');
+
+    this.currentUserPhoto.set(this.defaultAvatar);
 
     if (typeof localStorage === 'undefined') {
       return;
@@ -182,17 +226,27 @@ export class PostsComponent implements OnInit, OnDestroy {
 
     try {
       const parsedUser: unknown = JSON.parse(storedUser);
+
       const parsedRecord = this.asRecord(parsedUser);
 
-      // Supports both a direct user object and a nested user object.
+      const dataRecord = this.asRecord(
+        parsedRecord['data'],
+      );
+
       const nestedUser = this.asRecord(
-        parsedRecord['user'] ?? parsedRecord['data'],
+        parsedRecord['user'] ??
+        dataRecord['user'] ??
+        dataRecord,
       );
 
       const user =
         Object.keys(nestedUser).length > 0
           ? nestedUser
           : parsedRecord;
+
+      // ---------------------------------------------
+      // USER ID
+      // ---------------------------------------------
 
       const id =
         user['_id'] ??
@@ -201,11 +255,15 @@ export class PostsComponent implements OnInit, OnDestroy {
 
       this.userId.set(
         id === null ||
-          id === undefined ||
-          String(id).trim() === ''
+        id === undefined ||
+        String(id).trim() === ''
           ? null
           : String(id),
       );
+
+      // ---------------------------------------------
+      // USER NAME
+      // ---------------------------------------------
 
       const rawName =
         user['name'] ??
@@ -217,21 +275,64 @@ export class PostsComponent implements OnInit, OnDestroy {
         user['email'];
 
       this.currentUserName.set(
-        typeof rawName === 'string' && rawName.trim().length > 0
+        typeof rawName === 'string' &&
+        rawName.trim().length > 0
           ? rawName.trim()
           : 'User',
       );
+
+      // ---------------------------------------------
+      // USER PROFILE PHOTO
+      // ---------------------------------------------
+
+      const rawPhoto =
+        user['photo'] ??
+        user['profilePhoto'] ??
+        user['avatar'] ??
+        user['image'];
+
+      const photo =
+        typeof rawPhoto === 'string' &&
+        rawPhoto.trim().length > 0
+          ? rawPhoto.trim()
+          : this.defaultAvatar;
+
+      this.currentUserPhoto.set(photo);
+
+      console.log('Current user loaded:', {
+        id: this.userId(),
+        name: this.currentUserName(),
+        photo: this.currentUserPhoto(),
+      });
+
     } catch (error) {
       console.error('Unable to read the current user:', error);
 
       this.userId.set(null);
+
       this.currentUserName.set('User');
+
+      this.currentUserPhoto.set(this.defaultAvatar);
     }
   }
 
-  // =====================================================
-  // CHECK POST OWNERSHIP
-  // =====================================================
+  /* =========================================================
+     SECTION 9: PROFILE PHOTO ERROR
+     معالجة صورة البروفايل
+  ========================================================= */
+
+  onProfilePhotoError(event: Event): void {
+    const image = event.target as HTMLImageElement;
+
+    image.onerror = null;
+
+    image.src = this.defaultAvatar;
+  }
+
+  /* =========================================================
+     SECTION 10: CHECK POST OWNERSHIP
+     معرفة صاحب البوست
+  ========================================================= */
 
   isOwnPost(post: FeedPost): boolean {
     const currentUserId = this.userId();
@@ -258,10 +359,12 @@ export class PostsComponent implements OnInit, OnDestroy {
       record['ownerId'] ??
       record['authorId'] ??
       record['createdById'] ??
-      (typeof ownerSource === 'string' ||
-      typeof ownerSource === 'number'
-        ? ownerSource
-        : undefined);
+      (
+        typeof ownerSource === 'string' ||
+        typeof ownerSource === 'number'
+          ? ownerSource
+          : undefined
+      );
 
     if (ownerId === null || ownerId === undefined) {
       return false;
@@ -270,22 +373,26 @@ export class PostsComponent implements OnInit, OnDestroy {
     return String(ownerId) === currentUserId;
   }
 
-  // =====================================================
-  // NEW POST PRIVACY
-  // =====================================================
+  /* =========================================================
+     SECTION 11: NEW POST PRIVACY
+     خصوصية البوست الجديد
+  ========================================================= */
 
   selectNewPostPrivacy(
     privacy: PostPrivacy,
     menu: HTMLDetailsElement,
   ): void {
     this.newPostPrivacy = privacy;
+
     this.privacy.setValue(privacy);
+
     menu.open = false;
   }
 
-  // =====================================================
-  // SUBMIT POST
-  // =====================================================
+  /* =========================================================
+     SECTION 12: SUBMIT POST
+     إرسال بوست جديد
+  ========================================================= */
 
   submitForm(event?: Event): void {
     event?.preventDefault();
@@ -295,23 +402,27 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
 
     const privacy = this.privacy.value;
+
     const content = this.content.value.trim();
+
     const file = this.selectedMediaFile();
 
-    // A post must contain text, an image, or both.
     if (!content && !file) {
       this.postActionIsError.set(true);
+
       this.postActionMessage.set(
         'Please write a post or select an image.',
       );
+
       return;
     }
 
-    // The current API request supports image uploads only.
+    // Current API request supports image uploads only.
     if (file && !file.type.startsWith('image/')) {
       this.mediaError.set(
         'Please select an image. Video publishing requires backend support.',
       );
+
       return;
     }
 
@@ -327,28 +438,32 @@ export class PostsComponent implements OnInit, OnDestroy {
       formData.append('image', file, file.name);
     }
 
-    console.log('Privacy:', privacy);
-    console.log('Content:', content);
-    console.log('File:', file);
-
     this.publishing.set(true);
+
     this.postActionMessage.set('');
+
     this.postActionIsError.set(false);
+
     this.mediaError.set('');
 
     this.createPostSubscription?.unsubscribe();
 
     this.createPostSubscription =
       this.postsService.createPosts(formData).subscribe({
+
         next: () => {
           this.content.reset('');
+
           this.privacy.setValue('public');
+
           this.newPostPrivacy = 'public';
 
           this.removeSelectedMedia();
 
           this.publishing.set(false);
+
           this.postActionIsError.set(false);
+
           this.postActionMessage.set(
             'Post published successfully.',
           );
@@ -360,10 +475,15 @@ export class PostsComponent implements OnInit, OnDestroy {
           console.error('Failed to publish post:', error);
 
           const errorRecord = this.asRecord(error);
-          const errorBody = this.asRecord(errorRecord['error']);
+
+          const errorBody = this.asRecord(
+            errorRecord['error'],
+          );
+
           const apiMessage = errorBody['message'];
 
           this.publishing.set(false);
+
           this.postActionIsError.set(true);
 
           this.postActionMessage.set(
@@ -372,15 +492,18 @@ export class PostsComponent implements OnInit, OnDestroy {
               : 'Unable to publish post. Check your login and try again.',
           );
         },
+
       });
   }
 
-  // =====================================================
-  // SELECT IMAGE OR VIDEO
-  // =====================================================
+  /* =========================================================
+     SECTION 13: SELECT IMAGE OR VIDEO
+     اختيار صورة أو فيديو
+  ========================================================= */
 
   onMediaSelected(event: Event): void {
     const input = event.currentTarget as HTMLInputElement;
+
     const file = input.files?.[0];
 
     if (!file) {
@@ -388,6 +511,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
 
     const isImage = file.type.startsWith('image/');
+
     const isVideo = file.type.startsWith('video/');
 
     if (!isImage && !isVideo) {
@@ -396,26 +520,33 @@ export class PostsComponent implements OnInit, OnDestroy {
       );
 
       input.value = '';
+
       return;
     }
 
     this.releaseMediaPreview();
 
     this.selectedMediaFile.set(file);
+
     this.mediaType.set(isImage ? 'image' : 'video');
-    this.mediaPreviewUrl.set(URL.createObjectURL(file));
+
+    this.mediaPreviewUrl.set(
+      URL.createObjectURL(file),
+    );
+
     this.mediaError.set('');
 
-    // Allows the user to select the same file again.
     input.value = '';
   }
 
-  // =====================================================
-  // REMOVE SELECTED MEDIA
-  // =====================================================
+  /* =========================================================
+     SECTION 14: REMOVE SELECTED MEDIA
+     حذف الصورة أو الفيديو المختار
+  ========================================================= */
 
   removeSelectedMedia(): void {
     this.releaseMediaPreview();
+
     this.mediaError.set('');
 
     if (this.postMediaInput) {
@@ -423,9 +554,10 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // =====================================================
-  // RELEASE MEDIA PREVIEW
-  // =====================================================
+  /* =========================================================
+     SECTION 15: RELEASE MEDIA PREVIEW
+     تنظيف رابط معاينة الصورة
+  ========================================================= */
 
   private releaseMediaPreview(): void {
     const previewUrl = this.mediaPreviewUrl();
@@ -435,13 +567,16 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
 
     this.mediaPreviewUrl.set(null);
+
     this.mediaType.set(null);
+
     this.selectedMediaFile.set(null);
   }
 
-  // =====================================================
-  // GET POSTS
-  // =====================================================
+  /* =========================================================
+     SECTION 16: GET POSTS
+     تحميل البوستات
+  ========================================================= */
 
   getPostsData(): void {
     if (this.loading()) {
@@ -449,114 +584,123 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
 
     this.loading.set(true);
+
     this.errorMessage.set('');
 
     this.postsSubscription?.unsubscribe();
 
-    this.postsSubscription = this.postsService.getAllposts().subscribe({
-      next: (res) => {
-        const apiPosts = (res?.data?.posts ?? []) as ApiPost[];
+    this.postsSubscription =
+      this.postsService.getAllposts().subscribe({
 
-        const previousPosts = new Map(
-          this.allposts().map(
-            (post) => [String(post.id), post] as const,
-          ),
-        );
+        next: (res) => {
+          const apiPosts = (res?.data?.posts ?? []) as ApiPost[];
 
-        const updatedPosts: FeedPost[] = apiPosts.map(
-          (apiPost): FeedPost => {
-            const previous = previousPosts.get(
-              String(apiPost.id),
-            );
-
-            const apiComments = this.normalizeComments(
-              apiPost.comments,
-            );
-
-            const commentsList = this.mergeComments(
-              apiComments,
-              previous?.commentsList ?? [],
-            );
-
-            const commentsCount = Math.max(
-              this.normalizeCount(
-                apiPost.commentsCount,
-                apiPost.comments ??
-                  previous?.commentsCount ??
-                  0,
-              ),
-              commentsList.length,
-            );
-
-            return {
-              ...apiPost,
-
-              privacy:
-                this.normalizePrivacy(apiPost.privacy) ??
-                previous?.privacy ??
-                'public',
-
-              likesCount: this.normalizeCount(
-                apiPost.likesCount,
-                apiPost.likes ??
-                  previous?.likesCount ??
-                  0,
-              ),
-
-              commentsCount,
-
-              sharesCount: this.normalizeCount(
-                apiPost.sharesCount,
-                apiPost.shares ??
-                  previous?.sharesCount ??
-                  0,
-              ),
-
-              myReaction: previous?.myReaction ?? null,
-
-              isReactionPickerOpen: false,
-
-              isSaved: previous?.isSaved ?? false,
-
-              isFollowing: previous?.isFollowing ?? false,
-
-              isCommentsOpen:
-                previous?.isCommentsOpen ?? false,
-
-              commentText: previous?.commentText ?? '',
-
-              isCommentPreviewOpen:
-                previous?.isCommentPreviewOpen ?? false,
-
-              commentsList,
-            } as FeedPost;
-          },
-        );
-
-        this.allposts.set(updatedPosts);
-        this.loading.set(false);
-
-        console.log('Posts loaded:', updatedPosts);
-        console.log('Posts count:', updatedPosts.length);
-      },
-
-      error: (error: unknown) => {
-        console.error('Failed to load posts:', error);
-
-        if (this.allposts().length === 0) {
-          this.errorMessage.set(
-            'Unable to load posts. Please try again.',
+          const previousPosts = new Map(
+            this.allposts().map(
+              (post) => [String(post.id), post] as const,
+            ),
           );
-        }
 
-        this.loading.set(false);
-      },
-    });
+          const updatedPosts: FeedPost[] = apiPosts.map(
+            (apiPost): FeedPost => {
+
+              const previous = previousPosts.get(
+                String(apiPost.id),
+              );
+
+              const apiComments = this.normalizeComments(
+                apiPost.comments,
+              );
+
+              const commentsList = this.mergeComments(
+                apiComments,
+                previous?.commentsList ?? [],
+              );
+
+              const commentsCount = Math.max(
+                this.normalizeCount(
+                  apiPost.commentsCount,
+                  apiPost.comments ??
+                    previous?.commentsCount ??
+                    0,
+                ),
+                commentsList.length,
+              );
+
+              return {
+                ...apiPost,
+
+                privacy:
+                  this.normalizePrivacy(apiPost.privacy) ??
+                  previous?.privacy ??
+                  'public',
+
+                likesCount: this.normalizeCount(
+                  apiPost.likesCount,
+                  apiPost.likes ??
+                    previous?.likesCount ??
+                    0,
+                ),
+
+                commentsCount,
+
+                sharesCount: this.normalizeCount(
+                  apiPost.sharesCount,
+                  apiPost.shares ??
+                    previous?.sharesCount ??
+                    0,
+                ),
+
+                myReaction: previous?.myReaction ?? null,
+
+                isReactionPickerOpen: false,
+
+                isSaved: previous?.isSaved ?? false,
+
+                isFollowing: previous?.isFollowing ?? false,
+
+                isCommentsOpen:
+                  previous?.isCommentsOpen ?? false,
+
+                commentText: previous?.commentText ?? '',
+
+                isCommentPreviewOpen:
+                  previous?.isCommentPreviewOpen ?? false,
+
+                commentsList,
+
+              } as FeedPost;
+            },
+          );
+
+          this.allposts.set(updatedPosts);
+
+          this.loading.set(false);
+
+          console.log('Posts loaded:', updatedPosts);
+
+          console.log('Posts count:', updatedPosts.length);
+        },
+
+        error: (error: unknown) => {
+          console.error('Failed to load posts:', error);
+
+          if (this.allposts().length === 0) {
+            this.errorMessage.set(
+              'Unable to load posts. Please try again.',
+            );
+          }
+
+          this.loading.set(false);
+        },
+
+      });
   }
 
-  // =====================================================
-  // DATA HELPERS
-  // =====================================================
+  /* =========================================================
+     SECTION 17: DATA HELPERS
+     دوال مساعدة للبيانات
+  ========================================================= */
 
   private normalizePrivacy(
     value: unknown,
@@ -627,12 +771,13 @@ export class PostsComponent implements OnInit, OnDestroy {
 
     return value
       .map((item, index): FeedComment => {
+
         const comment = this.asRecord(item);
 
         const commentUser = this.asRecord(
           comment['user'] ??
-            comment['commentCreator'] ??
-            comment['author'],
+          comment['commentCreator'] ??
+          comment['author'],
         );
 
         const rawText =
@@ -707,9 +852,10 @@ export class PostsComponent implements OnInit, OnDestroy {
     );
   }
 
-  // =====================================================
-  // REACTIONS
-  // =====================================================
+  /* =========================================================
+     SECTION 18: REACTIONS
+     التفاعلات
+  ========================================================= */
 
   getCurrentReaction(
     post: FeedPost,
@@ -721,6 +867,7 @@ export class PostsComponent implements OnInit, OnDestroy {
 
   toggleLike(post: FeedPost): void {
     this.updatePost(post.id, (current) => {
+
       if (current.myReaction === 'like') {
         return {
           ...current,
@@ -752,6 +899,7 @@ export class PostsComponent implements OnInit, OnDestroy {
     type: ReactionType,
   ): void {
     this.updatePost(post.id, (current) => {
+
       if (current.myReaction === type) {
         return {
           ...current,
@@ -793,9 +941,10 @@ export class PostsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  // =====================================================
-  // POST PRIVACY, SAVING AND FOLLOWING
-  // =====================================================
+  /* =========================================================
+     SECTION 19: PRIVACY, SAVING AND FOLLOWING
+     الخصوصية والحفظ والمتابعة
+  ========================================================= */
 
   setPrivacy(
     post: FeedPost,
@@ -825,9 +974,10 @@ export class PostsComponent implements OnInit, OnDestroy {
     }));
   }
 
-  // =====================================================
-  // COMMENTS
-  // =====================================================
+  /* =========================================================
+     SECTION 20: COMMENTS
+     التعليقات
+  ========================================================= */
 
   toggleComments(post: FeedPost): void {
     this.updatePost(post.id, (current) => ({
@@ -848,6 +998,7 @@ export class PostsComponent implements OnInit, OnDestroy {
 
   previewComment(post: FeedPost): void {
     this.updatePost(post.id, (current) => {
+
       if (!current.commentText.trim()) {
         return {
           ...current,
@@ -872,6 +1023,7 @@ export class PostsComponent implements OnInit, OnDestroy {
 
   addComment(post: FeedPost): void {
     this.updatePost(post.id, (current) => {
+
       const text = current.commentText.trim();
 
       if (!text) {
@@ -911,13 +1063,12 @@ export class PostsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // =====================================================
-  // SHARE POST
-  // =====================================================
+  /* =========================================================
+     SECTION 21: SHARE POST
+     مشاركة البوست
+  ========================================================= */
 
-  async sharePost(
-    post: FeedPost,
-  ): Promise<void> {
+  async sharePost(post: FeedPost): Promise<void> {
     const text = String(post.body ?? '');
 
     if (typeof navigator === 'undefined') {
@@ -942,26 +1093,34 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // =====================================================
-  // DELETE POST
-  // =====================================================
+  /* =========================================================
+     SECTION 22: DELETE POST
+     حذف البوست
+  ========================================================= */
 
   deleteItem(id: string): void {
     this.postActionMessage.set('');
+
     this.postActionIsError.set(false);
 
     this.postsService.deletePosts(id).subscribe({
+
       next: (res) => {
+
         if (res?.success) {
           this.postActionMessage.set(
             'Post deleted successfully.',
           );
+
           this.postActionIsError.set(false);
+
           this.getPostsData();
+
           return;
         }
 
         this.postActionIsError.set(true);
+
         this.postActionMessage.set(
           'Unable to delete this post. Please try again.',
         );
@@ -971,10 +1130,13 @@ export class PostsComponent implements OnInit, OnDestroy {
         console.error('Failed to delete post:', error);
 
         this.postActionIsError.set(true);
+
         this.postActionMessage.set(
           'Unable to delete this post. Please try again.',
         );
       },
+
     });
   }
+
 }

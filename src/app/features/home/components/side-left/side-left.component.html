@@ -1,218 +1,361 @@
 
-<aside
-  class="group/sidebar w-full min-w-0 overflow-visible rounded-2xl border border-[#e4e6eb] bg-white shadow-sm transition-shadow duration-300 hover:shadow-md"
-  aria-label="Route Posts sidebar"
+<!-- =====================================================
+     ROUTE POSTS SIDEBAR TOGGLE
+====================================================== -->
+
+<button
+  type="button"
+  (click)="toggleSidebar()"
+  [attr.aria-expanded]="isSidebarOpen()"
+  aria-controls="route-sidebar"
+  [attr.aria-label]="isSidebarOpen() ? 'Close sidebar' : 'Open sidebar'"
+  class="sidebar-toggle"
 >
-  <!-- Cover -->
-  <div class="relative h-28 overflow-hidden rounded-t-2xl bg-[#1877f2]">
-    <img
-      src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=900&q=85"
-      alt="Route Posts cover"
-      class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover/sidebar:scale-105"
-    />
+  <i
+    class="fa-solid"
+    [class.fa-xmark]="isSidebarOpen()"
+    [class.fa-bars-staggered]="!isSidebarOpen()"
+  ></i>
+</button>
 
-    <div class="absolute inset-0 bg-gradient-to-r from-[#0b2454]/80 via-[#173b72]/35 to-transparent"></div>
+<!-- =====================================================
+     SIDEBAR BACKDROP
+====================================================== -->
 
-    <div class="relative flex items-center gap-3 p-4">
-      <div class="flex h-11 w-11 items-center justify-center rounded-full border border-white/30 bg-white/15 text-white backdrop-blur-sm">
-        <i class="fa-solid fa-route text-lg"></i>
+<button
+  type="button"
+  aria-label="Close sidebar"
+  (click)="closeSidebar()"
+  [class.backdrop-visible]="isSidebarOpen()"
+  class="sidebar-backdrop"
+></button>
+
+<!-- =====================================================
+     MAIN SIDEBAR
+====================================================== -->
+
+<aside
+  id="route-sidebar"
+  aria-label="Route Posts navigation"
+  [attr.aria-hidden]="!isSidebarOpen()"
+  [class.sidebar-open]="isSidebarOpen()"
+  [class.sidebar-closed]="!isSidebarOpen()"
+  class="route-sidebar"
+>
+
+  <!-- ===================================================
+       SECTION 1 — BRAND HEADER
+  ==================================================== -->
+
+  <header class="sidebar-header">
+
+    <a
+      routerLink="/main/home"
+      (click)="closeSidebar()"
+      class="sidebar-brand"
+      aria-label="Route Posts home"
+    >
+      <span class="sidebar-brand-icon">
+        <i class="fa-solid fa-route"></i>
+      </span>
+
+      <span class="sidebar-brand-text">
+        <strong>Route Posts</strong>
+        <small>Connect. Share. Discover.</small>
+      </span>
+    </a>
+
+    <button
+      type="button"
+      (click)="closeSidebar()"
+      aria-label="Close sidebar"
+      class="sidebar-close"
+    >
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+
+  </header>
+
+  <!-- ===================================================
+       SECTION 2 — SCROLLABLE CONTENT
+  ==================================================== -->
+
+  <div class="sidebar-scroll">
+
+    <!-- =================================================
+         USER PROFILE CARD
+    ================================================== -->
+
+    <section class="sidebar-profile">
+
+      <!-- PROFILE COVER -->
+      <div class="profile-cover">
+
+        <div class="profile-cover-pattern"></div>
+
+        <div class="profile-cover-label">
+          <i class="fa-solid fa-bolt"></i>
+          <span>YOUR COMMUNITY</span>
+        </div>
+
       </div>
 
-      <div>
-        <h2 class="text-base font-extrabold tracking-tight text-white">
-          Route Posts
-        </h2>
-        <p class="mt-1 text-[11px] font-medium text-white/80">
-          Your world. Your people.
-        </p>
-      </div>
-    </div>
+      <!-- PROFILE INFORMATION -->
+      <div class="profile-content">
 
-    <span class="absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-black/25 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur-sm">
-      <span class="h-2 w-2 rounded-full bg-[#31a24c]"></span>
-      Online
-    </span>
-  </div>
+        <!-- PROFILE TOP -->
+        <div class="profile-main">
 
-  <!-- Profile -->
-  <div class="px-4 pb-4">
-    <div class="-mt-8 flex items-end justify-between">
-      <div class="relative rounded-full border-4 border-white bg-white shadow-sm">
-        <img
-          src="https://i.pravatar.cc/160?img=12"
-          alt="Profile picture"
-          referrerpolicy="no-referrer"
-          class="h-[76px] w-[76px] rounded-full bg-[#f0f2f5] object-cover"
-        />
+          <!-- DYNAMIC PROFILE IMAGE -->
+          <div class="profile-avatar-wrapper">
 
-        <span class="absolute bottom-1 right-0 h-3.5 w-3.5 rounded-full border-[3px] border-white bg-[#31a24c]"></span>
-      </div>
+            <img
+              [src]="currentUserPhoto()"
+              (error)="onProfilePhotoError($event)"
+              [alt]="currentUserName()"
+              width="76"
+              height="76"
+              loading="lazy"
+              class="profile-avatar"
+            />
 
-      <div class="relative mb-1">
-        <button
-          type="button"
-          aria-label="Open profile menu"
-          [attr.aria-expanded]="showProfileMenu"
-          (click)="toggleProfileMenu()"
-          class="flex h-9 w-9 items-center justify-center rounded-full bg-[#f0f2f5] text-[#65676b] transition hover:bg-[#e4e6eb] hover:text-[#1877f2]"
-        >
-          <i class="fa-solid fa-ellipsis text-lg"></i>
-        </button>
+            <span
+              class="profile-online-indicator"
+              title="Active"
+            ></span>
 
-        @if (showProfileMenu) {
-          <div class="absolute right-0 top-11 z-50 w-48 rounded-xl border border-[#e4e6eb] bg-white p-1.5 shadow-[0_8px_24px_rgba(0,0,0,0.14)]">
-            <button
-              type="button"
-              (click)="closeProfileMenu()"
-              class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-[#050505] transition hover:bg-[#f0f2f5]"
-            >
-              <i class="fa-regular fa-user w-4 text-[#65676b]"></i>
-              My Profile
-            </button>
-
-            <button
-              type="button"
-              (click)="closeProfileMenu()"
-              class="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-semibold text-[#050505] transition hover:bg-[#f0f2f5]"
-            >
-              <i class="fa-solid fa-gear w-4 text-[#65676b]"></i>
-              Settings
-            </button>
           </div>
-        }
-      </div>
-    </div>
 
-    <div class="mt-3">
-      <div class="flex items-center gap-2">
-        <h3 class="text-base font-extrabold text-[#050505]">
-          My Account
-        </h3>
-        <i class="fa-solid fa-circle-check text-xs text-[#1877f2]" title="Verified"></i>
-      </div>
+          <!-- PROFILE OPTIONS -->
+          <div class="profile-menu-wrapper">
 
-      <p class="mt-1 text-xs leading-5 text-[#65676b]">
-        Welcome back! Stay connected with your community.
-      </p>
-    </div>
+            <button
+              type="button"
+              (click)="toggleProfileMenu()"
+              [attr.aria-expanded]="showProfileMenu"
+              aria-label="Profile options"
+              class="profile-menu-trigger"
+            >
+              <i class="fa-solid fa-ellipsis"></i>
+            </button>
 
-    <!-- Stats -->
-    <div class="mt-4 grid grid-cols-3 divide-x divide-[#e4e6eb] rounded-xl bg-[#f7f8fa] py-3">
-      <div class="px-1 text-center">
-        <p class="text-base font-extrabold text-[#050505]">24</p>
-        <p class="mt-1 text-[10px] font-medium text-[#65676b]">Posts</p>
-      </div>
+            @if (showProfileMenu) {
+              <div class="profile-dropdown">
 
-      <div class="px-1 text-center">
-        <p class="text-base font-extrabold text-[#050505]">128</p>
-        <p class="mt-1 text-[10px] font-medium text-[#65676b]">Friends</p>
-      </div>
+                <!-- MY PROFILE -->
+                <a
+                  routerLink="/main/profile"
+                  (click)="closeProfileMenu(); closeSidebar()"
+                  class="profile-dropdown-item"
+                >
+                  <i class="fa-regular fa-user"></i>
+                  <span>My Profile</span>
+                </a>
 
-      <div class="px-1 text-center">
-        <p class="text-base font-extrabold text-[#050505]">860</p>
-        <p class="mt-1 text-[10px] font-medium text-[#65676b]">Followers</p>
-      </div>
-    </div>
-  </div>
+                <!-- SETTINGS -->
+                <button
+                  type="button"
+                  (click)="closeProfileMenu()"
+                  class="profile-dropdown-item"
+                >
+                  <i class="fa-solid fa-gear"></i>
+                  <span>Settings</span>
+                </button>
 
-  <!-- Navigation -->
-  <div class="border-t border-[#e4e6eb] px-3 py-4">
-    <div class="mb-3 flex items-center justify-between px-2">
-      <h4 class="text-xs font-bold text-[#65676b]">
-        Your shortcuts
-      </h4>
-      <i class="fa-solid fa-ellipsis text-sm text-[#8a8d91]"></i>
-    </div>
+              </div>
+            }
 
-    <nav class="flex flex-col gap-1">
-      <!-- Feed -->
-      <a
-        routerLink="/main/home"
-        routerLinkActive="!bg-[#e7f3ff] !text-[#1877f2]"
-        class="group flex min-h-[52px] items-center gap-3 rounded-xl px-3 text-[#050505] transition-colors hover:bg-[#f0f2f5]"
-      >
-        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e7f3ff] text-[#1877f2]">
-          <i class="fa-solid fa-house text-lg"></i>
-        </span>
-        <span class="flex-1 text-sm font-bold">Feed</span>
-        <i class="fa-solid fa-chevron-right text-[10px] text-[#bec3c9] transition group-hover:translate-x-0.5"></i>
-      </a>
+          </div>
 
-      <!-- My Posts -->
-      <a
-        routerLink="/main/my-posts"
-        routerLinkActive="!bg-[#f0eaff] !text-[#7048e8]"
-        class="group flex min-h-[52px] items-center gap-3 rounded-xl px-3 text-[#050505] transition-colors hover:bg-[#f0f2f5]"
-      >
-        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#f0eaff] text-[#7048e8]">
-          <i class="fa-solid fa-layer-group text-lg"></i>
-        </span>
-        <span class="flex-1 text-sm font-bold">My Posts</span>
-        <i class="fa-solid fa-chevron-right text-[10px] text-[#bec3c9] transition group-hover:translate-x-0.5"></i>
-      </a>
-
-      <!-- Community -->
-      <a
-        routerLink="/main/community"
-        routerLinkActive="!bg-[#e6f7f5] !text-[#008b83]"
-        class="group flex min-h-[52px] items-center gap-3 rounded-xl px-3 text-[#050505] transition-colors hover:bg-[#f0f2f5]"
-      >
-        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e6f7f5] text-[#008b83]">
-          <i class="fa-solid fa-users text-lg"></i>
-        </span>
-        <span class="flex-1 text-sm font-bold">Community</span>
-        <i class="fa-solid fa-chevron-right text-[10px] text-[#bec3c9] transition group-hover:translate-x-0.5"></i>
-      </a>
-
-      <!-- Saved -->
-      <a
-        routerLink="/main/saved"
-        routerLinkActive="!bg-[#ffebe9] !text-[#e41e3f]"
-        class="group flex min-h-[52px] items-center gap-3 rounded-xl px-3 text-[#050505] transition-colors hover:bg-[#f0f2f5]"
-      >
-        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ffebe9] text-[#e41e3f]">
-          <i class="fa-regular fa-bookmark text-lg"></i>
-        </span>
-        <span class="flex-1 text-sm font-bold">Saved</span>
-        <i class="fa-solid fa-chevron-right text-[10px] text-[#bec3c9] transition group-hover:translate-x-0.5"></i>
-      </a>
-    </nav>
-  </div>
-
-  <!-- Community -->
-  <div class="px-3 pb-4">
-    <div class="rounded-2xl border border-[#dbeafe] bg-gradient-to-br from-[#edf5ff] to-white p-4">
-      <div class="flex items-start gap-3">
-        <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#1877f2] text-white">
-          <i class="fa-solid fa-user-group"></i>
         </div>
 
-        <div class="min-w-0 flex-1">
-          <h4 class="text-sm font-extrabold text-[#050505]">
-            Find your people
-          </h4>
-          <p class="mt-1.5 text-xs leading-5 text-[#65676b]">
-            Discover conversations and share moments that matter.
+        <!-- DYNAMIC USER DETAILS -->
+        <div class="profile-details">
+
+          <div class="profile-name-row">
+
+            <h2>{{ currentUserName() }}</h2>
+
+            <span
+              class="profile-verified"
+              title="Route Posts member"
+            >
+              <i class="fa-solid fa-check"></i>
+            </span>
+
+          </div>
+
+          @if (currentUserUsername()) {
+            <p class="profile-username">
+              {{ currentUserUsername() }}
+            </p>
+          }
+
+          <p class="profile-description">
+            Welcome back! Stay connected with your community.
           </p>
+
+          <span class="profile-member-badge">
+            <i class="fa-solid fa-circle-check"></i>
+            Route Posts member
+          </span>
+
         </div>
+
+        <!-- PROFILE STATISTICS -->
+        <div class="profile-stats">
+
+          <div class="profile-stat">
+            <strong>24</strong>
+            <span>Posts</span>
+          </div>
+
+          <div class="profile-stat">
+            <strong>128</strong>
+            <span>Friends</span>
+          </div>
+
+          <div class="profile-stat">
+            <strong>860</strong>
+            <span>Followers</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- =================================================
+         SECTION 3 — NAVIGATION
+    ================================================== -->
+
+    <section class="sidebar-navigation">
+
+      <div class="sidebar-section-heading">
+        <span>YOUR SPACE</span>
+        <i class="fa-solid fa-ellipsis"></i>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Main navigation">
+
+        <!-- FEED -->
+        <a
+          routerLink="/main/home"
+          routerLinkActive="active-nav"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeSidebar()"
+          class="sidebar-nav-link"
+        >
+          <span class="nav-icon nav-icon-blue">
+            <i class="fa-solid fa-house"></i>
+          </span>
+
+          <span class="nav-label">Feed</span>
+
+          <i class="fa-solid fa-chevron-right nav-chevron"></i>
+        </a>
+
+        <!-- MY POSTS -->
+        <a
+          routerLink="/main/my-posts"
+          routerLinkActive="active-nav"
+          (click)="closeSidebar()"
+          class="sidebar-nav-link"
+        >
+          <span class="nav-icon nav-icon-purple">
+            <i class="fa-solid fa-layer-group"></i>
+          </span>
+
+          <span class="nav-label">My Posts</span>
+
+          <i class="fa-solid fa-chevron-right nav-chevron"></i>
+        </a>
+
+        <!-- COMMUNITY -->
+        <a
+          routerLink="/main/community"
+          routerLinkActive="active-nav"
+          (click)="closeSidebar()"
+          class="sidebar-nav-link"
+        >
+          <span class="nav-icon nav-icon-teal">
+            <i class="fa-solid fa-users"></i>
+          </span>
+
+          <span class="nav-label">Community</span>
+
+          <i class="fa-solid fa-chevron-right nav-chevron"></i>
+        </a>
+
+        <!-- SAVED POSTS -->
+        <a
+          routerLink="/main/saved"
+          routerLinkActive="active-nav"
+          (click)="closeSidebar()"
+          class="sidebar-nav-link"
+        >
+          <span class="nav-icon nav-icon-red">
+            <i class="fa-solid fa-bookmark"></i>
+          </span>
+
+          <span class="nav-label">Saved Posts</span>
+
+          <i class="fa-solid fa-chevron-right nav-chevron"></i>
+        </a>
+
+      </nav>
+
+    </section>
+
+    <!-- =================================================
+         SECTION 4 — DISCOVER COMMUNITY
+    ================================================== -->
+
+    <section class="sidebar-discover">
+
+      <div class="discover-icon">
+        <i class="fa-solid fa-compass"></i>
+      </div>
+
+      <div class="discover-content">
+
+        <h3>Discover more</h3>
+
+        <p>
+          Find new conversations and connect with people.
+        </p>
+
       </div>
 
       <a
         routerLink="/main/community"
-        class="mt-4 flex min-h-10 items-center justify-center gap-2 rounded-xl bg-[#1877f2] px-3 py-2.5 text-xs font-bold text-white transition hover:bg-[#166fe5] active:scale-[0.99]"
+        (click)="closeSidebar()"
+        class="discover-button"
       >
-        Explore community
-        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        <span>Explore community</span>
+        <i class="fa-solid fa-arrow-right"></i>
       </a>
+
+    </section>
+
+  </div>
+
+  <!-- ===================================================
+       SECTION 5 — SIDEBAR FOOTER
+  ==================================================== -->
+
+  <footer class="sidebar-footer">
+
+    <div class="footer-security-icon">
+      <i class="fa-solid fa-shield-halved"></i>
     </div>
-  </div>
 
-  <!-- Footer -->
-  <div class="flex items-center justify-center gap-2 rounded-b-2xl border-t border-[#e4e6eb] bg-[#fafafa] px-3 py-3.5">
-    <i class="fa-solid fa-shield-halved text-xs text-[#31a24c]"></i>
-    <span class="text-[10px] font-medium text-[#65676b]">
-      Your community, your space
-    </span>
-  </div>
+    <div>
+      <strong>Your space. Your people.</strong>
+      <span>Connected with Route Posts</span>
+    </div>
+
+  </footer>
+
 </aside>
-
