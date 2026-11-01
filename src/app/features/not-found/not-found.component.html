@@ -1,1 +1,79 @@
-<p>not-found works!</p>
+<div class="min-h-screen bg-[#FAFAFA] text-slate-900 font-sans flex flex-col justify-between p-6 sm:p-12 relative overflow-hidden select-none">
+  <!-- Subtle Background Grid -->
+  <div class="absolute inset-0 bg-[linear-gradient(to_right,#e5e7eb_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-40 pointer-events-none"></div>
+
+  <!-- Top Bar / Header -->
+  <header class="max-w-6xl w-full mx-auto flex justify-between items-center z-10">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-black text-white font-bold text-sm flex items-center justify-center shadow-md">
+        404
+      </div>
+      <span class="text-xs font-semibold tracking-widest text-slate-400 uppercase">System Error</span>
+    </div>
+
+    <div class="flex items-center gap-2 bg-white border border-slate-200 shadow-sm rounded-full px-3 py-1 text-xs text-slate-600">
+      <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      All system services operational
+    </div>
+  </header>
+
+  <!-- Main Hero Content -->
+  <main class="max-w-3xl w-full mx-auto my-auto text-center z-10 py-16">
+    <!-- Big Editorial Number -->
+    <div class="relative inline-block mb-6">
+      <span class="text-[120px] sm:text-[180px] font-extrabold tracking-tighter leading-none text-transparent bg-clip-text bg-gradient-to-b from-slate-900 to-slate-400 select-none">
+        404
+      </span>
+      <span class="absolute -bottom-2 left-1/2 -translate-x-1/2 bg-slate-100 border border-slate-200 text-slate-600 text-xs font-mono px-3 py-0.5 rounded-full whitespace-nowrap">
+        ERR_PAGE_NOT_FOUND
+      </span>
+    </div>
+
+    <!-- Title & Subtitle -->
+    <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-slate-900 mb-3">
+      الصفحة غير موجودة أو تم نقلها
+    </h1>
+    <p class="text-slate-500 text-base sm:text-lg max-w-lg mx-auto mb-10 leading-relaxed">
+      العنوان الذي تحاول الوصول إليه غير متاح حالياً. يرجى التأكد من صحة الرابط أو العودة للرئيسية.
+    </p>
+
+    <!-- Quick Action Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-right mb-10">
+      <a href="/" class="group p-4 bg-white border border-slate-200/80 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-300 transition-all">
+        <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center mb-3 group-hover:bg-black group-hover:text-white transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        </div>
+        <h3 class="font-semibold text-sm text-slate-900">الصفحة الرئيسية</h3>
+        <p class="text-xs text-slate-400 mt-1">العودة لنقطة البداية</p>
+      </a>
+
+      <button (click)="goBack()" class="group p-4 bg-white border border-slate-200/80 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-300 transition-all text-right">
+        <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center mb-3 group-hover:bg-black group-hover:text-white transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </div>
+        <h3 class="font-semibold text-sm text-slate-900">الرجوع للسابق</h3>
+        <p class="text-xs text-slate-400 mt-1">العودة للصفحة الأخيرة</p>
+      </button>
+
+      <a href="/support" class="group p-4 bg-white border border-slate-200/80 rounded-2xl shadow-sm hover:shadow-md hover:border-slate-300 transition-all">
+        <div class="w-8 h-8 rounded-xl bg-slate-100 text-slate-700 flex items-center justify-center mb-3 group-hover:bg-black group-hover:text-white transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        </div>
+        <h3 class="font-semibold text-sm text-slate-900">الدعم الفني</h3>
+        <p class="text-xs text-slate-400 mt-1">الإبلاغ عن مشكلة</p>
+      </a>
+    </div>
+
+    <!-- Primary CTA -->
+    <a href="/" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-xl text-sm font-medium hover:bg-slate-800 transition-all shadow-sm hover:shadow">
+      <span>العودة للرئيسية</span>
+      <svg class="w-4 h-4 rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+    </a>
+  </main>
+
+  <!-- Footer Info -->
+  <footer class="max-w-6xl w-full mx-auto flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 border-t border-slate-200/60 pt-6 z-10 gap-2">
+    <div>&copy; 2026 جميع الحقوق محفوظة</div>
+    <div class="font-mono">HTTP 404 NOT_FOUND</div>
+  </footer>
+</div>

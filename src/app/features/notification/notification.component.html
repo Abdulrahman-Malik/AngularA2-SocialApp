@@ -1,1 +1,579 @@
-<p>notification works!</p>
+<main
+  class="notification-page"
+  aria-label="Notifications"
+  [attr.aria-busy]="loading()"
+>
+  <!-- ================================================
+       TOP PROGRESS
+  ================================================= -->
+
+  @if (loading() && notifications().length > 0) {
+    <div
+      class="notification-progress"
+      role="progressbar"
+      aria-label="Refreshing notifications"
+    ></div>
+  }
+
+  <!-- ================================================
+       NEW NOTIFICATIONS TOAST
+  ================================================= -->
+
+  @if (justArrived()) {
+    <button
+      type="button"
+      class="notification-toast"
+      (click)="showNew()"
+      aria-live="polite"
+    >
+      <span class="toast-icon">
+        <i class="fa-solid fa-bell"></i>
+      </span>
+
+      <span class="toast-message">
+        {{
+          newCount() === 1
+            ? 'You have a new notification'
+            : 'You have ' + newCount() + ' new notifications'
+        }}
+      </span>
+
+      <span class="toast-view">View</span>
+
+      <i class="fa-solid fa-chevron-up"></i>
+    </button>
+  }
+
+  <div class="notification-container">
+
+    <!-- ================================================
+         PAGE HEADER
+    ================================================= -->
+
+    <header class="notification-header">
+
+      <div class="notification-title-content">
+
+        <div class="notification-title-icon">
+          <i class="fa-solid fa-bell"></i>
+
+          @if (unreadCount() > 0) {
+            <span class="title-notification-indicator"></span>
+          }
+        </div>
+
+        <div class="header-title">
+
+          <span class="notification-eyebrow">
+            ROUTE POSTS
+          </span>
+
+          <h1>Notifications</h1>
+
+          <p>
+            Stay connected with your latest activity.
+          </p>
+
+        </div>
+
+      </div>
+
+      <!-- HEADER ACTIONS -->
+      <div class="header-actions">
+
+        <!-- REFRESH -->
+        <button
+          type="button"
+          class="header-action"
+          [class.is-spinning]="loading()"
+          [disabled]="loading()"
+          (click)="refresh()"
+          title="Refresh notifications"
+          aria-label="Refresh notifications"
+        >
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+
+        <!-- SOUND -->
+        <button
+          type="button"
+          class="header-action"
+          [class.is-active]="soundOn()"
+          [attr.aria-pressed]="soundOn()"
+          (click)="toggleSound()"
+          [title]="soundOn() ? 'Turn sound off' : 'Turn sound on'"
+          [attr.aria-label]="
+            soundOn()
+              ? 'Turn notification sound off'
+              : 'Turn notification sound on'
+          "
+        >
+          <i
+            [class]="
+              soundOn()
+                ? 'fa-solid fa-volume-high'
+                : 'fa-solid fa-volume-xmark'
+            "
+          ></i>
+        </button>
+
+      </div>
+
+    </header>
+
+    <!-- ================================================
+         NOTIFICATIONS CARD
+    ================================================= -->
+
+    <section class="notification-card">
+
+      <!-- CARD HEADER -->
+      <div class="notification-toolbar">
+
+        <div class="toolbar-title">
+
+          <div>
+            <h2>All notifications</h2>
+
+            <p class="toolbar-subtitle">
+              Your latest activity and updates
+            </p>
+          </div>
+
+          <span
+            class="toolbar-count"
+            [attr.aria-label]="loadedCount() + ' loaded notifications'"
+          >
+            {{ loadedCount() }}
+          </span>
+
+        </div>
+
+        <!-- MARK ALL AS READ -->
+        <button
+          type="button"
+          class="mark-all-button"
+          (click)="markAllAsRead()"
+          [disabled]="unreadCount() === 0"
+        >
+          <i class="fa-solid fa-check-double"></i>
+
+          <span>Mark all as read</span>
+        </button>
+
+      </div>
+
+      <!-- ================================================
+           FILTER NAVIGATION
+      ================================================= -->
+
+      <nav
+        class="notification-filters"
+        aria-label="Notification filters"
+      >
+
+        <!-- ALL -->
+        <button
+          type="button"
+          (click)="setFilter('all')"
+          [class.filter-active]="activeFilter() === 'all'"
+          [attr.aria-pressed]="activeFilter() === 'all'"
+        >
+          All
+
+          <span class="filter-total">
+            {{ loadedCount() }}
+          </span>
+        </button>
+
+        <!-- UNREAD -->
+        <button
+          type="button"
+          (click)="setFilter('unread')"
+          [class.filter-active]="activeFilter() === 'unread'"
+          [attr.aria-pressed]="activeFilter() === 'unread'"
+        >
+          Unread
+
+          @if (unreadCount() > 0) {
+            <span class="filter-count">
+              {{ unreadCount() }}
+            </span>
+          }
+
+        </button>
+
+      </nav>
+
+      <!-- ================================================
+           INITIAL LOADING
+      ================================================= -->
+
+      @if (loading() && notifications().length === 0) {
+
+        <div class="notification-state">
+
+          <div class="state-icon is-loading">
+            <i class="fa-solid fa-spinner fa-spin"></i>
+          </div>
+
+          <h3>Loading notifications</h3>
+
+          <p>
+            We're getting your latest updates ready.
+          </p>
+
+        </div>
+
+      }
+
+      <!-- ================================================
+           ERROR STATE
+      ================================================= -->
+
+      @else if (error() && notifications().length === 0) {
+
+        <div class="notification-state">
+
+          <div class="state-icon is-error">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+          </div>
+
+          <h3>Something went wrong</h3>
+
+          <p>{{ error() }}</p>
+
+          <button
+            type="button"
+            class="state-button"
+            (click)="refresh()"
+          >
+            <i class="fa-solid fa-rotate-right"></i>
+            Try again
+          </button>
+
+        </div>
+
+      }
+
+      <!-- ================================================
+           NOTIFICATIONS LIST
+      ================================================= -->
+
+      @else if (notifications().length > 0) {
+
+        <!-- INLINE ERROR -->
+        @if (error()) {
+          <div class="inline-error" role="alert">
+
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+            <span>{{ error() }}</span>
+
+            <button
+              type="button"
+              (click)="refresh()"
+            >
+              Retry
+            </button>
+
+          </div>
+        }
+
+        <div
+          class="notification-list"
+          aria-live="polite"
+        >
+
+          @for (
+            notification of notifications();
+            track notification.id;
+            let i = $index
+          ) {
+
+            <!-- NEW / EARLIER SECTION -->
+            @if (isSectionStart(i)) {
+              <div class="list-section">
+
+                <span class="section-indicator"></span>
+
+                <span>
+                  {{ isRecent(notification) ? 'New' : 'Earlier' }}
+                </span>
+
+              </div>
+            }
+
+            <!-- ==========================================
+                 NOTIFICATION ITEM
+            =========================================== -->
+
+            <article
+              class="notification-item"
+              [class.is-unread]="!notification.isRead"
+              [class.is-read]="notification.isRead"
+              [class.is-unavailable]="notification.unavailable"
+              [style.--i]="i < 12 ? i : 12"
+              role="button"
+              tabindex="0"
+              [attr.aria-label]="
+                'Open notification from ' + notification.actor
+              "
+              (click)="openNotification(notification)"
+              (keydown.enter)="openNotification(notification)"
+              (keydown.space)="
+                $event.preventDefault();
+                openNotification(notification)
+              "
+            >
+
+              <!-- AVATAR -->
+              <div class="avatar-wrap">
+
+                <img
+                  [src]="notification.avatar"
+                  [alt]="notification.actor"
+                  class="notification-avatar"
+                  loading="lazy"
+                  (error)="onAvatarError($event)"
+                />
+
+                <!-- NOTIFICATION TYPE ICON -->
+                <span
+                  class="type-icon"
+                  [ngClass]="getNotificationColor(notification.type)"
+                >
+                  <i
+                    [class]="getNotificationIcon(notification.type)"
+                    aria-hidden="true"
+                  ></i>
+                </span>
+
+              </div>
+
+              <!-- NOTIFICATION CONTENT -->
+              <div class="notification-body">
+
+                <!-- ACTIVITY MESSAGE -->
+                <p class="notification-message">
+
+                  <strong class="notification-username">
+                    {{ notification.actor }}
+                  </strong>
+
+                  {{ notification.message }}
+
+                </p>
+
+                <!-- USERNAME -->
+                @if (notification.username) {
+                  <span class="notification-handle">
+                    &#64;{{ notification.username }}
+                  </span>
+                }
+
+                <!-- RELATED POST / COMMENT -->
+                @if (notification.target) {
+                  <div class="notification-target">
+
+                    <i class="fa-regular fa-message"></i>
+
+                    <span>
+                      {{ notification.target }}
+                    </span>
+
+                  </div>
+                }
+
+                <!-- UNAVAILABLE POST -->
+                @if (notification.unavailable) {
+                  <div class="notification-unavailable">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <span>
+                      This post is no longer available.
+                    </span>
+
+                  </div>
+                }
+
+                <!-- DATE AND STATUS -->
+                <div class="notification-time">
+
+                  <time
+                    [attr.datetime]="notification.createdAt.toISOString()"
+                    [title]="notification.createdAt | date:'medium'"
+                  >
+                    {{ getRelativeTime(notification.createdAt) }}
+                  </time>
+
+                  @if (notification.isRead) {
+
+                    <span class="read-label">
+                      <i class="fa-solid fa-check"></i>
+                      Read
+                    </span>
+
+                  } @else {
+
+                    <span class="new-label">
+                      New
+                    </span>
+
+                  }
+
+                </div>
+
+              </div>
+
+              <!-- RIGHT SIDE -->
+              <div class="notification-item-actions">
+
+                @if (!notification.isRead) {
+
+                  <span
+                    class="unread-indicator"
+                    title="Unread notification"
+                    aria-label="Unread"
+                  ></span>
+
+                } @else {
+
+                  <span
+                    class="read-indicator"
+                    title="Read notification"
+                    aria-label="Read"
+                  >
+                    <i class="fa-solid fa-check"></i>
+                  </span>
+
+                }
+
+                <i
+                  class="fa-solid fa-chevron-right notification-open-icon"
+                  aria-hidden="true"
+                ></i>
+
+              </div>
+
+            </article>
+
+          }
+
+        </div>
+
+        <!-- ================================================
+             LOAD MORE
+        ================================================= -->
+
+        @if (hasMore()) {
+
+          <div class="load-more-area">
+
+            <button
+              type="button"
+              class="load-more-button"
+              (click)="loadMore()"
+              [disabled]="loadingMore()"
+            >
+
+              @if (loadingMore()) {
+
+                <i class="fa-solid fa-spinner fa-spin"></i>
+
+                Loading notifications...
+
+              } @else {
+
+                See more notifications
+
+                <i class="fa-solid fa-chevron-down"></i>
+
+              }
+
+            </button>
+
+          </div>
+
+        } @else {
+
+          <div class="end-of-list">
+
+            <span class="end-icon">
+              <i class="fa-solid fa-check"></i>
+            </span>
+
+            <span>
+              You're all caught up.
+            </span>
+
+          </div>
+
+        }
+
+      }
+
+      <!-- ================================================
+           EMPTY STATE
+      ================================================= -->
+
+      @else {
+
+        <div class="notification-state empty-state">
+
+          <div class="state-icon">
+            <i class="fa-regular fa-bell-slash"></i>
+          </div>
+
+          @if (activeFilter() === 'unread') {
+
+            <h3>You're all caught up!</h3>
+
+            <p>
+              You don't have any unread notifications right now.
+            </p>
+
+            <button
+              type="button"
+              class="state-button"
+              (click)="setFilter('all')"
+            >
+              <i class="fa-solid fa-bell"></i>
+              View all notifications
+            </button>
+
+          } @else {
+
+            <h3>No notifications yet</h3>
+
+            <p>
+              When someone likes, comments on, or shares your posts,
+              you'll see their activity here.
+            </p>
+
+          }
+
+        </div>
+
+      }
+
+    </section>
+
+    <!-- ================================================
+         FOOTER
+    ================================================= -->
+
+    <footer class="notification-footer">
+
+      <i class="fa-solid fa-shield-halved"></i>
+
+      <span>
+        Your notifications are private and visible only to you.
+      </span>
+
+    </footer>
+
+  </div>
+
+</main>

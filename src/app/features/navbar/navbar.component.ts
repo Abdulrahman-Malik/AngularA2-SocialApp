@@ -1,47 +1,152 @@
+import {
+  AfterViewInit,
+  Component,
+  inject,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 
-import { Component, inject, OnInit } from '@angular/core';
 import {
   RouterLink,
   RouterLinkActive,
 } from '@angular/router';
+
 import { initFlowbite } from 'flowbite';
+
 import { AuthService } from '../../core/auth/services/auth.service';
+
+import { NotificationService } from '../../features/notification/notification.service';
+
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [
+    RouterLink,
+    RouterLinkActive,
+  ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent
+  implements OnInit, AfterViewInit, OnDestroy {
+
+  /* =====================================================
+     1. SERVICES
+  ====================================================== */
+
   private readonly authService = inject(AuthService);
 
+  private readonly notificationService =
+    inject(NotificationService);
+
+  /* =====================================================
+     2. NOTIFICATIONS
+  ====================================================== */
+
+  // Reactive unread notifications count.
+  readonly unreadNotificationsCount =
+    this.notificationService.unreadCount;
+
+  // Use these getters when needed in the HTML.
+  get hasUnreadNotifications(): boolean {
+    return this.unreadNotificationsCount() > 0;
+  }
+
+  get notificationBadgeText(): string {
+    const count = this.unreadNotificationsCount();
+
+    return count > 99 ? '99+' : String(count);
+  }
+
+  /* =====================================================
+     3. THEME SETTINGS
+  ====================================================== */
+
   isDarkMode = true;
+
+  /* =====================================================
+     4. MENU STATES
+  ====================================================== */
+
   isProfileMenuOpen = false;
+
   isMobileMenuOpen = false;
+
   isSearchOpen = false;
 
+  /* =====================================================
+     5. USER INFORMATION
+  ====================================================== */
+
   searchText = '';
+
   userName = 'My Account';
+
   profileImage = '/assets/default-profile.png';
+
+  private readonly defaultAvatar =
+    '/assets/default-profile.png';
+
+  /* =====================================================
+     6. LIFECYCLE
+  ====================================================== */
 
   ngOnInit(): void {
     this.loadTheme();
+
     this.loadUser();
-    initFlowbite();
+
+    // Get the current unread notifications count.
+    this.notificationService.refreshUnreadCount();
+
+    // Keep the navbar counter updated every 30 seconds.
+    // NavbarComponent is the owner of notification polling.
+    this.notificationService.startPolling(30000);
   }
+
+  ngAfterViewInit(): void {
+    // Initialize Flowbite after the view is rendered.
+    try {
+      initFlowbite();
+    } catch (error) {
+      console.error('Flowbite initialization error:', error);
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Stop polling when navbar is destroyed.
+    this.notificationService.stopPolling();
+  }
+
+  /* =====================================================
+     7. LOGOUT
+  ====================================================== */
 
   logOut(): void {
     this.closeMenus();
+
+    this.notificationService.stopPolling();
+
     this.authService.logOut();
   }
 
-  private loadTheme(): void {
-    const savedTheme = localStorage.getItem('theme');
+  /* =====================================================
+     8. THEME MANAGEMENT
+  ====================================================== */
 
-    this.isDarkMode = savedTheme
-      ? savedTheme === 'dark'
-      : true;
+  private loadTheme(): void {
+    try {
+      const savedTheme = localStorage.getItem('theme');
+
+      this.isDarkMode = savedTheme
+        ? savedTheme === 'dark'
+        : true;
+
+    } catch (error) {
+      console.error('Unable to load theme:', error);
+
+      this.isDarkMode = true;
+    }
 
     this.applyTheme();
   }
@@ -49,63 +154,130 @@ export class NavbarComponent implements OnInit {
   toggleTheme(): void {
     this.isDarkMode = !this.isDarkMode;
 
-    localStorage.setItem(
-      'theme',
-      this.isDarkMode ? 'dark' : 'light'
-    );
+    try {
+      localStorage.setItem(
+        'theme',
+        this.isDarkMode ? 'dark' : 'light',
+      );
+    } catch (error) {
+      console.error('Unable to save theme:', error);
+    }
 
     this.applyTheme();
   }
 
   private applyTheme(): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
     document.documentElement.classList.toggle(
       'dark',
-      this.isDarkMode
+      this.isDarkMode,
     );
   }
 
+  /* =====================================================
+     9. LOAD USER INFORMATION
+  ====================================================== */
+
   private loadUser(): void {
-    const savedUser = localStorage.getItem('user');
+    let savedUser: string | null = null;
+
+    try {
+      savedUser = localStorage.getItem('user');
+    } catch (error) {
+      console.error('Unable to access user storage:', error);
+    }
 
     if (!savedUser) {
+      this.setDefaultUser();
       return;
     }
 
     try {
-      const user = JSON.parse(savedUser);
+      const parsedUser: unknown = JSON.parse(savedUser);
+
+      const user = this.asRecord(parsedUser);
+
+      if (!Object.keys(user).length) {
+        this.setDefaultUser();
+        return;
+      }
+
+      const firstName = this.getString(user['firstName']);
+      const lastName = this.getString(user['lastName']);
+
+      const fullName = [firstName, lastName]
+        .filter(Boolean)
+        .join(' ');
 
       this.userName =
-        user.name ||
-        user.username ||
-        [user.firstName, user.lastName]
-          .filter(Boolean)
-          .join(' ') ||
-        user.email ||
+        this.getString(user['name']) ||
+        this.getString(user['username']) ||
+        fullName ||
+        this.getString(user['email']) ||
         'My Account';
 
       this.profileImage =
-        user.photo ||
-        user.profilePhoto ||
-        user.image ||
-        '/assets/default-profile.png';
-    } catch {
-      this.userName = 'My Account';
-      this.profileImage = '/assets/default-profile.png';
+        this.getString(user['photo']) ||
+        this.getString(user['profilePhoto']) ||
+        this.getString(user['image']) ||
+        this.defaultAvatar;
+
+    } catch (error) {
+      console.error(
+        'Unable to parse user information:',
+        error,
+      );
+
+      this.setDefaultUser();
     }
   }
 
+  private setDefaultUser(): void {
+    this.userName = 'My Account';
+
+    this.profileImage = this.defaultAvatar;
+  }
+
+  /* =====================================================
+     10. PROFILE MENU
+  ====================================================== */
+
   toggleProfileMenu(): void {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
+
+    // Close other menus.
     this.isMobileMenuOpen = false;
+
+    this.closeSearch();
   }
+
+  /* =====================================================
+     11. MOBILE MENU
+  ====================================================== */
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
+
+    // Close the profile menu.
     this.isProfileMenuOpen = false;
+
+    this.closeSearch();
   }
+
+  /* =====================================================
+     12. SEARCH
+  ====================================================== */
 
   toggleSearch(): void {
     this.isSearchOpen = !this.isSearchOpen;
+
+    // Close other menus.
+    this.isProfileMenuOpen = false;
+
+    this.isMobileMenuOpen = false;
 
     if (!this.isSearchOpen) {
       this.searchText = '';
@@ -113,22 +285,72 @@ export class NavbarComponent implements OnInit {
   }
 
   onSearchInput(event: Event): void {
-    this.searchText = (
-      event.target as HTMLInputElement
-    ).value;
+    const input = event.target as HTMLInputElement;
+
+    this.searchText = input.value;
   }
+
+  private closeSearch(): void {
+    this.isSearchOpen = false;
+
+    this.searchText = '';
+  }
+
+  /* =====================================================
+     13. CLOSE MENUS
+  ====================================================== */
 
   closeMenus(): void {
     this.isProfileMenuOpen = false;
+
     this.isMobileMenuOpen = false;
+
+    this.closeSearch();
   }
 
-  onImageError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    const fallback = '/assets/default-profile.png';
+  /* =====================================================
+     14. NOTIFICATION COUNTER HELPERS
+  ====================================================== */
 
-    if (!img.src.endsWith(fallback)) {
-      img.src = fallback;
+  refreshNotificationCount(): void {
+    this.notificationService.refreshUnreadCount();
+  }
+
+  /* =====================================================
+     15. PROFILE IMAGE FALLBACK
+  ====================================================== */
+
+  onImageError(event: Event): void {
+    const image = event.currentTarget as HTMLImageElement;
+
+    if (!image) {
+      return;
     }
+
+    image.onerror = null;
+
+    image.src = this.defaultAvatar;
+  }
+
+  /* =====================================================
+     16. SAFE DATA HELPERS
+  ====================================================== */
+
+  private asRecord(value: unknown): Record<string, unknown> {
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value)
+    ) {
+      return value as Record<string, unknown>;
+    }
+
+    return {};
+  }
+
+  private getString(value: unknown): string {
+    return typeof value === 'string'
+      ? value.trim()
+      : '';
   }
 }

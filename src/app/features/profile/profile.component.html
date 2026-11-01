@@ -1,1 +1,517 @@
-<p>profile works!</p>
+<main class="profile-page">
+
+  <div class="cosmos" aria-hidden="true"></div>
+
+  <!-- Compact bar: shows after the header scrolls out of view -->
+  <div class="mini-bar" [class.visible]="condensed()" [attr.aria-hidden]="!condensed()">
+    <div class="mini-bar-inner">
+      <img [src]="profilePhoto()" [alt]="userName()" (error)="onImageError($event)" />
+      <strong>{{ userName() }}</strong>
+      <nav class="mini-tabs" aria-label="Quick sections">
+        <button type="button" [class.active]="activeTab() === 'posts'" (click)="setTab('posts')">Timeline</button>
+        <button type="button" [class.active]="activeTab() === 'photos'" (click)="setTab('photos')">Photos</button>
+        <button type="button" [class.active]="activeTab() === 'about'" (click)="setTab('about')">About</button>
+      </nav>
+    </div>
+  </div>
+
+  <div class="profile-container">
+
+    <!-- COVER -->
+    <section class="profile-cover">
+      <img [src]="profileCover() || defaultCover" alt="" class="cover-image" />
+      <div class="cover-shade"></div>
+      <canvas #starCanvas class="cover-stars" aria-hidden="true"></canvas>
+
+      <label for="cover-input" class="cover-edit" tabindex="0" (keydown.enter)="coverInput.click()">
+        @if (isProcessingImage() === 'cover') {
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          <span>Optimizing…</span>
+        } @else {
+          <i class="fa-solid fa-camera"></i>
+          <span>Change cover</span>
+        }
+      </label>
+      <input #coverInput id="cover-input" type="file" accept="image/*" class="visually-hidden"
+             (change)="onCoverSelected($event)" />
+    </section>
+
+    <!-- HEADER -->
+    <section class="profile-header" #headerEl>
+      <div class="profile-identity">
+        <div class="avatar-wrapper">
+          <img [src]="profilePhoto()" [alt]="userName()" class="profile-avatar" (error)="onImageError($event)" />
+        </div>
+
+        <div class="identity-details">
+          <h1>{{ userName() }}</h1>
+          @if (username()) {
+            <p class="identity-username">&#64;{{ username().replace('@', '') }}</p>
+          }
+          <p class="identity-bio" [class.muted]="!bio()">
+            {{ bio() || 'Add a short bio so people know who you are.' }}
+          </p>
+        </div>
+
+        <div class="profile-header-actions">
+          <button type="button" class="primary-action" (click)="openEditProfile()">
+            <i class="fa-solid fa-pen-to-square"></i> Edit profile
+          </button>
+          <button type="button" class="secondary-action" (click)="copyProfileLink()">
+            <i class="fa-solid fa-link"></i> Copy link
+          </button>
+        </div>
+      </div>
+
+      <div class="header-bottom">
+        <nav class="profile-tabs" role="tablist" aria-label="Profile sections">
+          @for (tab of tabs; track tab.id) {
+            <button type="button" role="tab" [class.active]="activeTab() === tab.id"
+                    [attr.aria-selected]="activeTab() === tab.id" (click)="setTab(tab.id)">
+              <i [class]="tab.icon"></i> {{ tab.label }}
+            </button>
+          }
+        </nav>
+
+        <dl class="profile-stats">
+          <div><dt>Posts</dt><dd>{{ postsCount() }}</dd></div>
+          <div><dt>Photos</dt><dd>{{ photosCount() }}</dd></div>
+          <div><dt>Likes</dt><dd>{{ likesCount() }}</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="profile-layout">
+
+      <!-- SIDEBAR -->
+      <aside class="profile-sidebar">
+
+        @if (completion().percent < 100) {
+          <section class="surface-card strength-card">
+            <div class="strength-top">
+              <h2>Finish your profile</h2>
+              <span>{{ completion().percent }}%</span>
+            </div>
+            <div class="strength-track" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+                 [attr.aria-valuenow]="completion().percent">
+              <span [style.width.%]="completion().percent"></span>
+            </div>
+            <ul>
+              @for (item of completion().items; track item.label) {
+                <li [class.done]="item.done">
+                  <i [class]="item.done ? 'fa-solid fa-circle-check' : 'fa-regular fa-circle'"></i>
+                  {{ item.label }}
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        <section class="surface-card intro-card">
+          <h2>Intro</h2>
+          <p class="intro-bio">{{ bio() || 'No bio yet.' }}</p>
+          <ul class="info-list">
+            <li><i class="fa-regular fa-user"></i> {{ userName() }}</li>
+            <li><i class="fa-solid fa-at"></i> {{ username() || 'Username not set' }}</li>
+            <li><i class="fa-solid fa-users"></i> Route Posts member</li>
+          </ul>
+          <button type="button" class="outline-full-button" (click)="openEditProfile()">Edit intro</button>
+        </section>
+
+        <section class="surface-card sidebar-photos">
+          <div class="section-heading">
+            <h2>Photos</h2>
+            @if (photosCount() > 0) {
+              <button type="button" class="text-link" (click)="setTab('photos')">See all</button>
+            }
+          </div>
+
+          @if (photosCount() > 0) {
+            <div class="sidebar-photo-grid">
+              @for (post of sidebarPhotos(); track post.id) {
+                <button type="button" class="sidebar-photo" (click)="openLightbox(post.id)"
+                        aria-label="Open photo">
+                  <img [src]="post.image" [alt]="post.body || 'Post photo'" loading="lazy" />
+                </button>
+              }
+            </div>
+          } @else {
+            <div class="mini-empty">
+              <i class="fa-regular fa-image"></i>
+              <span>Photos you post will show up here.</span>
+            </div>
+          }
+        </section>
+      </aside>
+
+      <!-- MAIN -->
+      <div class="profile-main-column">
+
+        @if (activeTab() === 'posts') {
+
+          <section class="surface-card composer-card"
+                   [class.dragging]="isDragging()"
+                   (dragover)="onDragOver($event)"
+                   (dragleave)="isDragging.set(false)"
+                   (drop)="onDrop($event)">
+            <div class="composer-top">
+              <img [src]="profilePhoto()" [alt]="userName()" class="composer-avatar" (error)="onImageError($event)" />
+              <textarea #composerBox class="composer-textarea"
+                        [value]="newPostContent()"
+                        (input)="onPostContentChange($event)"
+                        (paste)="onPaste($event)"
+                        (keydown.control.enter)="publishPost()"
+                        (keydown.meta.enter)="publishPost()"
+                        placeholder="What's on your mind, {{ firstName() }}?"
+                        rows="2" maxlength="2000" aria-label="Write your post"></textarea>
+            </div>
+
+            @if (postImagePreview()) {
+              <div class="composer-preview">
+                <img [src]="postImagePreview()!" alt="Selected image preview" />
+                <button type="button" class="remove-preview" (click)="removePostImage()" aria-label="Remove image">
+                  <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            }
+
+            @if (isProcessingImage() === 'post') {
+              <p class="processing"><i class="fa-solid fa-spinner fa-spin"></i> Optimizing your image…</p>
+            }
+
+            @if (postPublishError()) {
+              <p class="form-error" role="alert">
+                <i class="fa-solid fa-circle-exclamation"></i> {{ postPublishError() }}
+              </p>
+            }
+
+            <div class="composer-footer">
+              <div class="composer-tools">
+                <label for="post-photo-input" class="composer-tool" tabindex="0"
+                       (keydown.enter)="photoInput.click()">
+                  <i class="fa-regular fa-image"></i> Photo
+                </label>
+                <input #photoInput id="post-photo-input" type="file" accept="image/*" class="visually-hidden"
+                       (change)="onPostImageSelected($event)" />
+                <span class="composer-hint">Any image works, we resize it for you</span>
+              </div>
+
+              <div class="composer-submit">
+                <span class="char-count" [class.warn]="newPostContent().length > 1800">
+                  {{ newPostContent().length }}/2000
+                </span>
+                <button type="button" class="publish-button" (click)="publishPost()" [disabled]="!canPublish()">
+                  @if (isPublishingPost()) {
+                    <i class="fa-solid fa-spinner fa-spin"></i> Publishing…
+                  } @else {
+                    <i class="fa-solid fa-paper-plane"></i> Publish
+                  }
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <div class="timeline-heading">
+            <h2>Your posts</h2>
+            <span class="post-counter">{{ postsCount() }}</span>
+          </div>
+
+          @if (loading()) {
+            @for (i of [1, 2]; track i) {
+              <article class="surface-card feed-post skeleton" aria-hidden="true">
+                <div class="sk-row"><span class="sk sk-avatar"></span><span class="sk sk-line w40"></span></div>
+                <span class="sk sk-line w90"></span>
+                <span class="sk sk-line w70"></span>
+                <span class="sk sk-block"></span>
+              </article>
+            }
+          } @else if (errorMessage()) {
+            <section class="surface-card state-card">
+              <i class="fa-solid fa-triangle-exclamation state-main-icon error-icon"></i>
+              <h3>Couldn't load your posts</h3>
+              <p>{{ errorMessage() }}</p>
+              <button type="button" class="primary-action" (click)="getMyPosts()">Try again</button>
+            </section>
+          } @else if (myPosts().length === 0) {
+            <section class="surface-card state-card">
+              <div class="empty-illustration"><i class="fa-regular fa-pen-to-square"></i></div>
+              <h3>Nothing here yet</h3>
+              <p>Write something or add a photo in the box above to publish your first post.</p>
+              <button type="button" class="primary-action" (click)="focusComposer()">
+                <i class="fa-solid fa-plus"></i> Write a post
+              </button>
+            </section>
+          } @else {
+            @for (post of myPosts(); track post.id) {
+              <article class="surface-card feed-post">
+                <header class="feed-post-header">
+                  <img [src]="post.user.photo || profilePhoto()" [alt]="post.user.name || userName()"
+                       class="feed-avatar" (error)="onImageError($event)" />
+                  <div class="feed-author">
+                    <strong>{{ post.user.name || userName() }}</strong>
+                    <time [attr.datetime]="post.createdAt" [title]="post.createdAt | date:'medium'">
+                      {{ timeAgo(post.createdAt) }}
+                    </time>
+                  </div>
+                  <span class="post-visibility" title="Public post"><i class="fa-solid fa-earth-americas"></i></span>
+                </header>
+
+                @if (post.body) {
+                  <p class="feed-post-text" [class.clamped]="isLong(post.body) && !isExpanded(post.id)">{{ post.body }}</p>
+                  @if (isLong(post.body)) {
+                    <button type="button" class="text-link more-link" (click)="toggleExpanded(post.id)">
+                      {{ isExpanded(post.id) ? 'Show less' : 'Show more' }}
+                    </button>
+                  }
+                }
+
+                @if (post.image) {
+                  <button type="button" class="feed-post-image" [style.--bg]="bg(post.image)"
+                          (click)="openLightbox(post.id)" aria-label="View photo">
+                    <img [src]="post.image" [alt]="post.body || 'Post image'" loading="lazy" />
+                  </button>
+                }
+
+                <div class="feed-post-stats">
+                  <span class="stat-likes">
+                    <i class="fa-solid fa-heart"></i> {{ post.likesCount || 0 }}
+                  </span>
+                  <button type="button" class="stat-comments" (click)="toggleComments(post)">
+                    {{ post.commentsCount || 0 }} {{ post.commentsCount === 1 ? 'comment' : 'comments' }}
+                  </button>
+                </div>
+
+                <div class="feed-post-actions" role="group" aria-label="Post actions">
+                  <button type="button" class="action-like" [class.active]="isLiked(post)"
+                          [attr.aria-pressed]="isLiked(post)" (click)="toggleLike(post)">
+                    <i [class]="isLiked(post) ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+                    <span>{{ isLiked(post) ? 'Liked' : 'Like' }}</span>
+                  </button>
+                  <button type="button" [class.active]="isCommentsOpen(post)"
+                          [attr.aria-expanded]="isCommentsOpen(post)" (click)="toggleComments(post)">
+                    <i class="fa-regular fa-comment"></i>
+                    <span>Comment</span>
+                  </button>
+                  <button type="button" (click)="sharePost(post)">
+                    <i class="fa-solid fa-share-nodes"></i>
+                    <span>Share</span>
+                  </button>
+                </div>
+
+                @if (isCommentsOpen(post)) {
+                  <section class="comments" aria-label="Comments">
+                    @if (isLoadingComments(post)) {
+                      <div class="comment-skeleton" aria-hidden="true">
+                        <span class="sk sk-avatar sm"></span><span class="sk sk-line w70"></span>
+                      </div>
+                    } @else if (commentsFor(post).length === 0) {
+                      <p class="comments-empty">No comments yet. Start the conversation.</p>
+                    } @else {
+                      <ul class="comment-list">
+                        @for (c of commentsFor(post); track c.id) {
+                          <li class="comment">
+                            <img [src]="c.authorPhoto || profileService.defaultAvatar" [alt]="c.authorName"
+                                 (error)="onImageError($event)" />
+                            <div class="comment-bubble">
+                              <strong>{{ c.authorName }}</strong>
+                              <p>{{ c.content }}</p>
+                              <time>{{ timeAgo(c.createdAt) }}</time>
+                            </div>
+                          </li>
+                        }
+                      </ul>
+                    }
+
+                    <div class="comment-form">
+                      <img [src]="profilePhoto()" [alt]="userName()" (error)="onImageError($event)" />
+                      <textarea rows="1" maxlength="500" placeholder="Write a comment…"
+                                aria-label="Write a comment"
+                                [value]="commentDraft(post)"
+                                (input)="onCommentInput(post, $event)"
+                                (keydown)="onCommentKeydown(post, $event)"></textarea>
+                      <button type="button" (click)="submitComment(post)" aria-label="Send comment"
+                              [disabled]="!commentDraft(post).trim() || isSendingComment(post)">
+                        @if (isSendingComment(post)) {
+                          <i class="fa-solid fa-spinner fa-spin"></i>
+                        } @else {
+                          <i class="fa-solid fa-paper-plane"></i>
+                        }
+                      </button>
+                    </div>
+                  </section>
+                }
+              </article>
+            }
+          }
+        }
+
+        @else if (activeTab() === 'photos') {
+          <section class="surface-card gallery-card">
+            <div class="section-heading">
+              <h2>Photos</h2>
+              <span class="post-counter">{{ photosCount() }}</span>
+            </div>
+
+            @if (photosCount() > 0) {
+              <div class="photo-gallery">
+                @for (post of photos(); track post.id; let first = $first) {
+                  <button type="button" class="gallery-item" [class.featured]="first && photos().length > 2"
+                          (click)="openLightbox(post.id)"
+                          [attr.aria-label]="post.body || 'Open photo'">
+                    <img [src]="post.image" [alt]="post.body || 'Post photo'" loading="lazy" />
+                  </button>
+                }
+              </div>
+            } @else {
+              <div class="state-card">
+                <div class="empty-illustration"><i class="fa-regular fa-image"></i></div>
+                <h3>No photos yet</h3>
+                <p>Posts that include a photo will appear in this gallery.</p>
+                <button type="button" class="primary-action" (click)="focusComposer()">Post a photo</button>
+              </div>
+            }
+          </section>
+        }
+
+        @else {
+          <section class="surface-card about-card">
+            <div class="section-heading">
+              <h2>About {{ firstName() }}</h2>
+              <button type="button" class="text-link" (click)="openEditProfile()">
+                <i class="fa-solid fa-pen"></i> Edit
+              </button>
+            </div>
+            <dl class="about-list">
+              <div><dt>Full name</dt><dd>{{ userName() }}</dd></div>
+              <div><dt>Username</dt><dd>{{ username() || 'Not set' }}</dd></div>
+              <div><dt>Bio</dt><dd>{{ bio() || 'No bio added yet.' }}</dd></div>
+              <div><dt>Community</dt><dd>Route Posts</dd></div>
+            </dl>
+          </section>
+        }
+
+      </div>
+    </section>
+  </div>
+
+  <!-- EDIT PROFILE MODAL -->
+  @if (isEditOpen()) {
+    <div class="profile-modal-backdrop" (click)="closeEditProfile()">
+      <section class="profile-edit-modal" role="dialog" aria-modal="true"
+               aria-labelledby="edit-profile-title" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <h2 id="edit-profile-title">Edit profile</h2>
+          <button type="button" class="modal-close" (click)="closeEditProfile()" aria-label="Close">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </header>
+
+        <div class="modal-avatar-editor">
+          <div class="modal-avatar-wrap">
+            <img [src]="avatarPreview() || profilePhoto()" [alt]="editName()" (error)="onImageError($event)" />
+          </div>
+          <div>
+            <strong>{{ editName() || 'Your name' }}</strong>
+            <label for="profile-avatar-input" class="change-photo-button" tabindex="0"
+                   (keydown.enter)="avatarInput.click()">
+              @if (isProcessingImage() === 'avatar') {
+                <i class="fa-solid fa-spinner fa-spin"></i> Optimizing…
+              } @else {
+                <i class="fa-solid fa-camera"></i> Change photo
+              }
+            </label>
+            <input #avatarInput id="profile-avatar-input" type="file" accept="image/*" class="visually-hidden"
+                   (change)="onAvatarSelected($event)" />
+          </div>
+        </div>
+
+        <div class="edit-fields">
+          <label for="profile-name">Full name</label>
+          <input id="profile-name" type="text" [value]="editName()" (input)="onNameChange($event)"
+                 placeholder="Your full name" maxlength="80" autocomplete="name" />
+
+          <label for="profile-username">Username</label>
+          <input id="profile-username" type="text" [value]="editUsername()" (input)="onUsernameChange($event)"
+                 placeholder="letters, numbers, . and _" maxlength="30" autocomplete="username"
+                 [class.invalid]="!!usernameError()" />
+          @if (usernameError()) {
+            <small class="field-error">{{ usernameError() }}</small>
+          }
+
+          <label for="profile-bio">Bio <span class="field-count">{{ editBio().length }}/250</span></label>
+          <textarea id="profile-bio" [value]="editBio()" (input)="onBioChange($event)"
+                    placeholder="Write something about yourself…" rows="4" maxlength="250"></textarea>
+
+          @if (profileMessage()) {
+            <p class="form-error" role="alert">{{ profileMessage() }}</p>
+          }
+        </div>
+
+        <footer class="modal-actions">
+          <button type="button" class="cancel-button" (click)="closeEditProfile()">Cancel</button>
+          <button type="button" class="publish-button" (click)="saveProfile()"
+                  [disabled]="isSavingProfile() || !isDirty() || !!usernameError()">
+            @if (isSavingProfile()) {
+              <i class="fa-solid fa-spinner fa-spin"></i> Saving…
+            } @else {
+              Save changes
+            }
+          </button>
+        </footer>
+      </section>
+    </div>
+  }
+
+  <!-- LIGHTBOX -->
+  @if (currentPhoto(); as photo) {
+    <div class="lightbox" role="dialog" aria-modal="true" aria-label="Photo viewer" (click)="closeLightbox()">
+      <button type="button" class="lb-btn lb-close" (click)="closeLightbox()" aria-label="Close">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      @if (photos().length > 1) {
+        <button type="button" class="lb-btn lb-prev" (click)="stepLightbox(-1); $event.stopPropagation()" aria-label="Previous photo">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button type="button" class="lb-btn lb-next" (click)="stepLightbox(1); $event.stopPropagation()" aria-label="Next photo">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      }
+
+      <figure (click)="$event.stopPropagation()">
+        <img [src]="photo.image" [alt]="photo.body || 'Post photo'" />
+        <figcaption>
+          @if (photo.body) { <p>{{ photo.body }}</p> }
+          <span>{{ lightboxIndex()! + 1 }} of {{ photos().length }}</span>
+        </figcaption>
+      </figure>
+    </div>
+  }
+
+  <!-- BOTTOM NAV (phones) -->
+  <nav class="bottom-nav" aria-label="Profile sections">
+    <button type="button" [class.active]="activeTab() === 'posts'" (click)="setTab('posts')">
+      <i class="fa-solid fa-house"></i><span>Timeline</span>
+    </button>
+    <button type="button" [class.active]="activeTab() === 'photos'" (click)="setTab('photos')">
+      <i class="fa-regular fa-images"></i><span>Photos</span>
+    </button>
+    <button type="button" class="nav-fab" (click)="focusComposer()" aria-label="New post">
+      <i class="fa-solid fa-plus"></i>
+    </button>
+    <button type="button" [class.active]="activeTab() === 'about'" (click)="setTab('about')">
+      <i class="fa-regular fa-id-card"></i><span>About</span>
+    </button>
+    <button type="button" (click)="openEditProfile()">
+      <i class="fa-solid fa-pen"></i><span>Edit</span>
+    </button>
+  </nav>
+
+  <!-- TOAST -->
+  @if (toast(); as t) {
+    <div class="toast" [class.error]="t.type === 'error'" role="status" aria-live="polite">
+      <i [class]="t.type === 'error' ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-check'"></i>
+      {{ t.message }}
+    </div>
+  }
+</main>
