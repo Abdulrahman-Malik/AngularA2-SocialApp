@@ -1,4 +1,3 @@
-
 import { Routes } from '@angular/router';
 
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
@@ -17,6 +16,8 @@ import { NotificationComponent } from './features/notification/notification.comp
 import { authGuard } from './core/auth/guard/auth-guard';
 import { guestGuard } from './core/auth/guard/guest-guard';
 
+import { ViewDetialsComponent } from './features/feed/view-detials.component';
+
 export const routes: Routes = [
   {
     path: 'main',
@@ -24,16 +25,27 @@ export const routes: Routes = [
     canActivate: [authGuard],
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
+
       { path: 'home', component: HomeComponent },
       { path: 'navbar', component: NavbarComponent },
       { path: 'profile', component: ProfileComponent },
       { path: 'change', component: ChangePasswordComponent },
       { path: 'forget', component: ForgetPasswordComponent },
       { path: 'notification', component: NotificationComponent },
+
+      // Post Details
+      {
+        path: 'view-details/:id',
+        component: ViewDetialsComponent,
+      },
+
       { path: 'notfound', component: NotFoundComponent },
+
+      // Unknown Main Routes
       { path: '**', redirectTo: 'notfound' },
     ],
   },
+
   {
     path: 'auth',
     component: AuthLayoutComponent,
@@ -44,6 +56,7 @@ export const routes: Routes = [
       { path: 'register', component: RegisterComponent },
     ],
   },
+
   { path: '', redirectTo: 'auth/login', pathMatch: 'full' },
   { path: '**', redirectTo: 'auth/login' },
 ];

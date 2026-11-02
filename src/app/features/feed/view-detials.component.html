@@ -1,0 +1,341 @@
+<!-- Night-sky backdrop (pure CSS, no canvas = no cost) -->
+<div class="sky" aria-hidden="true">
+  <span class="aurora aurora-a"></span>
+  <span class="aurora aurora-b"></span>
+</div>
+
+<main class="post-details-page">
+  <div class="details-container">
+
+    <!-- ================= HEADER ================= -->
+    <header class="details-header">
+
+      <a routerLink="/main/home" class="details-brand" aria-label="Route Posts home">
+        <span class="brand-logo">R</span>
+        <span class="brand-copy">
+          <strong>Route Posts</strong>
+          <small>Connect. Share. Discover.</small>
+        </span>
+      </a>
+
+      <a routerLink="/main/home" class="back-button">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        <span>Back to feed</span>
+      </a>
+
+    </header>
+
+    <!-- ================= INTRO ================= -->
+    <section class="details-intro">
+
+      <div class="intro-icon" aria-hidden="true">
+        <i class="fa-solid fa-file-lines"></i>
+      </div>
+
+      <div class="intro-copy">
+        <h1>Post details</h1>
+        <p>Everything about this post, in one place.</p>
+      </div>
+
+      @if (isRefreshing()) {
+        <span class="sync-pill" role="status">
+          <span class="sync-dot"></span>
+          Updating
+        </span>
+      }
+
+    </section>
+
+    <!-- ================= LOADING (skeleton) ================= -->
+    @if (isLoading()) {
+
+      <section class="post-details-card" aria-busy="true" aria-label="Loading post">
+
+        <div class="post-card-header">
+          <div class="author-information">
+            <span class="sk sk-circle"></span>
+            <div class="sk-stack">
+              <span class="sk sk-line w-40"></span>
+              <span class="sk sk-line w-60 sm"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="post-content sk-stack">
+          <span class="sk sk-line w-100"></span>
+          <span class="sk sk-line w-90"></span>
+          <span class="sk sk-line w-60"></span>
+        </div>
+
+        <div class="sk sk-image"></div>
+
+        <div class="engagement-section">
+          <span class="sk sk-tile"></span>
+          <span class="sk sk-tile"></span>
+          <span class="sk sk-tile"></span>
+        </div>
+
+      </section>
+
+    }
+
+    <!-- ================= ERROR ================= -->
+    @else if (errorMessage()) {
+
+      <section class="details-state-card" role="alert">
+
+        <div class="state-icon">
+          <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+        </div>
+
+        <h2>Couldn’t load this post</h2>
+        <p>{{ errorMessage() }}</p>
+
+        <button type="button" class="retry-button" (click)="retryGetPost()">
+          <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+          Try again
+        </button>
+
+      </section>
+
+    }
+
+    <!-- ================= POST ================= -->
+    @else if (postDetails()) {
+
+      <article class="post-details-card">
+
+        @if (staleNotice()) {
+          <div class="stale-notice" role="status">
+            <i class="fa-solid fa-cloud-arrow-down" aria-hidden="true"></i>
+            <span>Showing a saved copy. We couldn’t refresh it just now.</span>
+            <button type="button" (click)="retryGetPost()">Refresh</button>
+          </div>
+        }
+
+        <!-- Author row -->
+        <header class="post-card-header">
+
+          <div class="author-information">
+
+            @if (postAuthor().photo) {
+              <img
+                [src]="postAuthor().photo"
+                [alt]="postAuthor().name || 'Post author'"
+                class="author-avatar"
+                width="48"
+                height="48"
+                decoding="async"
+              />
+            } @else {
+              <div class="author-avatar-fallback" aria-hidden="true">
+                <i class="fa-solid fa-user"></i>
+              </div>
+            }
+
+            <div class="author-copy">
+
+              <strong dir="auto">{{ postAuthor().name || 'Unknown user' }}</strong>
+
+              <div class="author-meta">
+
+                @if (postAuthor().username) {
+                  <span>&#64;{{ postAuthor().username }}</span>
+                  <span class="meta-dot" aria-hidden="true">·</span>
+                }
+
+                <time [attr.datetime]="postDate().iso">{{ postDate().text }}</time>
+
+                <span class="meta-dot" aria-hidden="true">·</span>
+
+                <span class="privacy-label">
+                  <i [class]="postPrivacy().icon" aria-hidden="true"></i>
+                  {{ postPrivacy().label }}
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <span class="post-id-badge" [title]="postId()">#{{ postId() }}</span>
+
+        </header>
+
+        <!-- Body -->
+        @if (postBody()) {
+          <div class="post-content">
+            <p dir="auto">{{ postBody() }}</p>
+          </div>
+        }
+
+        <!-- Image -->
+        @if (postImage()) {
+          <figure class="post-image-container">
+            <img
+              [src]="postImage()"
+              [alt]="postBody() || 'Post image'"
+              class="post-image"
+              fetchpriority="high"
+              decoding="async"
+              (error)="onImageError()"
+            />
+          </figure>
+        }
+
+        <!-- Empty -->
+        @if (!postBody() && !postImage()) {
+          <div class="post-empty-content">
+            <i class="fa-regular fa-file-lines" aria-hidden="true"></i>
+            <p>This post has no text or image.</p>
+          </div>
+        }
+
+        <!-- Engagement -->
+        <section class="engagement-section" aria-label="Engagement">
+
+          <div class="engagement-item">
+            <span class="engagement-icon likes-icon" aria-hidden="true">
+              <i class="fa-solid fa-thumbs-up"></i>
+            </span>
+            <div>
+              <strong>{{ postLikesCount() }}</strong>
+              <small>Likes</small>
+            </div>
+          </div>
+
+          <div class="engagement-item">
+            <span class="engagement-icon comments-icon" aria-hidden="true">
+              <i class="fa-solid fa-comment"></i>
+            </span>
+            <div>
+              <strong>{{ postCommentsCount() }}</strong>
+              <small>Comments</small>
+            </div>
+          </div>
+
+          <div class="engagement-item">
+            <span class="engagement-icon shares-icon" aria-hidden="true">
+              <i class="fa-solid fa-share"></i>
+            </span>
+            <div>
+              <strong>{{ postSharesCount() }}</strong>
+              <small>Shares</small>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Overview -->
+        <section class="post-information-section">
+
+          <div class="section-heading">
+            <h2>Post overview</h2>
+          </div>
+
+          <div class="information-grid">
+
+            <div class="information-card">
+              <span class="information-icon blue" aria-hidden="true">
+                <i class="fa-solid fa-hashtag"></i>
+              </span>
+              <div>
+                <small>Post ID</small>
+                <strong>{{ postId() }}</strong>
+              </div>
+            </div>
+
+            <div class="information-card">
+              <span class="information-icon purple" aria-hidden="true">
+                <i class="fa-solid fa-user"></i>
+              </span>
+              <div>
+                <small>Published by</small>
+                <strong dir="auto">{{ postAuthor().name || 'Unknown user' }}</strong>
+              </div>
+            </div>
+
+            <div class="information-card">
+              <span class="information-icon green" aria-hidden="true">
+                <i class="fa-regular fa-calendar"></i>
+              </span>
+              <div>
+                <small>Published on</small>
+                <strong>{{ postDate().text }}</strong>
+              </div>
+            </div>
+
+            <div class="information-card">
+              <span class="information-icon orange" aria-hidden="true">
+                <i class="fa-solid fa-shield-halved"></i>
+              </span>
+              <div>
+                <small>Audience</small>
+                <strong>{{ postPrivacy().label }}</strong>
+              </div>
+            </div>
+
+          </div>
+
+        </section>
+
+        <!-- Comments -->
+        <section class="comments-preview-section">
+
+          <div class="section-heading">
+            <h2>Recent comments</h2>
+            <span class="comments-total">{{ postCommentsCount() }}</span>
+          </div>
+
+          @for (comment of postComments(); track comment._id || $index) {
+
+            <div class="comment-preview">
+
+              @if (comment.commentCreator?.photo) {
+                <img
+                  [src]="comment.commentCreator.photo"
+                  alt=""
+                  class="comment-avatar"
+                  width="36"
+                  height="36"
+                  loading="lazy"
+                  decoding="async"
+                />
+              } @else {
+                <span class="comment-avatar-fallback" aria-hidden="true">
+                  <i class="fa-solid fa-user"></i>
+                </span>
+              }
+
+              <div class="comment-content">
+                <strong dir="auto">{{ comment.commentCreator?.name || 'User' }}</strong>
+                <p dir="auto">{{ comment.content || comment.body || '' }}</p>
+              </div>
+
+            </div>
+
+          } @empty {
+
+            <p class="comments-empty">
+              No comments yet. Open the feed to start the conversation.
+            </p>
+
+          }
+
+        </section>
+
+      </article>
+
+    }
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="details-footer">
+      <span class="footer-logo">R</span>
+      <span>Route Posts</span>
+      <span class="footer-dot" aria-hidden="true">·</span>
+      <span>Made for meaningful connections.</span>
+    </footer>
+
+  </div>
+</main>

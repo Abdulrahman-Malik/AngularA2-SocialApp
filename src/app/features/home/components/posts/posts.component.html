@@ -18,7 +18,6 @@
         class="composer-card !mb-2"
         aria-labelledby="create-post-heading"
       >
-
         <!-- COMPOSER HEADER -->
         <header class="composer-heading">
           <div class="composer-heading-icon" aria-hidden="true">
@@ -33,12 +32,8 @@
 
         <div class="composer-content">
 
-          <!-- ===============================================
-               CURRENT USER
-          ================================================ -->
-
+          <!-- CURRENT USER -->
           <div class="composer-profile">
-
             <img
               [src]="currentUserPhoto()"
               (error)="onProfilePhotoError($event)"
@@ -77,13 +72,9 @@
                 <option value="private">Only me</option>
               </select>
             </div>
-
           </div>
 
-          <!-- ===============================================
-               POST CONTENT
-          ================================================ -->
-
+          <!-- POST CONTENT -->
           <div class="composer-editor">
             <label for="create-post-text" class="sr-only">
               Write a new post
@@ -107,25 +98,18 @@
             </div>
           </div>
 
-          <!-- ===============================================
-               MEDIA ERROR
-          ================================================ -->
-
+          <!-- MEDIA ERROR -->
           @if (mediaError()) {
             <p class="media-error" role="alert">
               <i
                 class="fa-solid fa-circle-exclamation"
                 aria-hidden="true"
               ></i>
-
               <span>{{ mediaError() }}</span>
             </p>
           }
 
-          <!-- ===============================================
-               POST ACTION MESSAGE
-          ================================================ -->
-
+          <!-- POST ACTION MESSAGE -->
           @if (postActionMessage()) {
             <p
               class="my-3 rounded-xl border px-4 py-3 text-sm"
@@ -142,10 +126,7 @@
             </p>
           }
 
-          <!-- ===============================================
-               MEDIA PREVIEW
-          ================================================ -->
-
+          <!-- MEDIA PREVIEW -->
           @if (mediaPreviewUrl(); as previewUrl) {
             <div
               id="post-media-preview"
@@ -213,10 +194,7 @@
             </div>
           }
 
-          <!-- ===============================================
-               ADD TO POST
-          ================================================ -->
-
+          <!-- ADD TO POST -->
           <div class="composer-tools">
             <span class="composer-tools-label">
               Add to your post
@@ -266,7 +244,6 @@
                   class="fa-solid fa-user-tag"
                   aria-hidden="true"
                 ></i>
-
                 <span class="hidden sm:inline">People</span>
               </button>
 
@@ -282,17 +259,13 @@
                   class="fa-regular fa-face-smile"
                   aria-hidden="true"
                 ></i>
-
                 <span class="hidden sm:inline">Feeling</span>
               </button>
 
             </div>
           </div>
 
-          <!-- ===============================================
-               PUBLISH POST
-          ================================================ -->
-
+          <!-- PUBLISH POST -->
           <button
             type="submit"
             class="composer-publish-button"
@@ -304,14 +277,12 @@
                 class="fa-solid fa-spinner animate-spin"
                 aria-hidden="true"
               ></i>
-
               <span>Publishing...</span>
             } @else {
               <i
                 class="fa-solid fa-paper-plane"
                 aria-hidden="true"
               ></i>
-
               <span>Publish post</span>
             }
           </button>
@@ -542,10 +513,7 @@
                             class="audience-option"
                             [class.audience-option-active]="post.privacy === 'public'"
                             [attr.aria-pressed]="post.privacy === 'public'"
-                            (click)="
-                              setPrivacy(post, 'public');
-                              postAudienceMenu.open = false
-                            "
+                            (click)="setPrivacy(post, 'public'); postAudienceMenu.open = false"
                           >
                             <span class="audience-icon audience-public">
                               <i
@@ -573,10 +541,7 @@
                             class="audience-option"
                             [class.audience-option-active]="post.privacy === 'followers'"
                             [attr.aria-pressed]="post.privacy === 'followers'"
-                            (click)="
-                              setPrivacy(post, 'followers');
-                              postAudienceMenu.open = false
-                            "
+                            (click)="setPrivacy(post, 'followers'); postAudienceMenu.open = false"
                           >
                             <span class="audience-icon audience-followers">
                               <i
@@ -604,10 +569,7 @@
                             class="audience-option"
                             [class.audience-option-active]="post.privacy === 'private'"
                             [attr.aria-pressed]="post.privacy === 'private'"
-                            (click)="
-                              setPrivacy(post, 'private');
-                              postAudienceMenu.open = false
-                            "
+                            (click)="setPrivacy(post, 'private'); postAudienceMenu.open = false"
                           >
                             <span class="audience-icon audience-private">
                               <i
@@ -727,10 +689,7 @@
                 </div>
               }
 
-              <!-- =========================================
-                   POST IMAGE
-              ========================================== -->
-
+              <!-- POST IMAGE -->
               @if (post.image) {
                 <figure class="post-media">
                   <img
@@ -784,6 +743,47 @@
                   </span>
 
                 </div>
+              </div>
+
+              <!-- =========================================
+                   PREMIUM VIEW DETAILS NAVIGATION
+              ========================================== -->
+
+              <div class="post-details-navigation">
+
+                <a
+                  [routerLink]="['/main/view-details', post.id]"
+                  class="post-details-link"
+                  [attr.aria-label]="'View complete details for post ' + post.id"
+                >
+
+                  <!-- ICON -->
+                  <span class="details-icon-box">
+                    <i
+                      class="fa-solid fa-file-circle-info"
+                      aria-hidden="true"
+                    ></i>
+                  </span>
+
+                  <!-- TEXT -->
+                  <span class="details-content">
+                    <strong>Explore Post Details</strong>
+                    <small>
+                      View complete information about this post
+                    </small>
+                  </span>
+
+                  <!-- ACTION -->
+                  <span class="details-action">
+                    <span>View Post</span>
+                    <i
+                      class="fa-solid fa-arrow-right"
+                      aria-hidden="true"
+                    ></i>
+                  </span>
+
+                </a>
+
               </div>
 
               <!-- =========================================

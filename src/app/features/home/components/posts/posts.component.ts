@@ -15,6 +15,8 @@ import { Subscription } from 'rxjs';
 import { PostsService } from './components/posts.service';
 import { Post } from './models/post.interface';
 import { CommentComponent } from './comment/comment.component';
+import { ViewDetialsComponent } from '../../../feed/view-detials.component';
+import { RouterLink } from '@angular/router';
 
 /* =========================================================
    TYPES
@@ -83,8 +85,9 @@ export type FeedPost = Omit<
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    CommentComponent,
-  ],
+    CommentComponent, ViewDetialsComponent,
+    RouterLink
+],
   templateUrl: './posts.component.html',
   styleUrl: './posts.component.css',
 })
