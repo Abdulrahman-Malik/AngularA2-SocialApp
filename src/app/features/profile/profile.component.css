@@ -858,3 +858,284 @@ h2 { margin: 0; font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
 @media (max-width: 680px) {
   .mini-bar .theme-toggle { margin-inline-start: auto; }
 }
+/* =========================================================
+   ROUTE POSTS — CLEAN WHITE PROFILE THEME
+========================================================= */
+
+:host {
+  --ink: #17233d;
+  --ink-soft: #52627d;
+  --ink-faint: #8491a8;
+
+  --paper: #ffffff;
+  --solid: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f5f7fb;
+  --line: #e6eaf2;
+
+  --route: #2163eb;
+  --route-deep: #174fc5;
+  --route-tint: rgba(33, 99, 235, 0.08);
+
+  --violet: #8065ed;
+  --heart: #f04470;
+  --ok: #16a477;
+  --danger: #e5485d;
+
+  --shadow:
+    0 2px 8px rgba(30, 50, 90, 0.035),
+    0 12px 32px rgba(30, 50, 90, 0.055);
+
+  color: var(--ink);
+  color-scheme: light;
+  background: #ffffff;
+}
+
+/* Main page */
+
+.profile-page {
+  background: #ffffff;
+  color: var(--ink);
+}
+
+/* Remove dark cosmic background */
+
+.cosmos::before,
+.cosmos::after {
+  display: none !important;
+  background: none !important;
+  animation: none !important;
+}
+
+/* Profile header and cards */
+
+.profile-header,
+.surface-card {
+  background: #ffffff !important;
+  border-color: #e7ebf3 !important;
+  box-shadow: var(--shadow);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Sidebar */
+
+.intro-card,
+.sidebar-photos,
+.strength-card,
+.composer-card,
+.gallery-card,
+.about-card {
+  background: #ffffff !important;
+}
+
+/* Mini navbar */
+
+.mini-bar,
+.bottom-nav {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: #e7ebf3;
+  box-shadow: 0 4px 18px rgba(30, 50, 90, 0.06);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+}
+
+/* Cover */
+
+.profile-cover {
+  box-shadow: 0 15px 35px rgba(30, 50, 90, 0.12);
+}
+
+.cover-shade {
+  background: linear-gradient(
+    0deg,
+    rgba(10, 30, 65, 0.35),
+    transparent 65%
+  );
+}
+
+/* Typography */
+
+.identity-details h1 {
+  color: #17233d;
+  text-shadow: none;
+}
+
+.identity-username {
+  color: var(--route);
+}
+
+.identity-bio,
+.intro-bio,
+.info-list li,
+.strength-card li {
+  color: var(--ink-soft);
+}
+
+/* Avatar */
+
+.avatar-wrapper {
+  background: #ffffff;
+  box-shadow:
+    0 0 0 1px #e6eaf2,
+    0 8px 25px rgba(30, 50, 90, 0.12);
+}
+
+.profile-avatar {
+  background: #f5f7fb;
+}
+
+/* Statistics */
+
+.profile-stats div {
+  background: #f5f7fb;
+  border-color: #e7ebf3;
+}
+
+.profile-stats dd {
+  color: #17233d;
+}
+
+.profile-stats dt {
+  color: #8491a8;
+}
+
+/* Buttons */
+
+.primary-action,
+.publish-button,
+.comment-form button {
+  background: linear-gradient(135deg, #2163eb, #4389ff);
+  color: #ffffff;
+  box-shadow: 0 5px 15px rgba(33, 99, 235, 0.18);
+}
+
+.primary-action:hover,
+.publish-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #174fc5, #3479ee);
+}
+
+/* Tabs */
+
+.profile-tabs button {
+  color: #8491a8;
+}
+
+.profile-tabs button:hover,
+.profile-tabs button.active {
+  color: #2163eb;
+}
+
+/* Inputs */
+
+.composer-textarea,
+.comment-form textarea,
+.edit-fields input,
+.edit-fields textarea {
+  color: #17233d;
+  background: #f7f9fc;
+  border-color: #e2e8f2;
+}
+
+.composer-textarea::placeholder,
+.comment-form textarea::placeholder {
+  color: #98a3b7;
+}
+
+/* Post content */
+
+.feed-post-text {
+  color: #26344e;
+}
+
+.feed-author strong {
+  color: #17233d;
+}
+
+.feed-author time {
+  color: #8491a8;
+}
+
+.feed-post-engagement,
+.feed-post-stats {
+  color: #8491a8;
+}
+
+/* Comments */
+
+.comment-bubble {
+  background: #f5f7fb;
+  border-color: #e7ebf3;
+}
+
+.comment-bubble strong,
+.comment-bubble p {
+  color: #26344e;
+}
+
+/* Gallery */
+
+.gallery-item,
+.sidebar-photo {
+  background: #f5f7fb;
+  box-shadow: 0 0 0 1px #e7ebf3;
+}
+
+/* Progress */
+
+.strength-track {
+  background: #e9eef8;
+}
+
+.strength-track span {
+  background: linear-gradient(90deg, #2163eb, #8065ed);
+  box-shadow: none;
+}
+
+/* Edit modal */
+
+.profile-edit-modal {
+  background: #ffffff !important;
+  border-color: #e7ebf3;
+}
+
+.modal-header,
+.modal-actions {
+  border-color: #e7ebf3;
+}
+
+.modal-header h2,
+.edit-fields label,
+.modal-avatar-editor strong {
+  color: #17233d;
+}
+
+.modal-avatar-editor {
+  background: #f5f7fb;
+  border-color: #e7ebf3;
+}
+
+.modal-avatar-wrap {
+  background: #ffffff;
+}
+
+/* Theme button */
+
+.theme-toggle {
+  color: #33415d;
+  background: #f5f7fb;
+  border-color: #e7ebf3;
+}
+
+/* Responsive background */
+
+@media (max-width: 680px) {
+  .profile-page {
+    background: #ffffff;
+  }
+
+  .profile-header,
+  .surface-card {
+    background: #ffffff !important;
+  }
+}
