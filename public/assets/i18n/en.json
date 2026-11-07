@@ -1,0 +1,52 @@
+
+{
+  "COMMON": {
+    "LOGIN": "Login",
+    "REGISTER": "Register",
+    "LOADING": "Loading...",
+    "EMAIL": "Email",
+    "PASSWORD": "Password",
+    "REQUIRED": "This field is required.",
+    "CREATE_ACCOUNT": "Create your account"
+  },
+  "BRAND": {
+    "NAME": "Route Posts",
+    "TAGLINE": "Your community, one click away."
+  },
+  "LOGIN": {
+    "WELCOME_LABEL": "WELCOME BACK",
+    "TITLE": "Welcome back!",
+    "DESCRIPTION": "Log in to Route Posts and pick up where you left off.",
+    "EMAIL_OR_USERNAME": "Email or username",
+    "EMAIL_OR_USERNAME_PLACEHOLDER": "Enter your email or username",
+    "EMAIL_OR_USERNAME_REQUIRED": "Email or username is required.",
+    "PASSWORD_LABEL": "Password",
+    "PASSWORD_PLACEHOLDER": "Enter your password",
+    "PASSWORD_REQUIRED": "Password is required.",
+    "FORGOT_PASSWORD": "Forgot password?",
+    "REMEMBER_ME": "Remember me",
+    "SECURE_SIGN_IN": "Secure sign in",
+    "SUBMIT": "Log In",
+    "ERROR_INVALID_CREDENTIALS": "Email or password is incorrect.",
+    "ERROR_GENERIC": "Unable to log in. Please try again.",
+    "NEW_HERE": "New to Route Posts?",
+    "REGISTER_CTA": "Create your account",
+    "PRIVACY_NOTICE": "Your privacy and security matter to us."
+  },
+  "NAV": {
+    "SEARCH": "Search Route Posts...",
+    "HOME": "Home",
+    "PROFILE": "Profile",
+    "NOTIFICATIONS": "Notifications",
+    "UNREAD": "Unread",
+    "CHANGE_LANGUAGE": "Change language",
+    "TOGGLE_MENU": "Toggle navigation menu",
+    "OPEN_PROFILE_MENU": "Open profile menu",
+    "PROFILE_MENU": "Profile menu",
+    "SEE_PROFILE": "View profile",
+    "SETTINGS": "Settings",
+    "DARK_MODE": "Dark mode",
+    "LOGOUT": "Log out",
+    "CLOSE_MENU": "Close menu"
+  }
+}

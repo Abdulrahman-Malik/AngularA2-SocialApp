@@ -1,21 +1,35 @@
 import {
-  AfterViewInit,
   Component,
+  ElementRef,
+  HostListener,
   inject,
   OnDestroy,
   OnInit,
+  PLATFORM_ID,
 } from '@angular/core';
+
+import { isPlatformBrowser } from '@angular/common';
 
 import {
   RouterLink,
   RouterLinkActive,
 } from '@angular/router';
 
-import { initFlowbite } from 'flowbite';
+import {
+  TranslatePipe,
+  TranslateService,
+} from '@ngx-translate/core';
+
+import { take } from 'rxjs';
 
 import { AuthService } from '../../core/auth/services/auth.service';
-
 import { NotificationService } from '../../features/notification/notification.service';
+
+type AppLanguage = 'ar' | 'en';
+
+/** Breakpoints (px) must match navbar.component.css */
+const TABLET_MIN_WIDTH = 768;
+const LAPTOP_MIN_WIDTH = 992;
 
 @Component({
   selector: 'app-navbar',
@@ -23,31 +37,88 @@ import { NotificationService } from '../../features/notification/notification.se
   imports: [
     RouterLink,
     RouterLinkActive,
+    TranslatePipe,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.css',
 })
-export class NavbarComponent
-  implements OnInit, AfterViewInit, OnDestroy {
+export class NavbarComponent implements OnInit, OnDestroy {
 
-  /* =====================================================
-     1. SERVICES
-  ====================================================== */
+  // =====================================================
+  // 1. SERVICES & PLATFORM
+  // =====================================================
 
   private readonly authService = inject(AuthService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly translate = inject(TranslateService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  private readonly notificationService =
-    inject(NotificationService);
+  private readonly isBrowser = isPlatformBrowser(
+    inject(PLATFORM_ID)
+  );
 
-  /* =====================================================
-     2. NOTIFICATIONS
-  ====================================================== */
+  // =====================================================
+  // 2. LANGUAGE
+  // =====================================================
 
-  // Reactive unread notifications count.
+  currentLang: AppLanguage = 'en';
+
+  private loadLanguage(): void {
+    const savedLang = this.getStorageItem('lang');
+
+    this.currentLang = savedLang === 'ar' ? 'ar' : 'en';
+
+    this.translate
+      .use(this.currentLang)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.applyLanguageDirection(this.currentLang);
+        },
+        error: (error) => {
+          console.error('Language initialization error:', error);
+        },
+      });
+  }
+
+  toggleLanguage(): void {
+    const newLang: AppLanguage =
+      this.currentLang === 'ar' ? 'en' : 'ar';
+
+    this.translate
+      .use(newLang)
+      .pipe(take(1))
+      .subscribe({
+        next: () => {
+          this.currentLang = newLang;
+
+          this.setStorageItem('lang', newLang);
+          this.applyLanguageDirection(newLang);
+          this.closeMenus();
+        },
+        error: (error) => {
+          console.error('Language change error:', error);
+        },
+      });
+  }
+
+  private applyLanguageDirection(lang: AppLanguage): void {
+    if (!this.isBrowser) return;
+
+    const direction = lang === 'ar' ? 'rtl' : 'ltr';
+
+    document.documentElement.lang = lang;
+    document.documentElement.dir = direction;
+    document.body.dir = direction;
+  }
+
+  // =====================================================
+  // 3. NOTIFICATIONS
+  // =====================================================
+
   readonly unreadNotificationsCount =
     this.notificationService.unreadCount;
 
-  // Use these getters when needed in the HTML.
   get hasUnreadNotifications(): boolean {
     return this.unreadNotificationsCount() > 0;
   }
@@ -58,25 +129,57 @@ export class NavbarComponent
     return count > 99 ? '99+' : String(count);
   }
 
-  /* =====================================================
-     3. THEME SETTINGS
-  ====================================================== */
+  refreshNotificationCount(): void {
+    this.notificationService.refreshUnreadCount();
+  }
+
+  // =====================================================
+  // 4. THEME
+  // =====================================================
 
   isDarkMode = true;
 
-  /* =====================================================
-     4. MENU STATES
-  ====================================================== */
+  private loadTheme(): void {
+    const savedTheme = this.getStorageItem('theme');
+
+    this.isDarkMode = savedTheme
+      ? savedTheme === 'dark'
+      : true;
+
+    this.applyTheme();
+  }
+
+  toggleTheme(): void {
+    this.isDarkMode = !this.isDarkMode;
+
+    this.setStorageItem(
+      'theme',
+      this.isDarkMode ? 'dark' : 'light'
+    );
+
+    this.applyTheme();
+  }
+
+  private applyTheme(): void {
+    if (!this.isBrowser) return;
+
+    document.documentElement.classList.toggle(
+      'dark',
+      this.isDarkMode
+    );
+  }
+
+  // =====================================================
+  // 5. MENU STATES
+  // =====================================================
 
   isProfileMenuOpen = false;
-
   isMobileMenuOpen = false;
-
   isSearchOpen = false;
 
-  /* =====================================================
-     5. USER INFORMATION
-  ====================================================== */
+  // =====================================================
+  // 6. USER INFORMATION
+  // =====================================================
 
   searchText = '';
 
@@ -87,108 +190,45 @@ export class NavbarComponent
   private readonly defaultAvatar =
     '/assets/default-profile.png';
 
-  /* =====================================================
-     6. LIFECYCLE
-  ====================================================== */
+  // =====================================================
+  // 7. LIFECYCLE
+  // =====================================================
 
   ngOnInit(): void {
+    this.loadLanguage();
     this.loadTheme();
-
     this.loadUser();
 
-    // Get the current unread notifications count.
-    this.notificationService.refreshUnreadCount();
-
-    // Keep the navbar counter updated every 30 seconds.
-    // NavbarComponent is the owner of notification polling.
-    this.notificationService.startPolling(30000);
-  }
-
-  ngAfterViewInit(): void {
-    // Initialize Flowbite after the view is rendered.
-    try {
-      initFlowbite();
-    } catch (error) {
-      console.error('Flowbite initialization error:', error);
+    if (this.isBrowser) {
+      this.notificationService.refreshUnreadCount();
+      this.notificationService.startPolling(30000);
     }
   }
 
   ngOnDestroy(): void {
-    // Stop polling when navbar is destroyed.
-    this.notificationService.stopPolling();
+    if (this.isBrowser) {
+      cancelAnimationFrame(this.glowFrame);
+      this.notificationService.stopPolling();
+    }
   }
 
-  /* =====================================================
-     7. LOGOUT
-  ====================================================== */
+  // =====================================================
+  // 8. LOGOUT
+  // =====================================================
 
   logOut(): void {
     this.closeMenus();
 
     this.notificationService.stopPolling();
-
     this.authService.logOut();
   }
 
-  /* =====================================================
-     8. THEME MANAGEMENT
-  ====================================================== */
-
-  private loadTheme(): void {
-    try {
-      const savedTheme = localStorage.getItem('theme');
-
-      this.isDarkMode = savedTheme
-        ? savedTheme === 'dark'
-        : true;
-
-    } catch (error) {
-      console.error('Unable to load theme:', error);
-
-      this.isDarkMode = true;
-    }
-
-    this.applyTheme();
-  }
-
-  toggleTheme(): void {
-    this.isDarkMode = !this.isDarkMode;
-
-    try {
-      localStorage.setItem(
-        'theme',
-        this.isDarkMode ? 'dark' : 'light',
-      );
-    } catch (error) {
-      console.error('Unable to save theme:', error);
-    }
-
-    this.applyTheme();
-  }
-
-  private applyTheme(): void {
-    if (typeof document === 'undefined') {
-      return;
-    }
-
-    document.documentElement.classList.toggle(
-      'dark',
-      this.isDarkMode,
-    );
-  }
-
-  /* =====================================================
-     9. LOAD USER INFORMATION
-  ====================================================== */
+  // =====================================================
+  // 9. LOAD USER
+  // =====================================================
 
   private loadUser(): void {
-    let savedUser: string | null = null;
-
-    try {
-      savedUser = localStorage.getItem('user');
-    } catch (error) {
-      console.error('Unable to access user storage:', error);
-    }
+    const savedUser = this.getStorageItem('user');
 
     if (!savedUser) {
       this.setDefaultUser();
@@ -197,7 +237,6 @@ export class NavbarComponent
 
     try {
       const parsedUser: unknown = JSON.parse(savedUser);
-
       const user = this.asRecord(parsedUser);
 
       if (!Object.keys(user).length) {
@@ -226,115 +265,207 @@ export class NavbarComponent
         this.defaultAvatar;
 
     } catch (error) {
-      console.error(
-        'Unable to parse user information:',
-        error,
-      );
-
+      console.error('Unable to parse user information:', error);
       this.setDefaultUser();
     }
   }
 
   private setDefaultUser(): void {
     this.userName = 'My Account';
-
     this.profileImage = this.defaultAvatar;
   }
 
-  /* =====================================================
-     10. PROFILE MENU
-  ====================================================== */
+  // =====================================================
+  // 10. PROFILE MENU
+  // =====================================================
 
   toggleProfileMenu(): void {
     this.isProfileMenuOpen = !this.isProfileMenuOpen;
 
-    // Close other menus.
     this.isMobileMenuOpen = false;
-
     this.closeSearch();
   }
 
-  /* =====================================================
-     11. MOBILE MENU
-  ====================================================== */
+  // =====================================================
+  // 11. MOBILE MENU
+  // =====================================================
 
   toggleMobileMenu(): void {
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
 
-    // Close the profile menu.
     this.isProfileMenuOpen = false;
-
     this.closeSearch();
   }
 
-  /* =====================================================
-     12. SEARCH
-  ====================================================== */
+  // =====================================================
+  // 12. SEARCH
+  // =====================================================
 
   toggleSearch(): void {
     this.isSearchOpen = !this.isSearchOpen;
 
-    // Close other menus.
     this.isProfileMenuOpen = false;
-
     this.isMobileMenuOpen = false;
 
-    if (!this.isSearchOpen) {
+    if (this.isSearchOpen) {
+      this.focusSearchInput();
+    } else {
       this.searchText = '';
     }
   }
 
   onSearchInput(event: Event): void {
     const input = event.target as HTMLInputElement;
-
     this.searchText = input.value;
   }
 
   private closeSearch(): void {
     this.isSearchOpen = false;
-
     this.searchText = '';
   }
 
-  /* =====================================================
-     13. CLOSE MENUS
-  ====================================================== */
+  /** `autofocus` is unreliable with @if, so focus after the panel renders. */
+  private focusSearchInput(): void {
+    if (!this.isBrowser) return;
+
+    setTimeout(() => {
+      this.host.nativeElement
+        .querySelector<HTMLInputElement>('#mobile-search-panel input')
+        ?.focus();
+    });
+  }
+
+  // =====================================================
+  // 13. CLOSE MENUS
+  // =====================================================
 
   closeMenus(): void {
     this.isProfileMenuOpen = false;
-
     this.isMobileMenuOpen = false;
 
     this.closeSearch();
   }
 
-  /* =====================================================
-     14. NOTIFICATION COUNTER HELPERS
-  ====================================================== */
+  // =====================================================
+  // 14. KEYBOARD & RESIZE
+  // =====================================================
 
-  refreshNotificationCount(): void {
-    this.notificationService.refreshUnreadCount();
+  /** Escape closes any open panel and returns focus to the profile button. */
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    if (
+      !this.isProfileMenuOpen &&
+      !this.isMobileMenuOpen &&
+      !this.isSearchOpen
+    ) {
+      return;
+    }
+
+    const wasProfileOpen = this.isProfileMenuOpen;
+
+    this.closeMenus();
+
+    if (wasProfileOpen && this.isBrowser) {
+      setTimeout(() => {
+        this.host.nativeElement
+          .querySelector<HTMLButtonElement>('.profile-trigger')
+          ?.focus();
+      });
+    }
   }
 
-  /* =====================================================
-     15. PROFILE IMAGE FALLBACK
-  ====================================================== */
+  /** Close panels that the current breakpoint no longer shows. */
+  @HostListener('window:resize')
+  onResize(): void {
+    if (!this.isBrowser) return;
+
+    const width = window.innerWidth;
+
+    if (width >= TABLET_MIN_WIDTH) {
+      this.isMobileMenuOpen = false;
+    }
+
+    if (width >= LAPTOP_MIN_WIDTH) {
+      this.closeSearch();
+    }
+  }
+
+  // =====================================================
+  // 15. POINTER GLOW
+  // =====================================================
+
+  private glowFrame = 0;
+
+  /** Feeds --mx / --my to the CSS so a soft light follows the cursor. */
+  onPointerMove(event: PointerEvent): void {
+    if (!this.isBrowser || event.pointerType === 'touch') return;
+
+    const shell = event.currentTarget as HTMLElement | null;
+    if (!shell) return;
+
+    const { clientX, clientY } = event;
+
+    cancelAnimationFrame(this.glowFrame);
+
+    this.glowFrame = requestAnimationFrame(() => {
+      const rect = shell.getBoundingClientRect();
+
+      shell.style.setProperty('--mx', `${clientX - rect.left}px`);
+      shell.style.setProperty('--my', `${clientY - rect.top}px`);
+    });
+  }
+
+  onPointerLeave(event: PointerEvent): void {
+    const shell = event.currentTarget as HTMLElement | null;
+    if (!shell) return;
+
+    cancelAnimationFrame(this.glowFrame);
+
+    shell.style.removeProperty('--mx');
+    shell.style.removeProperty('--my');
+  }
+
+  // =====================================================
+  // 16. PROFILE IMAGE FALLBACK
+  // =====================================================
 
   onImageError(event: Event): void {
     const image = event.currentTarget as HTMLImageElement;
 
-    if (!image) {
-      return;
-    }
+    if (!image) return;
 
     image.onerror = null;
-
     image.src = this.defaultAvatar;
   }
 
-  /* =====================================================
-     16. SAFE DATA HELPERS
-  ====================================================== */
+  // =====================================================
+  // 17. STORAGE HELPERS
+  // =====================================================
+
+  private getStorageItem(key: string): string | null {
+    if (!this.isBrowser) return null;
+
+    try {
+      return localStorage.getItem(key);
+    } catch (error) {
+      console.error(`Unable to read ${key}:`, error);
+      return null;
+    }
+  }
+
+  private setStorageItem(key: string, value: string): void {
+    if (!this.isBrowser) return;
+
+    try {
+      localStorage.setItem(key, value);
+    } catch (error) {
+      console.error(`Unable to save ${key}:`, error);
+    }
+  }
+
+  // =====================================================
+  // 18. SAFE DATA HELPERS
+  // =====================================================
 
   private asRecord(value: unknown): Record<string, unknown> {
     if (

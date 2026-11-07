@@ -1,75 +1,45 @@
 <!-- =====================================================
-     ROUTE POSTS — PREMIUM RESPONSIVE NAVBAR
+     ROUTE POSTS — NAVBAR
+     RTL / LTR · LIGHT / DARK · RESPONSIVE
+     All styling lives in navbar.component.css
 ===================================================== -->
 
-<nav class="navbar-shell sticky top-0 z-[100] w-full">
+<nav
+  class="navbar-shell"
+  [class.is-dark]="isDarkMode"
+  [attr.dir]="currentLang === 'ar' ? 'rtl' : 'ltr'"
+  (pointermove)="onPointerMove($event)"
+  (pointerleave)="onPointerLeave($event)"
+>
 
-  <!-- MAIN NAVBAR -->
-  <div
-    class="navbar-container mx-auto grid w-full max-w-7xl
-           grid-cols-[1fr_auto] items-center gap-3 px-4
-           md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]
-           md:gap-5 lg:px-6"
-  >
+  <div class="navbar-container">
 
     <!-- =================================================
-         LEFT: BRAND + DESKTOP SEARCH
+         START: BRAND + DESKTOP SEARCH
     ================================================== -->
 
-    <div
-      class="navbar-start flex min-w-0 items-center gap-3
-             md:col-start-1 md:justify-self-start"
-    >
+    <div class="navbar-start">
 
-      <!-- BRAND -->
       <a
         routerLink="/main/home"
-        class="brand group flex shrink-0 items-center gap-2.5 no-underline"
+        class="brand"
         aria-label="Route Posts Home"
         (click)="closeMenus()"
       >
-        <span
-          class="brand-logo flex h-10 w-10 items-center justify-center
-                 rounded-xl bg-primary text-lg font-extrabold
-                 text-white shadow-md transition duration-200
-                 group-hover:scale-105 group-hover:shadow-lg"
-        >
-          R
-        </span>
+        <span class="brand-logo" aria-hidden="true">R</span>
 
-        <span
-          class="brand-name hidden whitespace-nowrap text-xl
-                 font-extrabold tracking-tight sm:inline-block"
-        >
-          Route<span class="text-primary">Posts</span>
-        </span>
+        <span class="brand-name">Route<span>Posts</span></span>
       </a>
 
-      <!-- DESKTOP SEARCH -->
-      <label
-        class="search-pill hidden min-w-0 items-center gap-2.5
-               rounded-full border border-gray-200 bg-gray-50
-               px-3.5 py-2 transition-all
-               focus-within:border-primary
-               focus-within:bg-white
-               focus-within:ring-2 focus-within:ring-primary/10
-               dark:border-[#3e4042] dark:bg-[#3a3b3c]
-               dark:focus-within:bg-[#242526] md:flex"
-      >
-        <i
-          class="fa-solid fa-magnifying-glass text-sm text-gray-400"
-          aria-hidden="true"
-        ></i>
+      <label class="search-pill">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
 
         <input
           type="search"
           [value]="searchText"
           (input)="onSearchInput($event)"
-          placeholder="Search Route Posts"
-          aria-label="Search Route Posts"
-          class="w-36 min-w-0 border-none bg-transparent text-sm
-                 text-gray-700 outline-none focus:ring-0
-                 dark:text-gray-100 lg:w-44 xl:w-52"
+          [placeholder]="'NAV.SEARCH' | translate"
+          [attr.aria-label]="'NAV.SEARCH' | translate"
         />
       </label>
 
@@ -79,360 +49,232 @@
          CENTER: DESKTOP NAVIGATION
     ================================================== -->
 
-    <div
-      class="desktop-navigation hidden h-full min-w-0 items-center
-             justify-center gap-2 md:col-start-2 md:flex"
-    >
+    <div class="desktop-navigation">
 
-      <!-- HOME -->
       <a
         routerLink="/main/home"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="nav-link relative flex h-12 min-w-16 items-center
-               justify-center rounded-xl px-5 text-gray-600
-               transition-all duration-200
-               hover:bg-gray-100 hover:text-primary
-               dark:text-gray-300 dark:hover:bg-[#3a3b3c]"
-        aria-label="Home"
-        title="Home"
+        class="nav-link"
+        [attr.aria-label]="'NAV.HOME' | translate"
         (click)="closeMenus()"
       >
-        <i
-          class="fa-solid fa-house text-lg"
-          aria-hidden="true"
-        ></i>
-
-        <span class="tooltip" aria-hidden="true">Home</span>
+        <i class="fa-solid fa-house" aria-hidden="true"></i>
+        <span class="tooltip">{{ 'NAV.HOME' | translate }}</span>
       </a>
 
-      <!-- PROFILE -->
       <a
         routerLink="/main/profile"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
-        class="nav-link relative flex h-12 min-w-16 items-center
-               justify-center rounded-xl px-5 text-gray-600
-               transition-all duration-200
-               hover:bg-gray-100 hover:text-primary
-               dark:text-gray-300 dark:hover:bg-[#3a3b3c]"
-        aria-label="Profile"
-        title="Profile"
+        class="nav-link"
+        [attr.aria-label]="'NAV.PROFILE' | translate"
         (click)="closeMenus()"
       >
-        <i
-          class="fa-solid fa-user text-lg"
-          aria-hidden="true"
-        ></i>
-
-        <span class="tooltip" aria-hidden="true">Profile</span>
+        <i class="fa-solid fa-user" aria-hidden="true"></i>
+        <span class="tooltip">{{ 'NAV.PROFILE' | translate }}</span>
       </a>
 
-      <!-- NOTIFICATIONS -->
       <a
         routerLink="/main/notification"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
-        class="nav-link notification-nav-link relative flex h-12
-               min-w-16 items-center justify-center rounded-xl
-               px-5 text-gray-600 transition-all duration-200
-               hover:bg-gray-100 hover:text-primary
-               dark:text-gray-300 dark:hover:bg-[#3a3b3c]"
+        class="nav-link"
         [attr.aria-label]="
-          'Notifications, ' +
-          unreadNotificationsCount() +
-          ' unread'
+          ('NAV.NOTIFICATIONS' | translate) + ', ' +
+          unreadNotificationsCount() + ' ' +
+          ('NAV.UNREAD' | translate)
         "
-        title="Notifications"
         (click)="closeMenus()"
       >
-        <span class="nav-icon-wrap relative inline-grid">
-
-          <i
-            class="fa-solid fa-bell text-lg"
-            aria-hidden="true"
-          ></i>
+        <span class="nav-icon-wrap">
+          <i class="fa-solid fa-bell" aria-hidden="true"></i>
 
           @if (hasUnreadNotifications) {
-            <span
-              class="nav-notification-badge"
-              aria-live="polite"
-              aria-atomic="true"
-            >
+            <span class="nav-notification-badge" aria-hidden="true">
               {{ notificationBadgeText }}
             </span>
           }
-
         </span>
 
-        <span class="tooltip" aria-hidden="true">
-          Notifications
-        </span>
+        <span class="tooltip">{{ 'NAV.NOTIFICATIONS' | translate }}</span>
       </a>
 
     </div>
 
     <!-- =================================================
-         RIGHT: MOBILE ACTIONS + PROFILE
+         END: ACTIONS
     ================================================== -->
 
-    <div
-      class="navbar-actions flex shrink-0 items-center
-             justify-self-end gap-2 md:col-start-3"
-    >
+    <div class="navbar-actions">
 
-      <!-- MOBILE SEARCH -->
+      <!-- LANGUAGE -->
+
       <button
         type="button"
-        class="icon-button flex h-10 w-10 items-center
-               justify-center rounded-full border-0
-               bg-gray-100 text-gray-600 transition-colors
-               hover:bg-gray-200 dark:bg-[#3a3b3c]
-               dark:text-gray-200 dark:hover:bg-[#4e4f50] md:hidden"
+        class="language-button"
+        (click)="toggleLanguage()"
+        [attr.aria-label]="'NAV.CHANGE_LANGUAGE' | translate"
+        [attr.title]="'NAV.CHANGE_LANGUAGE' | translate"
+      >
+        <i class="fa-solid fa-language" aria-hidden="true"></i>
+        <span>{{ currentLang === 'ar' ? 'English' : 'العربية' }}</span>
+      </button>
+
+      <!-- SEARCH (below 992px) -->
+
+      <button
+        type="button"
+        class="icon-button search-button"
         (click)="toggleSearch()"
-        aria-label="Search"
+        [attr.aria-label]="'NAV.SEARCH' | translate"
         [attr.aria-expanded]="isSearchOpen"
         aria-controls="mobile-search-panel"
       >
         <i
-          class="fa-solid text-lg"
+          class="fa-solid"
           [class.fa-magnifying-glass]="!isSearchOpen"
           [class.fa-xmark]="isSearchOpen"
           aria-hidden="true"
         ></i>
       </button>
 
-      <!-- MOBILE MENU -->
+      <!-- MENU (below 768px) -->
+
       <button
         type="button"
-        class="icon-button flex h-10 w-10 items-center
-               justify-center rounded-full border-0
-               bg-gray-100 text-gray-600 transition-colors
-               hover:bg-gray-200 dark:bg-[#3a3b3c]
-               dark:text-gray-200 dark:hover:bg-[#4e4f50] md:hidden"
+        class="icon-button mobile-menu-button"
         (click)="toggleMobileMenu()"
         [attr.aria-expanded]="isMobileMenuOpen"
         aria-controls="mobile-navigation"
-        aria-label="Toggle navigation"
+        [attr.aria-label]="'NAV.TOGGLE_MENU' | translate"
       >
         <i
-          class="fa-solid text-lg"
+          class="fa-solid"
           [class.fa-bars]="!isMobileMenuOpen"
           [class.fa-xmark]="isMobileMenuOpen"
           aria-hidden="true"
         ></i>
       </button>
 
-      <!-- =================================================
-           PROFILE MENU
-      ================================================== -->
+      <!-- PROFILE MENU -->
 
-      <div class="profile-wrapper relative shrink-0">
+      <div class="profile-wrapper">
 
-        <!-- PROFILE BUTTON -->
         <button
           type="button"
-          class="profile-trigger flex items-center justify-center
-                 gap-1 rounded-full border border-transparent
-                 p-1 transition-all hover:border-gray-200
-                 hover:bg-gray-100 dark:hover:border-[#3e4042]
-                 dark:hover:bg-[#3a3b3c]"
+          class="profile-trigger"
           (click)="toggleProfileMenu()"
           [attr.aria-expanded]="isProfileMenuOpen"
           aria-haspopup="menu"
-          aria-label="Open profile menu"
+          [attr.aria-label]="'NAV.OPEN_PROFILE_MENU' | translate"
         >
           <img
             [src]="profileImage"
             [alt]="userName"
-            class="profile-avatar h-9 w-9 rounded-full
-                   border border-gray-200 object-cover
-                   shadow-sm dark:border-[#3e4042]"
+            class="profile-avatar"
             (error)="onImageError($event)"
           />
 
-          <span
-            class="hidden pr-1 text-xs text-gray-500
-                   dark:text-gray-300 sm:inline-block"
-            aria-hidden="true"
-          >
+          <span class="profile-chevron-badge" aria-hidden="true">
             <i class="fa-solid fa-chevron-down"></i>
           </span>
         </button>
 
-        <!-- PROFILE DROPDOWN -->
         @if (isProfileMenuOpen) {
-
           <div
-            class="profile-dropdown absolute right-0 z-[120] mt-3
-                   w-72 max-w-[calc(100vw-24px)] rounded-2xl
-                   border border-gray-100 bg-white p-2
-                   shadow-xl dark:border-[#3e4042]
-                   dark:bg-[#242526]"
+            class="profile-dropdown"
             role="menu"
-            aria-label="Profile menu"
+            [attr.aria-label]="'NAV.PROFILE_MENU' | translate"
           >
 
-            <!-- USER INFORMATION -->
+            <!-- USER CARD -->
+
             <a
               routerLink="/main/profile"
-              class="dropdown-card flex items-center gap-3
-                     rounded-xl p-3 no-underline transition-colors
-                     hover:bg-gray-50 dark:hover:bg-[#3a3b3c]"
+              class="dropdown-card"
               role="menuitem"
               (click)="closeMenus()"
             >
-              <span class="relative shrink-0">
-
+              <span class="dropdown-avatar-wrap">
                 <img
                   [src]="profileImage"
                   [alt]="userName"
-                  class="h-12 w-12 rounded-full border
-                         border-gray-200 object-cover
-                         dark:border-[#3e4042]"
+                  class="dropdown-avatar"
                   (error)="onImageError($event)"
                 />
-
-                <span
-                  class="absolute bottom-0 right-0 h-3.5 w-3.5
-                         rounded-full border-2 border-white
-                         bg-green-500 dark:border-[#242526]"
-                  aria-hidden="true"
-                ></span>
-
+                <span class="online-indicator" aria-hidden="true"></span>
               </span>
 
-              <span class="min-w-0 flex-1">
-
-                <span
-                  class="block truncate font-semibold
-                         text-gray-900 dark:text-gray-100"
-                >
-                  {{ userName }}
+              <span class="dropdown-card-copy">
+                <span class="dropdown-user-name">{{ userName }}</span>
+                <span class="dropdown-user-caption">
+                  {{ 'NAV.SEE_PROFILE' | translate }}
                 </span>
-
-                <span
-                  class="mt-0.5 block text-xs text-gray-500
-                         dark:text-gray-400"
-                >
-                  See your profile
-                </span>
-
               </span>
 
-              <i
-                class="fa-solid fa-chevron-right
-                       text-xs text-gray-400"
-                aria-hidden="true"
-              ></i>
+              <i class="fa-solid fa-chevron-right chevron" aria-hidden="true"></i>
             </a>
 
-            <div
-              class="my-2 h-px bg-gray-100
-                     dark:bg-[#3e4042]"
-            ></div>
+            <div class="dropdown-divider" role="separator"></div>
 
             <!-- SETTINGS -->
+
             <a
               routerLink="/main/change"
-              class="dropdown-item flex items-center gap-3
-                     rounded-xl px-3 py-2.5 text-sm
-                     font-medium text-gray-700 no-underline
-                     transition-colors hover:bg-gray-50
-                     dark:text-gray-200 dark:hover:bg-[#3a3b3c]"
+              class="dropdown-item"
               role="menuitem"
               (click)="closeMenus()"
             >
-              <span
-                class="flex w-5 items-center justify-center
-                       text-gray-400"
-              >
+              <span class="dropdown-icon" aria-hidden="true">
                 <i class="fa-solid fa-gear"></i>
               </span>
 
-              <span class="flex-1">Settings</span>
+              <span class="dropdown-label">{{ 'NAV.SETTINGS' | translate }}</span>
 
-              <i
-                class="fa-solid fa-chevron-right
-                       text-xs text-gray-400"
-                aria-hidden="true"
-              ></i>
+              <i class="fa-solid fa-chevron-right chevron" aria-hidden="true"></i>
             </a>
 
             <!-- DARK MODE -->
+
             <button
               type="button"
-              class="dropdown-item flex w-full items-center
-                     justify-between rounded-xl border-0
-                     bg-transparent px-3 py-2.5 text-sm
-                     font-medium text-gray-700 transition-colors
-                     hover:bg-gray-50 dark:text-gray-200
-                     dark:hover:bg-[#3a3b3c]"
+              class="dropdown-item"
               role="menuitemcheckbox"
               [attr.aria-checked]="isDarkMode"
               (click)="toggleTheme()"
             >
-              <span class="flex items-center gap-3">
-
-                <span
-                  class="flex w-5 items-center justify-center
-                         text-gray-400"
-                >
-                  <i
-                    class="fa-solid"
-                    [class.fa-sun]="isDarkMode"
-                    [class.fa-moon]="!isDarkMode"
-                    aria-hidden="true"
-                  ></i>
-                </span>
-
-                <span>Dark mode</span>
-
-              </span>
-
-              <span
-                class="relative h-6 w-10 rounded-full
-                       bg-gray-300 transition-colors
-                       dark:bg-[#555]"
-                [class.bg-primary]="isDarkMode"
-                aria-hidden="true"
-              >
-                <span
-                  class="absolute left-1 top-1 h-4 w-4
-                         rounded-full bg-white shadow-sm
-                         transition-transform"
-                  [class.translate-x-4]="isDarkMode"
-                ></span>
-              </span>
-            </button>
-
-            <div
-              class="my-2 h-px bg-gray-100
-                     dark:bg-[#3e4042]"
-            ></div>
-
-            <!-- LOGOUT -->
-            <button
-              type="button"
-              class="dropdown-item logout-item flex w-full
-                     items-center gap-3 rounded-xl border-0
-                     bg-transparent px-3 py-2.5 text-sm
-                     font-medium text-red-600 transition-colors
-                     hover:bg-red-50 dark:hover:bg-red-950/30"
-              role="menuitem"
-              (click)="logOut()"
-            >
-              <span
-                class="flex w-5 items-center justify-center"
-              >
+              <span class="dropdown-icon" aria-hidden="true">
                 <i
-                  class="fa-solid fa-arrow-right-from-bracket"
-                  aria-hidden="true"
+                  class="fa-solid"
+                  [class.fa-sun]="isDarkMode"
+                  [class.fa-moon]="!isDarkMode"
                 ></i>
               </span>
 
-              <span>Log out</span>
+              <span class="dropdown-label">{{ 'NAV.DARK_MODE' | translate }}</span>
+
+              <span class="switch" [class.is-on]="isDarkMode" aria-hidden="true">
+                <span class="switch-thumb"></span>
+              </span>
+            </button>
+
+            <div class="dropdown-divider" role="separator"></div>
+
+            <!-- LOGOUT -->
+
+            <button
+              type="button"
+              class="dropdown-item logout-item"
+              role="menuitem"
+              (click)="logOut()"
+            >
+              <span class="dropdown-icon" aria-hidden="true">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              </span>
+
+              <span class="dropdown-label">{{ 'NAV.LOGOUT' | translate }}</span>
             </button>
 
           </div>
@@ -441,177 +283,92 @@
       </div>
 
     </div>
-
   </div>
 
   <!-- =================================================
-       MOBILE SEARCH PANEL
+       SEARCH PANEL (below 992px)
   ================================================== -->
 
   @if (isSearchOpen) {
-
-    <div
-      id="mobile-search-panel"
-      class="search-panel absolute left-0 top-full z-[110]
-             w-full border-t border-gray-100 bg-white
-             p-3 shadow-lg dark:border-[#3e4042]
-             dark:bg-[#242526] md:hidden"
-    >
-      <label
-        class="flex w-full items-center gap-3 rounded-xl
-               border border-gray-200 bg-gray-50 px-3 py-3
-               transition-all focus-within:border-primary
-               focus-within:bg-white
-               focus-within:ring-2 focus-within:ring-primary/10
-               dark:border-[#3e4042] dark:bg-[#3a3b3c]
-               dark:focus-within:bg-[#242526]"
-      >
-        <i
-          class="fa-solid fa-magnifying-glass text-sm
-                 text-gray-400"
-          aria-hidden="true"
-        ></i>
+    <div id="mobile-search-panel" class="search-panel">
+      <label class="search-pill search-pill-panel">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
 
         <input
           type="search"
           [value]="searchText"
           (input)="onSearchInput($event)"
-          placeholder="Search Route Posts"
-          aria-label="Search Route Posts"
-          class="w-full min-w-0 border-none bg-transparent
-                 text-sm text-gray-700 outline-none
-                 focus:ring-0 dark:text-gray-100"
+          [placeholder]="'NAV.SEARCH' | translate"
+          [attr.aria-label]="'NAV.SEARCH' | translate"
           autofocus
         />
       </label>
     </div>
-
   }
 
   <!-- =================================================
-       MOBILE NAVIGATION
+       MOBILE NAVIGATION (below 768px)
   ================================================== -->
 
   @if (isMobileMenuOpen) {
+    <div id="mobile-navigation" class="mobile-navigation">
 
-    <div
-      id="mobile-navigation"
-      class="mobile-navigation absolute left-0 top-full
-             z-[110] flex w-full flex-col gap-1.5
-             border-t border-gray-100 bg-white px-3 py-3
-             shadow-lg dark:border-[#3e4042]
-             dark:bg-[#242526] md:hidden"
-    >
-
-      <!-- HOME -->
       <a
         routerLink="/main/home"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
-        class="mobile-nav-link flex items-center gap-3
-               rounded-xl px-3 py-2.5 font-medium
-               text-gray-700 no-underline transition-colors
-               hover:bg-gray-50 dark:text-gray-200
-               dark:hover:bg-[#3a3b3c]"
+        class="mobile-nav-link"
         (click)="closeMenus()"
       >
-        <span
-          class="mobile-nav-icon flex h-10 w-10
-                 items-center justify-center rounded-xl
-                 bg-gray-100 text-gray-500
-                 dark:bg-[#3a3b3c] dark:text-gray-200"
-        >
+        <span class="mobile-nav-icon" aria-hidden="true">
           <i class="fa-solid fa-house"></i>
         </span>
-
-        <span class="flex-1">Home</span>
-
-        <i
-          class="fa-solid fa-chevron-right
-                 text-xs text-gray-400"
-          aria-hidden="true"
-        ></i>
+        <span>{{ 'NAV.HOME' | translate }}</span>
+        <i class="fa-solid fa-chevron-right chevron" aria-hidden="true"></i>
       </a>
 
-      <!-- PROFILE -->
       <a
         routerLink="/main/profile"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
-        class="mobile-nav-link flex items-center gap-3
-               rounded-xl px-3 py-2.5 font-medium
-               text-gray-700 no-underline transition-colors
-               hover:bg-gray-50 dark:text-gray-200
-               dark:hover:bg-[#3a3b3c]"
+        class="mobile-nav-link"
         (click)="closeMenus()"
       >
-        <span
-          class="mobile-nav-icon flex h-10 w-10
-                 items-center justify-center rounded-xl
-                 bg-gray-100 text-gray-500
-                 dark:bg-[#3a3b3c] dark:text-gray-200"
-        >
+        <span class="mobile-nav-icon" aria-hidden="true">
           <i class="fa-solid fa-user"></i>
         </span>
-
-        <span class="flex-1">Profile</span>
-
-        <i
-          class="fa-solid fa-chevron-right
-                 text-xs text-gray-400"
-          aria-hidden="true"
-        ></i>
+        <span>{{ 'NAV.PROFILE' | translate }}</span>
+        <i class="fa-solid fa-chevron-right chevron" aria-hidden="true"></i>
       </a>
 
-      <!-- NOTIFICATIONS -->
       <a
         routerLink="/main/notification"
         routerLinkActive="nav-active"
         ariaCurrentWhenActive="page"
-        class="mobile-nav-link flex items-center gap-3
-               rounded-xl px-3 py-2.5 font-medium
-               text-gray-700 no-underline transition-colors
-               hover:bg-gray-50 dark:text-gray-200
-               dark:hover:bg-[#3a3b3c]"
+        class="mobile-nav-link"
         [attr.aria-label]="
-          'Notifications, ' +
-          unreadNotificationsCount() +
-          ' unread'
+          ('NAV.NOTIFICATIONS' | translate) + ', ' +
+          unreadNotificationsCount() + ' ' +
+          ('NAV.UNREAD' | translate)
         "
         (click)="closeMenus()"
       >
-        <span
-          class="mobile-nav-icon flex h-10 w-10
-                 items-center justify-center rounded-xl
-                 bg-gray-100 text-gray-500
-                 dark:bg-[#3a3b3c] dark:text-gray-200"
-        >
+        <span class="mobile-nav-icon" aria-hidden="true">
           <i class="fa-solid fa-bell"></i>
         </span>
-
-        <span class="flex-1">Notifications</span>
+        <span>{{ 'NAV.NOTIFICATIONS' | translate }}</span>
 
         @if (hasUnreadNotifications) {
-          <span
-            class="mobile-notification-badge"
-            aria-live="polite"
-            aria-atomic="true"
-          >
+          <span class="mobile-notification-badge" aria-hidden="true">
             {{ notificationBadgeText }}
           </span>
         } @else {
-          <i
-            class="fa-solid fa-chevron-right
-                   text-xs text-gray-400"
-            aria-hidden="true"
-          ></i>
+          <i class="fa-solid fa-chevron-right chevron" aria-hidden="true"></i>
         }
-
       </a>
 
     </div>
-
   }
 
 </nav>
@@ -620,15 +377,11 @@
      MENU BACKDROP
 ===================================================== -->
 
-@if (isProfileMenuOpen || isMobileMenuOpen) {
-
+@if (isProfileMenuOpen || isMobileMenuOpen || isSearchOpen) {
   <button
     type="button"
-    class="menu-backdrop fixed inset-0 z-[90]
-           cursor-default border-0 bg-black/20
-           backdrop-blur-[2px]"
-    aria-label="Close menu"
+    class="menu-backdrop"
+    [attr.aria-label]="'NAV.CLOSE_MENU' | translate"
     (click)="closeMenus()"
   ></button>
-
 }

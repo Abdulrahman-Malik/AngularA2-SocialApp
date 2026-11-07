@@ -1,0 +1,52 @@
+
+{
+  "COMMON": {
+    "LOGIN": "تسجيل الدخول",
+    "REGISTER": "إنشاء حساب",
+    "LOADING": "جارٍ التحميل...",
+    "EMAIL": "البريد الإلكتروني",
+    "PASSWORD": "كلمة المرور",
+    "REQUIRED": "هذا الحقل مطلوب.",
+    "CREATE_ACCOUNT": "إنشاء حسابك"
+  },
+  "BRAND": {
+    "NAME": "Route Posts",
+    "TAGLINE": "مجتمعك، على بُعد نقرة واحدة."
+  },
+  "LOGIN": {
+    "WELCOME_LABEL": "مرحبًا بعودتك",
+    "TITLE": "أهلًا بعودتك!",
+    "DESCRIPTION": "سجّل الدخول إلى Route Posts وتابع من حيث توقفت.",
+    "EMAIL_OR_USERNAME": "البريد الإلكتروني أو اسم المستخدم",
+    "EMAIL_OR_USERNAME_PLACEHOLDER": "أدخل البريد الإلكتروني أو اسم المستخدم",
+    "EMAIL_OR_USERNAME_REQUIRED": "البريد الإلكتروني أو اسم المستخدم مطلوب.",
+    "PASSWORD_LABEL": "كلمة المرور",
+    "PASSWORD_PLACEHOLDER": "أدخل كلمة المرور",
+    "PASSWORD_REQUIRED": "كلمة المرور مطلوبة.",
+    "FORGOT_PASSWORD": "هل نسيت كلمة المرور؟",
+    "REMEMBER_ME": "تذكرني",
+    "SECURE_SIGN_IN": "تسجيل دخول آمن",
+    "SUBMIT": "تسجيل الدخول",
+    "ERROR_INVALID_CREDENTIALS": "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+    "ERROR_GENERIC": "تعذر تسجيل الدخول. حاول مرة أخرى.",
+    "NEW_HERE": "ليس لديك حساب في Route Posts؟",
+    "REGISTER_CTA": "أنشئ حسابك",
+    "PRIVACY_NOTICE": "خصوصيتك وأمانك مهمان بالنسبة لنا."
+  },
+  "NAV": {
+    "SEARCH": "ابحث في Route Posts...",
+    "HOME": "الرئيسية",
+    "PROFILE": "الملف الشخصي",
+    "NOTIFICATIONS": "الإشعارات",
+    "UNREAD": "غير مقروء",
+    "CHANGE_LANGUAGE": "تغيير اللغة",
+    "TOGGLE_MENU": "فتح أو إغلاق قائمة التنقل",
+    "OPEN_PROFILE_MENU": "فتح قائمة الملف الشخصي",
+    "PROFILE_MENU": "قائمة الملف الشخصي",
+    "SEE_PROFILE": "عرض الملف الشخصي",
+    "SETTINGS": "الإعدادات",
+    "DARK_MODE": "الوضع الداكن",
+    "LOGOUT": "تسجيل الخروج",
+    "CLOSE_MENU": "إغلاق القائمة"
+  }
+}

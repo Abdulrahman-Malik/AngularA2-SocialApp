@@ -1,0 +1,64 @@
+
+/* =========================================
+   Global Language Direction
+========================================= */
+
+/* Arabic RTL */
+html[dir="rtl"] {
+  direction: rtl;
+}
+
+html[dir="rtl"] body {
+  direction: rtl;
+  text-align: right;
+}
+
+/* English LTR */
+html[dir="ltr"] {
+  direction: ltr;
+}
+
+html[dir="ltr"] body {
+  direction: ltr;
+  text-align: left;
+}
+
+/* =========================================
+   Arabic Typography
+========================================= */
+
+html[lang="ar"] body {
+  font-family: "Cairo", "Tajawal", sans-serif;
+  letter-spacing: normal;
+}
+
+/* Remove excessive English-style letter spacing */
+html[lang="ar"] .tracking-tight,
+html[lang="ar"] .tracking-wider,
+html[lang="ar"] .tracking-widest,
+html[lang="ar"] .tracking-\[3px\],
+html[lang="ar"] .tracking-\[2\.5px\] {
+  letter-spacing: normal;
+}
+
+/* =========================================
+   Form Elements
+========================================= */
+
+html[dir="rtl"] input,
+html[dir="rtl"] textarea {
+  text-align: right;
+}
+
+html[dir="ltr"] input,
+html[dir="ltr"] textarea {
+  text-align: left;
+}
+
+/* =========================================
+   Font Awesome Icons
+========================================= */
+
+html[dir="rtl"] .fa-arrow-right {
+  transform: rotate(180deg);
+}

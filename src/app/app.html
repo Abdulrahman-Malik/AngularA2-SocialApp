@@ -1,6 +1,17 @@
+<!-- Global Loading Spinner -->
+<ngx-spinner
+  name="httpLoader"
+  bdColor="rgba(0, 0, 0, .5)"
+  [fullScreen]="true"
+  [zIndex]="99999"
+  [template]="loadingTemplate"
+>
+</ngx-spinner>
 
+<!-- Main Router -->
 <router-outlet />
 
+<!-- PWA Install Banner -->
 @if (installBannerVisible()) {
   <aside
     class="pwa-install-card"
@@ -8,6 +19,7 @@
     dir="rtl"
     aria-label="تثبيت تطبيق Route Posts"
   >
+    <!-- Close Button -->
     <button
       type="button"
       class="pwa-install-card__close"
@@ -18,7 +30,9 @@
       &times;
     </button>
 
+    <!-- Header -->
     <div class="pwa-install-card__header">
+
       <div class="pwa-install-card__icon" aria-hidden="true">
         <svg
           viewBox="0 0 24 24"
@@ -38,6 +52,7 @@
       </div>
 
       <div class="pwa-install-card__content">
+
         <span class="pwa-install-card__eyebrow">
           ROUTE POSTS
         </span>
@@ -47,9 +62,11 @@
         <p>
           ثبّت التطبيق وافتحه بسهولة من الشاشة الرئيسية.
         </p>
+
       </div>
     </div>
 
+    <!-- Install Button -->
     <button
       type="button"
       class="pwa-install-card__action"
@@ -77,11 +94,17 @@
     <p class="pwa-install-card__hint">
       ستختفي هذه الرسالة تلقائيًا
     </p>
+
   </aside>
 }
 
+<!-- PWA Install Toast -->
 @if (installMessage()) {
-  <div class="pwa-install-toast" role="status" dir="rtl">
+  <div
+    class="pwa-install-toast"
+    role="status"
+    dir="rtl"
+  >
     {{ installMessage() }}
   </div>
 }

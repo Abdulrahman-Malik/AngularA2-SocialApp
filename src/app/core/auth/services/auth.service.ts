@@ -1,9 +1,9 @@
-
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+
 @Injectable({
   providedIn: 'root',
 })
@@ -24,6 +24,20 @@ export class AuthService {
       data
     );
   }
+
+  changePassword(payload: {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}): Observable<any> {
+  return this.httpClient.patch(
+    `${environment.baseUrl}/users/change-password`,
+    {
+      password: payload.currentPassword,
+      newPassword: payload.newPassword,
+    }
+  );
+}
 
   logOut(): void {
     localStorage.removeItem('token');
