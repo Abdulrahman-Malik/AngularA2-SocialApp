@@ -550,70 +550,60 @@ export class NotificationService {
   ====================================================== */
 
   private fetch(
-    page: number,
-  ): Observable<{
-    items: NotificationItem[];
-    hasMore: boolean;
-  }> {
+  page: number,
+): Observable<{
+  items: NotificationItem[];
+  hasMore: boolean;
+}> {
+  let params = new HttpParams()
+    .set('page', page)
+    .set('limit', this.limit);
 
-    const params = new HttpParams()
-      .set(
-        'unread',
-        this._filter() === 'unread'
-          ? 'true'
-          : 'false',
-      )
-      .set('page', page)
-      .set('limit', this.limit);
-
-    return this.http
-      .get<ApiResponse<NotificationsListResponse>>(
-        this.base,
-        {
-          params,
-          headers: this.getHeaders(),
-        },
-      )
-      .pipe(
-        map(response => {
-          const notifications =
-            response.data?.notifications ?? [];
-
-          const meta = response.data?.meta;
-
-          // Actual API pagination structure:
-          // meta.pagination.currentPage
-          // meta.pagination.numberOfPages
-          // meta.pagination.nextPage
-
-          const pagination = meta?.pagination;
-
-          const currentPage =
-            pagination?.currentPage ??
-            meta?.currentPage ??
-            page;
-
-          const totalPages =
-            pagination?.numberOfPages ??
-            meta?.numberOfPages ??
-            meta?.totalPages;
-
-          let hasMore: boolean;
-
-          if (pagination?.nextPage !== undefined) {
-            hasMore = pagination.nextPage !== null;
-          } else if (totalPages !== undefined) {
-            hasMore = currentPage < totalPages;
-          } else {
-            hasMore =
-              notifications.length === this.limit;
-          }
-
-          return {
-            items: notifications.map(toNotificationItem),
-            hasMore,
-          };
-        }),
-      );
+  if (this._filter() === 'unread') {
+    params = params.set('unread', 'true');
   }
+
+  return this.http
+    .get<ApiResponse<NotificationsListResponse>>(
+      this.base,
+      {
+        params,
+        headers: this.getHeaders(),
+      },
+    )
+    .pipe(
+      map(response => {
+        const notifications =
+          response.data?.notifications ?? [];
+
+        const meta = response.data?.meta;
+        const pagination = meta?.pagination;
+
+        const currentPage =
+          pagination?.currentPage ??
+          meta?.currentPage ??
+          page;
+
+        const totalPages =
+          pagination?.numberOfPages ??
+          meta?.numberOfPages ??
+          meta?.totalPages;
+
+        let hasMore: boolean;
+
+        if (pagination?.nextPage !== undefined) {
+          hasMore = pagination.nextPage !== null;
+        } else if (totalPages !== undefined) {
+          hasMore = currentPage < totalPages;
+        } else {
+          hasMore = notifications.length === this.limit;
+        }
+
+        return {
+          items: notifications.map(toNotificationItem),
+          hasMore,
+        };
+      }),
+    );
+}
 }

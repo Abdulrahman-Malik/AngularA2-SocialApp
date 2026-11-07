@@ -85,7 +85,7 @@ export type FeedPost = Omit<
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    CommentComponent, ViewDetialsComponent,
+    CommentComponent, 
     RouterLink
 ],
   templateUrl: './posts.component.html',
