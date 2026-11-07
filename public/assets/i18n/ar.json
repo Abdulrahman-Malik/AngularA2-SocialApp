@@ -48,5 +48,107 @@
     "DARK_MODE": "الوضع الداكن",
     "LOGOUT": "تسجيل الخروج",
     "CLOSE_MENU": "إغلاق القائمة"
+  },
+  "HOME": {
+    "CREATE_POST": {
+      "TITLE": "إنشاء منشور",
+      "SUBTITLE": "أفكارك تستحق أن تشاركها مع الآخرين.",
+      "SHARE_COMMUNITY": "شارك مع مجتمعك",
+      "AUDIENCE_LABEL": "جمهور المنشور",
+      "PUBLIC": "عام",
+      "FOLLOWERS": "المتابعون",
+      "ONLY_ME": "أنا فقط",
+      "WRITE_PLACEHOLDER": "بماذا تفكر؟",
+      "CHARACTER_COUNT": "{{current}} / 5000",
+      "MEDIA_ERROR": "حدث خطأ أثناء اختيار الملف.",
+      "PUBLISHING": "جارٍ النشر...",
+      "PUBLISH": "نشر المنشور",
+      "ADD_TO_POST": "أضف إلى منشورك",
+      "PHOTO_VIDEO": "صورة / فيديو",
+      "PEOPLE": "الأشخاص",
+      "FEELING": "الشعور أو النشاط",
+      "TAG_PEOPLE": "الإشارة إلى أشخاص",
+      "REMOVE_MEDIA": "إزالة الوسائط المرفقة",
+      "REMOVE_SELECTED_FILE": "إزالة الملف المحدد",
+      "SELECTED_MEDIA": "الوسائط المحددة",
+      "IMAGE_PREVIEW": "معاينة الصورة المحددة",
+      "POST_AUDIENCE": "اختر جمهور المنشور",
+      "AUDIENCE_DESCRIPTION": "اختر الأشخاص الذين يمكنهم مشاهدة هذا المنشور."
+    },
+    "AUDIENCE": {
+      "PUBLIC": "عام",
+      "PUBLIC_DESCRIPTION": "يمكن لأي شخص مشاهدة هذا المنشور.",
+      "FOLLOWERS": "المتابعون",
+      "FOLLOWERS_DESCRIPTION": "الأشخاص الذين يتابعونك.",
+      "PRIVATE": "أنا فقط",
+      "PRIVATE_DESCRIPTION": "يمكنك أنت فقط مشاهدة هذا المنشور.",
+      "CHANGE_AUDIENCE": "تغيير جمهور المنشور"
+    },
+    "FEED": {
+      "TITLE": "المنشورات",
+      "LOADING": "جارٍ تحميل المنشورات...",
+      "ERROR_TITLE": "تعذر تحميل المنشورات",
+      "ERROR_DESCRIPTION": "حدث خطأ أثناء تحميل المنشورات. يُرجى المحاولة مرة أخرى.",
+      "TRY_AGAIN": "حاول مرة أخرى",
+      "EMPTY_TITLE": "لا توجد منشورات هنا حاليًا.",
+      "EMPTY_DESCRIPTION": "عندما تتوفر منشورات جديدة، ستجدها هنا.",
+      "REFRESH": "تحديث المنشورات",
+      "USER": "مستخدم",
+      "POST_OPTIONS": "خيارات المنشور",
+      "CREATED_AT": "تاريخ النشر",
+      "MADE_FOR_CONNECTIONS": "صُممنا لبناء علاقات حقيقية."
+    },
+    "POST": {
+      "LIKES": "إعجاب",
+      "COMMENTS": "تعليق",
+      "COMMENTS_PLURAL": "تعليقات",
+      "SHARES": "مشاركة",
+      "SHARES_PLURAL": "مشاركات",
+      "LIKE": "أعجبني",
+      "REMOVE_REACTION": "إزالة التفاعل",
+      "CHOOSE_REACTION": "اختر تفاعلًا",
+      "CLOSE_REACTIONS": "إغلاق التفاعلات",
+      "COMMENT": "تعليق",
+      "SHARE": "مشاركة",
+      "SAVE": "حفظ المنشور",
+      "UNSAVE": "إزالة المنشور من المحفوظات",
+      "TURN_ON_NOTIFICATIONS": "تفعيل إشعارات المنشور",
+      "TURN_OFF_NOTIFICATIONS": "إيقاف إشعارات المنشور",
+      "DELETE": "حذف المنشور",
+      "VIEW_DETAILS": "استكشف تفاصيل المنشور",
+      "DETAILS_DESCRIPTION": "عرض المعلومات الكاملة لهذا المنشور",
+      "VIEW_POST": "عرض المنشور",
+      "POST_DETAILS_LABEL": "عرض التفاصيل الكاملة للمنشور {{id}}",
+      "COMMENTS_LABEL": "تعليقات المنشور",
+      "POST_IMAGE": "صورة المنشور",
+      "LIKES_LABEL": "{{count}} إعجاب",
+      "REACTIONS": {
+        "LIKE": "أعجبني",
+        "LOVE": "أحببته",
+        "HAHA": "هاها",
+        "WOW": "واو",
+        "SAD": "حزين",
+        "ANGRY": "غاضب"
+      }
+    },
+    "MESSAGES": {
+      "PUBLISH_SUCCESS": "تم نشر منشورك بنجاح.",
+      "PUBLISH_ERROR": "تعذر نشر المنشور. يُرجى المحاولة مرة أخرى.",
+      "DELETE_SUCCESS": "تم حذف المنشور بنجاح.",
+      "DELETE_ERROR": "تعذر حذف المنشور.",
+      "SAVE_SUCCESS": "تم حفظ المنشور بنجاح.",
+      "UNSAVE_SUCCESS": "تمت إزالة المنشور من المنشورات المحفوظة.",
+      "PRIVACY_SUCCESS": "تم تحديث جمهور المنشور بنجاح.",
+      "PRIVACY_ERROR": "تعذر تحديث جمهور المنشور.",
+      "SHARE_SUCCESS": "تمت مشاركة المنشور بنجاح.",
+      "SHARE_ERROR": "تعذرت مشاركة المنشور."
+    },
+    "COMMENTS": {
+      "LOAD_ERROR": "تعذر تحميل التعليقات."
+    },
+    "FOOTER": {
+      "BRAND": "Route Posts",
+      "TAGLINE": "صُممنا لبناء علاقات حقيقية."
+    }
   }
 }

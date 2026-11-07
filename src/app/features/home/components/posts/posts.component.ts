@@ -17,6 +17,7 @@ import { Post } from './models/post.interface';
 import { CommentComponent } from './comment/comment.component';
 import { ViewDetialsComponent } from '../../../feed/view-detials.component';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 /* =========================================================
    TYPES
@@ -85,8 +86,8 @@ export type FeedPost = Omit<
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    CommentComponent, 
-    RouterLink
+    CommentComponent,
+    RouterLink,TranslatePipe
 ],
   templateUrl: './posts.component.html',
   styleUrl: './posts.component.css',

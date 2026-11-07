@@ -1,4 +1,3 @@
-
 {
   "COMMON": {
     "LOGIN": "Login",
@@ -48,5 +47,107 @@
     "DARK_MODE": "Dark mode",
     "LOGOUT": "Log out",
     "CLOSE_MENU": "Close menu"
+  },
+  "HOME": {
+    "CREATE_POST": {
+      "TITLE": "Create a post",
+      "SUBTITLE": "Your thoughts deserve to be shared.",
+      "SHARE_COMMUNITY": "Share with your community",
+      "AUDIENCE_LABEL": "Post audience",
+      "PUBLIC": "Public",
+      "FOLLOWERS": "Followers",
+      "ONLY_ME": "Only me",
+      "WRITE_PLACEHOLDER": "What's on your mind?",
+      "CHARACTER_COUNT": "{{current}} / 5000",
+      "MEDIA_ERROR": "An error occurred while selecting the file.",
+      "PUBLISHING": "Publishing...",
+      "PUBLISH": "Publish post",
+      "ADD_TO_POST": "Add to your post",
+      "PHOTO_VIDEO": "Photo / Video",
+      "PEOPLE": "People",
+      "FEELING": "Feeling or activity",
+      "TAG_PEOPLE": "Tag people",
+      "REMOVE_MEDIA": "Remove attached media",
+      "REMOVE_SELECTED_FILE": "Remove selected file",
+      "SELECTED_MEDIA": "Selected media",
+      "IMAGE_PREVIEW": "Selected image preview",
+      "POST_AUDIENCE": "Choose post audience",
+      "AUDIENCE_DESCRIPTION": "Choose who can see this post."
+    },
+    "AUDIENCE": {
+      "PUBLIC": "Public",
+      "PUBLIC_DESCRIPTION": "Anyone can see this post.",
+      "FOLLOWERS": "Followers",
+      "FOLLOWERS_DESCRIPTION": "People who follow you.",
+      "PRIVATE": "Only me",
+      "PRIVATE_DESCRIPTION": "Only you can see this post.",
+      "CHANGE_AUDIENCE": "Change post audience"
+    },
+    "FEED": {
+      "TITLE": "Posts",
+      "LOADING": "Loading posts...",
+      "ERROR_TITLE": "We couldn't load your feed",
+      "ERROR_DESCRIPTION": "Something went wrong while loading posts. Please try again.",
+      "TRY_AGAIN": "Try again",
+      "EMPTY_TITLE": "It's quiet here for now.",
+      "EMPTY_DESCRIPTION": "When posts become available, you'll find them here.",
+      "REFRESH": "Refresh feed",
+      "USER": "User",
+      "POST_OPTIONS": "Post options",
+      "CREATED_AT": "Post date",
+      "MADE_FOR_CONNECTIONS": "Made for meaningful connections."
+    },
+    "POST": {
+      "LIKES": "Like",
+      "COMMENTS": "Comment",
+      "COMMENTS_PLURAL": "Comments",
+      "SHARES": "Share",
+      "SHARES_PLURAL": "Shares",
+      "LIKE": "Like",
+      "REMOVE_REACTION": "Remove reaction",
+      "CHOOSE_REACTION": "Choose a reaction",
+      "CLOSE_REACTIONS": "Close reactions",
+      "COMMENT": "Comment",
+      "SHARE": "Share",
+      "SAVE": "Save post",
+      "UNSAVE": "Remove saved post",
+      "TURN_ON_NOTIFICATIONS": "Turn on notifications",
+      "TURN_OFF_NOTIFICATIONS": "Turn off notifications",
+      "DELETE": "Delete post",
+      "VIEW_DETAILS": "Explore Post Details",
+      "DETAILS_DESCRIPTION": "View complete information about this post",
+      "VIEW_POST": "View Post",
+      "POST_DETAILS_LABEL": "View complete details for post {{id}}",
+      "COMMENTS_LABEL": "Post comments",
+      "POST_IMAGE": "Post image",
+      "LIKES_LABEL": "{{count}} likes",
+      "REACTIONS": {
+        "LIKE": "Like",
+        "LOVE": "Love",
+        "HAHA": "Haha",
+        "WOW": "Wow",
+        "SAD": "Sad",
+        "ANGRY": "Angry"
+      }
+    },
+    "MESSAGES": {
+      "PUBLISH_SUCCESS": "Your post has been published successfully.",
+      "PUBLISH_ERROR": "Unable to publish your post. Please try again.",
+      "DELETE_SUCCESS": "Post deleted successfully.",
+      "DELETE_ERROR": "Unable to delete the post.",
+      "SAVE_SUCCESS": "Post saved successfully.",
+      "UNSAVE_SUCCESS": "Post removed from saved posts.",
+      "PRIVACY_SUCCESS": "Post audience updated successfully.",
+      "PRIVACY_ERROR": "Unable to update post audience.",
+      "SHARE_SUCCESS": "Post shared successfully.",
+      "SHARE_ERROR": "Unable to share the post."
+    },
+    "COMMENTS": {
+      "LOAD_ERROR": "Unable to load comments."
+    },
+    "FOOTER": {
+      "BRAND": "Route Posts",
+      "TAGLINE": "Made for meaningful connections."
+    }
   }
 }
